@@ -1,0 +1,20 @@
+require('root/env.js');
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const bodyParser = require('body-parser');
+
+const app = express();
+app.use(bodyParser.json());
+
+const db = require('root/lib/db.js');
+
+const controllers = fs.readdirSync('./routes').map(name => {
+  return require(path.resolve('./routes', path.parse(name).name))(app);
+});
+
+process.on('unhandledRejection', function(reason, p) {
+  console.error("Unhandled Rejection at: Promise ", p, " reason: ", reason);
+});
+
+module.exports = app;

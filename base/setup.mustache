@@ -1,0 +1,15 @@
+const r = require('root/lib/db');
+
+const tables = fs.readdirSync('root/tables').map(table => {
+  return require(path.resolve('./tables', path.parse(name).name));
+});
+
+module.exports = () => {
+  return r.dbCreate(process.env.RETHINK_NAME).run()
+  .catch((err) => {
+    var arr = err.message.split('\n');
+    if (arr[0] === 'Database `'+process.env.RETHINK_NAME+'` already exists in:') return;
+    throw err;
+  })
+  .then(Promise.all(tables));
+};

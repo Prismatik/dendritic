@@ -1,0 +1,15 @@
+var fs = require('fs');
+var path = require('path');
+
+const app = require('root/index.js');
+
+const server = app.listen(process.env.PORT, () => {
+  files = fs.readdirSync('./tests').filter(function(file) {
+    if (file === 'index.js') return false;
+    if (file === 'fixtures') return false;
+    if (file.indexOf('swp') > -1) return false;
+    return file.indexOf('.js');
+  }).forEach(function(file) {
+    require(path.resolve('./tests/'+file));
+  });
+});
