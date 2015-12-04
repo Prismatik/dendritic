@@ -1,9 +1,9 @@
 const jsen = require('jsen');
 
 const db = require('../lib/db.js');
-const validate = jsen(require('../schemas/sprint.json'));
+const validate = jsen(require('../schemas/{{name}}.json'));
 
-const firstChange res => return res.changes[0]
+const firstChange = res => res.changes[0]
 
 module.exports = {
   get: (params) => {

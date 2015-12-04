@@ -1,4 +1,4 @@
-const test = require('./tape');
+const test = require('blue-tape');
 const fetch = require('node-fetch');
 
 const assertOk = (t) => {
@@ -61,7 +61,7 @@ test('GET /{{pluralName}}/:id should return 200', (t) => {
   const {{name}} = fixture.valid();
   return {{name}}Poster({{name}})
   .then(unwrapJSON)
-  .then(body => getJSON('/{{pluralName}}/'+body.id)
+  .then(body => getJSON('/{{pluralName}}/'+body.id))
   .then(assertOk(t));
 });
 
@@ -69,7 +69,7 @@ test('POSTing a valid {{name}} should actually persist it', (t) => {
   const {{name}} = fixture.valid();
   return {{name}}Poster({{name}})
   .then(unwrapJSON)
-  .then(body => getJSON('/{{pluralName}}/'+body.id)
+  .then(body => getJSON('/{{pluralName}}/'+body.id))
   .then((json) => {
     t.equal(json.name, {{name}}.name);
   });
@@ -85,7 +85,7 @@ test('POSTing an updated {{name}} should actually persist it', (t) => {
   })
   .then(body => poster('{{name}}/'+body.id)(body))
   .then(unwrapJSON)
-  .then(body => getJSON('/{{pluralName}}/'+body.id)
+  .then(body => getJSON('/{{pluralName}}/'+body.id))
   .then((json) => {
     t.equal(json.name, 'Something else');
   });
@@ -106,7 +106,7 @@ test('DELETEing a {{name}} should actually delete it', (t) => {
   .then(unwrapJSON)
   .then(body => deleter('{{name}}/'+body.id)(body))
   .then(unwrapOldVal)
-  .then(body => getJSON('/{{pluralName}}/'+body.id)
+  .then(body => getJSON('/{{pluralName}}/'+body.id))
   .then(res => {
     t.equal(res.statusCode, 404);
   });
