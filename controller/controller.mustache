@@ -1,0 +1,30 @@
+const jsen = require('jsen');
+
+const db = require('../lib/db.js');
+const validate = jsen(require('../schemas/sprint.json'));
+
+const firstChange res => return res.changes[0]
+
+module.exports = {
+  get: (params) => {
+    if (params.id) return db.table('{{pluralName}}').get(params.id).run()
+
+    return db.table('{{pluralName}}').run()
+  },
+  create: ({{name}}) => {
+    const valid = validate({{name}});
+    if (!valid) return Promise.reject(valid);
+    return db.table('{{pluralName}}').insert({{name}}, {returnChanges: true}).run()
+    .then(firstChange);
+  },
+  update: ({{name}}) => {
+    const valid = validate({{name}});
+    if (!valid) return Promise.reject(valid);
+    return db.table('{{pluralName}}').update({{name}}, {returnChanges: true}).run()
+    .then(firstChange);
+  },
+  delete: ({{name}}) => {
+    return db.table('{{pluralName}}').get({{name}}.id).delete({returnChanges: true}).run()
+    .then(firstChange);
+  }
+};

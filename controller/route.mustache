@@ -1,0 +1,45 @@
+const _ = require('lodash');
+const {{name}} = require('../controllers/{{name}}.js');
+
+const errHandlerFactory = res => {
+  return err => {
+    console.error(JSON.stringify(err, null, 2));
+    res.status(500).end('db err');
+  }
+};
+
+const respond = res => body => {
+  return Promise.resolve(res.json(body));
+};
+
+module.exports = app => {
+  app.get('/{{pluralName}}', (req, res) => {
+    {{name}}.get()
+    .then(respond(res))
+    .catch( errHandlerFactory(res) )
+  });
+
+  app.get('/{{pluralName}}/:id', (req, res) => {
+    {{name}}.get({id: req.params.id})
+    .then(respond(res))
+    .catch( errHandlerFactory(res) )
+  });
+
+  app.post('/{{pluralName}}', (req, res) => {
+    {{name}}.create(req.body)
+    .then(respond(res))
+    .catch( errHandlerFactory(res) )
+  });
+
+  app.post('/{{pluralName}}/:id', (req, res) => {
+    {{name}}.update(req.body)
+    .then(respond(res))
+    .catch( errHandlerFactory(res) )
+  });
+
+  app.delete('/{{pluralName}}/:id', (req, res) => {
+    {{name}}.delete(req.body)
+    .then(respond(res))
+    .catch( errHandlerFactory(res) )
+  });
+};

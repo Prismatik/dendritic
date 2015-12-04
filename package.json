@@ -1,0 +1,12 @@
+{
+  "name": "glume",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "david@banham.id.au",
+  "license": "ISC",
+  "dependencies": {
+    "mkdirp": "^0.5.1",
+    "mustache": "^2.2.0"
+  }
+}
