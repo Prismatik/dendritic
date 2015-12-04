@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
 const mustache = require('mustache');
-
+const _ = require('lodash');
 
 module.exports = (name, pluralName) => {
   const opts = {
@@ -14,17 +14,18 @@ module.exports = (name, pluralName) => {
 
   const things = [
     {n: 'db', p: 'lib'},
-    {n: 'index', p: ''},
-    {n: 'start', p: ''},
-    {n: 'test', p: ''},
-    {n: 'setup', p: ''},
-    {n: 'env', p: ''},
-  ]
+    {n: 'index'},
+    {n: 'start'},
+    {n: 'test'},
+    {n: 'setup'},
+    {n: 'env'},
+    {n: 'package', e: 'json'},
+  ].map(thing => _.extend({p: '', e: 'js'}, thing));
 
   things.forEach(thing => {
     const template = fs.readFileSync(__dirname + '/'+thing.n+'.mustache').toString();
     const dir = path.join(process.cwd(), thing.p);
-    const target = path.join(dir, thing.n+'.js');
+    const target = path.join(dir, thing.n+'.'+thing.e);
     console.log('writing', thing.n, 'to', target);
     if (fs.existsSync(target)) return console.error(target, 'already exists. Not overwriting it');
 
@@ -33,11 +34,9 @@ module.exports = (name, pluralName) => {
     fs.writeFileSync(target, rendered);
   });
 
-  try {
-    const dir = path.join(process.cwd(), 'node_modules');
-    mkdirp.sync(dir);
-    fs.symlinkSync('..', path.join(dir, 'root'));
-  } catch (e) {
-    console.error('error creating root symlink', e);
-  };
+  const modulesDir = path.join(process.cwd(), 'node_modules');
+  if (!fs.existsSync(modulesDir)) mkdirp.sync(modulesDir);
+  const target = path.join(modulesDir, 'root');
+  if (!fs.existsSync(target)) fs.symlinkSync('..', target);
+
 };

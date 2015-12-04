@@ -5,8 +5,27 @@
   "main": "index.js",
   "author": "david@banham.id.au",
   "license": "ISC",
+  "bin": {
+    "glume": "./index.js"
+  },
+  "scripts": {
+    "test": "node test"
+  },
   "dependencies": {
+    "lodash": "^3.10.1",
     "mkdirp": "^0.5.1",
-    "mustache": "^2.2.0"
+    "mustache": "^2.2.0",
+    "rimraf": "^2.4.4"
+  },
+  "devDependencies": {
+    "blue-tape": "^0.1.11",
+    "jsen": "^0.6.0",
+    "json-schema-faker": "^0.2.5",
+    "lodash": "^3.10.1",
+    "node-fetch": "^1.3.3",
+    "required_env": "^1.0.0",
+    "restify": "^4.0.3",
+    "rethinkdbdash": "^2.2.8",
+    "rimraf": "^2.4.4"
   }
 }

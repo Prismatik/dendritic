@@ -1,11 +1,11 @@
 require('root/env.js');
-const express = require('express');
+const restify = require('restify');
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
 
-const app = express();
-app.use(bodyParser.json());
+const app = restify.createServer();
+app.use(restify.bodyParser());
 
 const db = require('root/lib/db.js');
 

@@ -6,6 +6,9 @@ module.exports = () => {
     if (err.message.split('\n')[0] === 'Table `'+process.env.RETHINK_NAME+'.{{pluralName}}` already exists in:') return;
     throw err;
   })
+  .then(() => {
+    db.table('{{pluralName}}').wait().run()
+  })
   //.then(() => r.table('entities').indexCreate('emails', { multi: true }).run())
   //.catch(err => {
   //  if (err.message.indexOf('Index `emails` already exists') > -1 )return;

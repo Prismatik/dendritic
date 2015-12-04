@@ -1,7 +1,10 @@
+const fs = require('fs');
+const path = require('path');
+
 const r = require('root/lib/db');
 
-const tables = fs.readdirSync('root/tables').map(table => {
-  return require(path.resolve('./tables', path.parse(name).name));
+const tables = fs.readdirSync('./tables').map(table => {
+  return require(path.resolve('./tables', path.parse(table).name));
 });
 
 module.exports = () => {
@@ -11,5 +14,7 @@ module.exports = () => {
     if (arr[0] === 'Database `'+process.env.RETHINK_NAME+'` already exists in:') return;
     throw err;
   })
-  .then(Promise.all(tables));
+  .then(() => {
+    return Promise.all(tables.map(table => table()))
+  })
 };

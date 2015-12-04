@@ -7,7 +7,7 @@ const firstChange = res => res.changes[0]
 
 module.exports = {
   get: (params) => {
-    if (params.id) return db.table('{{pluralName}}').get(params.id).run()
+    if (params && params.id) return db.table('{{pluralName}}').get(params.id).run()
 
     return db.table('{{pluralName}}').run()
   },
@@ -23,8 +23,8 @@ module.exports = {
     return db.table('{{pluralName}}').update({{name}}, {returnChanges: true}).run()
     .then(firstChange);
   },
-  delete: ({{name}}) => {
-    return db.table('{{pluralName}}').get({{name}}.id).delete({returnChanges: true}).run()
+  delete: (id) => {
+    return db.table('{{pluralName}}').get(id).delete({returnChanges: true}).run()
     .then(firstChange);
   }
 };

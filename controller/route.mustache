@@ -3,12 +3,17 @@ const {{name}} = require('../controllers/{{name}}.js');
 
 const errHandlerFactory = res => {
   return err => {
-    console.error(JSON.stringify(err, null, 2));
-    res.status(500).end('db err');
+    console.error('route error', err.message);
+    res.status(500);
+    res.json(err);
   }
 };
 
 const respond = res => body => {
+  if (!body || (Array.isArray(body) && body.length === 0)) {
+    res.status(404);
+    return Promise.resolve(res.json({err: 'Not found'}));
+  }
   return Promise.resolve(res.json(body));
 };
 
@@ -37,8 +42,8 @@ module.exports = app => {
     .catch( errHandlerFactory(res) )
   });
 
-  app.delete('/{{pluralName}}/:id', (req, res) => {
-    {{name}}.delete(req.body)
+  app.del('/{{pluralName}}/:id', (req, res) => {
+    {{name}}.delete(req.params.id)
     .then(respond(res))
     .catch( errHandlerFactory(res) )
   });
