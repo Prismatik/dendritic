@@ -17,4 +17,4 @@ spawn('node', ['../../index.js', 'base', appName, appName+'s'], opts);
 spawn('node', ['../../index.js', 'controller', controllerName, controllerName+'s'], opts);
 spawn('npm', ['test'], opts);
 
-//rimraf.sync(dir);
+rimraf.sync(dir);
