@@ -1,7 +1,8 @@
 const jsen = require('jsen');
 
 const db = require('../lib/db.js');
-const validate = jsen(require('../schemas/{{name}}.json'));
+const schema = require('../schemas/{{name}}.json');
+const validate = jsen(schema);
 
 const firstChange = res => {
   return {
@@ -14,12 +15,22 @@ const wrapResult = res => {
   return {result: res}
 }
 
+const properties = Object.keys(schema.properties);
+
 module.exports = {
   get: (params) => {
-    if (params && params.id) return db.table('{{pluralName}}').get(params.id).run()
-    .then(wrapResult)
+    const table = db.table('{{pluralName}}');
+    if (params && params.id) {
+      return table.get(params.id).run()
+      .then(wrapResult);
+    }
 
-    return db.table('{{pluralName}}').run()
+    const filterParams = properties.reduce((p, prop) => {
+      p[prop] = params[prop];
+      return p
+    }, {});
+
+    return table.filter(filterParams).run()
     .then(wrapResult)
   },
   create: ({{name}}) => {

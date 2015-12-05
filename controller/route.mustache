@@ -19,13 +19,13 @@ const respond = res => body => {
 
 module.exports = app => {
   app.get('/{{pluralName}}', (req, res) => {
-    {{name}}.get()
+    {{name}}.get(req.query)
     .then(respond(res))
     .catch( errHandlerFactory(res) )
   });
 
   app.get('/{{pluralName}}/:id', (req, res) => {
-    {{name}}.get({id: req.params.id})
+    {{name}}.get(_.assign({id: req.params.id}, req.query))
     .then(respond(res))
     .catch( errHandlerFactory(res) )
   });

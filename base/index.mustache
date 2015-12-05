@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 
 const app = restify.createServer();
 app.use(restify.bodyParser());
+app.use(restify.queryParser());
 
 const db = require('root/lib/db.js');
 

@@ -88,6 +88,27 @@ test('GET /{{pluralName}} should return an object with a .result property', (t) 
   });
 });
 
+test('GET /{{pluralName}} should accept search params in the querystring', (t) => {
+  return {{name}}Creator(2)
+  .then({{pluralName}} => {
+    return getJSON('/{{pluralName}}?name='+{{pluralName}}[0].name)
+    .then(json => {
+      t.equal(json.length, 1);
+      t.equal(json[0].name, {{pluralName}}[0].name);
+    });
+  });
+});
+
+test('GET /{{pluralName}} should not match non-property search params in the querystring', (t) => {
+  return {{name}}Creator(2)
+  .then({{pluralName}} => {
+    return getJSON('/{{pluralName}}?foo='+{{pluralName}}[0].name)
+    .then(json => {
+      t.ok(json.length > 1);
+    });
+  });
+});
+
 test('GET /{{pluralName}} should return an array', (t) => {
   return single{{name}}Creator()
   .then(() => getJSON('/{{pluralName}}'))
