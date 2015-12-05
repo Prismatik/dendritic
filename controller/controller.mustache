@@ -3,13 +3,24 @@ const jsen = require('jsen');
 const db = require('../lib/db.js');
 const validate = jsen(require('../schemas/{{name}}.json'));
 
-const firstChange = res => res.changes[0]
+const firstChange = res => {
+  return {
+    result: res.changes[0].new_val || res.changes[0],
+    old_val: res.changes[0].old_val
+  }
+}
+
+const wrapResult = res => {
+  return {result: res}
+}
 
 module.exports = {
   get: (params) => {
     if (params && params.id) return db.table('{{pluralName}}').get(params.id).run()
+    .then(wrapResult)
 
     return db.table('{{pluralName}}').run()
+    .then(wrapResult)
   },
   create: ({{name}}) => {
     const valid = validate({{name}});

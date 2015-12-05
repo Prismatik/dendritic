@@ -10,7 +10,7 @@ const assertOk = (t) => {
 
 const unwrapJSON = (res) => {
   return res.json()
-  .then(json => json.new_val || json);
+  .then(json => json.result);
 }
 
 const unwrapOldVal = (res) => {
@@ -66,6 +66,17 @@ test('GET /{{pluralName}} should return 200', (t) => {
   return {{name}}Poster({{name}})
   .then(fetch(url+'/{{pluralName}}'))
   .then(assertOk(t));
+});
+
+test('GET /{{pluralName}} should return an object with a .result property', (t) => {
+  const {{name}} = fixture.valid();
+  return {{name}}Poster({{name}})
+  .then(() => fetch(url+'/{{pluralName}}'))
+  .then(res => res.json())
+  .then(json => {
+    t.equal(typeof json, 'object');
+    t.ok(json.result);
+  });
 });
 
 test('GET /{{pluralName}} should return an array', (t) => {

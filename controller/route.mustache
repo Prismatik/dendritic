@@ -10,7 +10,7 @@ const errHandlerFactory = res => {
 };
 
 const respond = res => body => {
-  if (!body || (Array.isArray(body) && body.length === 0)) {
+  if (!body.result || (Array.isArray(body.result) && body.result.length === 0)) {
     res.status(404);
     return Promise.resolve(res.json({err: 'Not found'}));
   }
