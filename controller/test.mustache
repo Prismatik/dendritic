@@ -1,5 +1,6 @@
 const test = require('blue-tape');
 const fetch = require('node-fetch');
+const _ = require('lodash');
 const fixture = require('../fixtures/{{name}}');
 
 const assertOk = (t) => {
@@ -47,6 +48,18 @@ const deleter = suffix => () => {
 
 const {{name}}Poster = poster('/{{pluralName}}')
 
+const {{name}}Creator = times => {
+  return Promise.all(_.times(times, () => {
+    const data = fixture.valid();
+    return {{name}}Poster(data)
+    .then(unwrapJSON)
+  }));
+};
+
+const pop = data => data[0];
+
+const single{{name}}Creator = () => {{name}}Creator(1).then(pop);
+
 test('POSTing a valid sprint should return 200', (t) => {
   const {{name}} = fixture.valid();
   return {{name}}Poster({{name}})
@@ -54,23 +67,19 @@ test('POSTing a valid sprint should return 200', (t) => {
 });
 
 test('GET /{{pluralName}}/:id should return 200', (t) => {
-  const {{name}} = fixture.valid();
-  return {{name}}Poster({{name}})
-  .then(unwrapJSON)
+  return single{{name}}Creator()
   .then(body => fetch(url+'/{{pluralName}}/'+body.id))
   .then(assertOk(t));
 });
 
 test('GET /{{pluralName}} should return 200', (t) => {
-  const {{name}} = fixture.valid();
-  return {{name}}Poster({{name}})
-  .then(fetch(url+'/{{pluralName}}'))
+  return single{{name}}Creator()
+  .then(() => fetch(url+'/{{pluralName}}'))
   .then(assertOk(t));
 });
 
 test('GET /{{pluralName}} should return an object with a .result property', (t) => {
-  const {{name}} = fixture.valid();
-  return {{name}}Poster({{name}})
+  return single{{name}}Creator()
   .then(() => fetch(url+'/{{pluralName}}'))
   .then(res => res.json())
   .then(json => {
@@ -80,8 +89,7 @@ test('GET /{{pluralName}} should return an object with a .result property', (t) 
 });
 
 test('GET /{{pluralName}} should return an array', (t) => {
-  const {{name}} = fixture.valid();
-  return {{name}}Poster({{name}})
+  return single{{name}}Creator()
   .then(() => getJSON('/{{pluralName}}'))
   .then(json => {
     t.ok(Array.isArray(json));
@@ -89,19 +97,17 @@ test('GET /{{pluralName}} should return an array', (t) => {
 });
 
 test('POSTing a valid {{name}} should actually persist it', (t) => {
-  const {{name}} = fixture.valid();
-  return {{name}}Poster({{name}})
-  .then(unwrapJSON)
-  .then(body => getJSON('/{{pluralName}}/'+body.id))
-  .then((json) => {
-    t.equal(json.name, {{name}}.name);
+  return single{{name}}Creator()
+  .then(spec => {
+    return getJSON('/{{pluralName}}/'+spec.id)
+    .then((json) => {
+      t.equal(json.name, spec.name);
+    });
   });
 });
 
 test('POSTing an updated {{name}} should actually persist it', (t) => {
-  const {{name}} = fixture.valid();
-  return {{name}}Poster({{name}})
-  .then(unwrapJSON)
+  return single{{name}}Creator()
   .then(body => {
     body.name = 'Something else';
     return body
@@ -115,18 +121,13 @@ test('POSTing an updated {{name}} should actually persist it', (t) => {
 });
 
 test('DELETEing a {{name}} should return 200', (t) => {
-  const {{name}} = fixture.valid();
-  return {{name}}Poster({{name}})
-  .then(unwrapJSON)
+  return single{{name}}Creator()
   .then(body => deleter('/{{pluralName}}/'+body.id)())
   .then(assertOk(t));
 });
 
 test('DELETEing a {{name}} should actually delete it', (t) => {
-  const {{name}} = fixture.valid();
-
-  return {{name}}Poster({{name}})
-  .then(unwrapJSON)
+  return single{{name}}Creator()
   .then(body => deleter('/{{pluralName}}/'+body.id)())
   .then(unwrapOldVal)
   .then(body => fetch(url+'/{{pluralName}}/'+body.id))
