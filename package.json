@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "blue-tape": "^0.1.11",
+    "istanbul": "^0.4.1",
     "jsen": "^0.6.0",
     "json-schema-faker": "^0.2.5",
     "lodash": "^3.10.1",
