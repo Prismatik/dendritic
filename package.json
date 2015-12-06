@@ -1,12 +1,12 @@
 {
-  "name": "glume",
+  "name": "claytons",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "author": "david@banham.id.au",
   "license": "ISC",
   "bin": {
-    "glume": "./index.js"
+    "claytons": "./index.js"
   },
   "scripts": {
     "test": "node test"

@@ -10,7 +10,7 @@ mkdirp.sync(dir);
 
 const opts = {cwd: dir, stdio: 'inherit'};
 
-const appName = 'glume_test_'+randomstring();
+const appName = 'claytons_test_'+randomstring();
 const controllerName = randomstring();
 
 spawn('node', ['../../index.js', 'base', appName, appName+'s'], opts);
