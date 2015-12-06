@@ -5,6 +5,10 @@
   "main": "index.js",
   "author": "david@banham.id.au",
   "license": "ISC",
+    "repository": {
+    "type": "git",
+    "url": "https://github.com/Prismatik/claytons.git"
+  },
   "bin": {
     "claytons": "./index.js"
   },
