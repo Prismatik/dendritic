@@ -26,9 +26,9 @@ const getJSON = (suffix) => {
 
 const url = 'http://localhost:'+process.env.PORT;
 
-const poster = suffix => data => {
+const sender = method => suffix => data => {
   return fetch(url+suffix, {
-    method: 'post',
+    method: method,
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
@@ -36,6 +36,9 @@ const poster = suffix => data => {
     body: JSON.stringify( data )
   });
 };
+
+const poster = sender('post');
+const putter = sender('put');
 
 const deleter = suffix => () => {
   return fetch(url+suffix, {
@@ -127,13 +130,13 @@ test('POSTing a valid {{name}} should actually persist it', (t) => {
   });
 });
 
-test('POSTing an updated {{name}} should actually persist it', (t) => {
+test('PUTing an updated {{name}} should actually persist it', (t) => {
   return single{{name}}Creator()
   .then(body => {
     body.name = 'Something else';
     return body
   })
-  .then(body => poster('/{{pluralName}}/'+body.id)(body))
+  .then(body => putter('/{{pluralName}}/'+body.id)(body))
   .then(unwrapJSON)
   .then(body => getJSON('/{{pluralName}}/'+body.id))
   .then((json) => {

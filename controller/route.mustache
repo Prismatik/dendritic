@@ -36,7 +36,7 @@ module.exports = app => {
     .catch( errHandlerFactory(res) )
   });
 
-  app.post('/{{pluralName}}/:id', (req, res) => {
+  app.put('/{{pluralName}}/:id', (req, res) => {
     {{name}}.update(req.body)
     .then(respond(res))
     .catch( errHandlerFactory(res) )
