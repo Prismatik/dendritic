@@ -167,10 +167,8 @@ test('opening a websocket connection to a {{name}} should return it', (t) => {
     return new Promise(resolve => {
       const io = IO(url+'/{{pluralName}}', {query: 'id='+body.id, forceNew: true});
       io.on('record', data => {
-        if (data.new_val) {
-          resolve(data.new_val);
-          io.disconnect();
-        };
+        resolve(data.new_val);
+        io.disconnect();
       });
     })
     .then(data => {
@@ -185,14 +183,12 @@ test('opening a websocket connection to {{pluralName}} should return all of them
     return new Promise(resolve => {
       const io = IO(url+'/{{pluralName}}', {forceNew: true});
       var count = 0;
-      io.on('record', data => {
-        if (data.new_val) {
-          count++;
-          if (count > 1) {
-            resolve(data.new_val);
-            io.disconnect();
-          }
-        };
+      io.on('record', () => {
+        count++;
+        if (count > 1) {
+          resolve();
+          io.disconnect();
+        }
       });
     });
   });
@@ -205,13 +201,12 @@ test('websockets should accept the same filter params as GET requests', (t) => {
     return new Promise(resolve => {
       const io = IO(url+'/{{pluralName}}', {query: 'name='+target.name, forceNew: true});
       io.on('record', data => {
-        if (data.new_val) {
-          t.deepEqual(data.new_val, target);
-        };
-        if (data.state && data.state === 'ready') {
-          io.disconnect();
-          t.end();
-        }
+        t.deepEqual(data.new_val, target);
+      });
+      io.on('state', data => {
+        if (data.state != 'ready') return;
+        io.disconnect();
+        t.end();
       });
     });
   });

@@ -55,6 +55,8 @@ module.exports = {
       {{name}}.watch(socket.handshake.query)
       .then(cursor => {
         cursor.each((err, data) => {
+          if (!data) return;
+          if (data.state) return socket.emit('state', data);
           socket.emit('record', data);
         });
       });
