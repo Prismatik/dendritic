@@ -1,23 +1,26 @@
 before_install:
-  - source /etc/lsb-release && echo "deb http://download.rethinkdb.com/apt $DISTRIB_CODENAME main" | sudo tee /etc/apt/sources.list.d/rethinkdb.list
-  - wget -qO- http://download.rethinkdb.com/apt/pubkey.gpg | sudo apt-key add -
-  - sudo apt-get update -q
-  - sudo apt-get install rethinkdb -y
-  - sudo cp /etc/rethinkdb/default.conf.sample /etc/rethinkdb/instances.d/instance1.conf
-  - sudo /etc/init.d/rethinkdb restart
+- source /etc/lsb-release && echo "deb http://download.rethinkdb.com/apt $DISTRIB_CODENAME
+  main" | sudo tee /etc/apt/sources.list.d/rethinkdb.list
+- wget -qO- http://download.rethinkdb.com/apt/pubkey.gpg | sudo apt-key add -
+- sudo apt-get update -q
+- sudo apt-get install rethinkdb -y
+- sudo cp /etc/rethinkdb/default.conf.sample /etc/rethinkdb/instances.d/instance1.conf
+- sudo /etc/init.d/rethinkdb restart
 language: node_js
 node_js:
-  - "4.0"
-  - "4.1"
-  - "4.2"
-  - "4"
+- '4.0'
+- '4.1'
+- '4.2'
+- '4'
 env:
-  - SLOW_TEST=true
-  - CXX=g++-4.8
-
+- SLOW_TEST=true
+- CXX=g++-4.8
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+    - ubuntu-toolchain-r-test
     packages:
-      - g++-4.8
+    - g++-4.8
+notifications:
+  slack:
+    secure: SsO1lo2lOgkJRCq5rwVHfy05zcnbyOmcY6V0HboeN7P9a83G9lgiWXXhaNusYWO3MinAZp+pwuCmFB6LjQKwtx+9rYYwpnVU4NKTRNnGZSQOOXlMUHwjsGUs+iOfGXUFh+5i3tC3u1IsmucCcdMtvPdDqEdApmXc7pTZ6KW/BHo3WOJCX1WtuSP105jhZHRp37/14fXAFKxoy/PsMVWLNn3tDOJ/rzlzTlPX5slNNaFqtOcGfO7oQ0oVfckZORu1sKMs/kbNaFfK7iWe/WeD4xeh3tODFq+7qH25tlhxqN+WlZFRnUSn9K5KyRWgcxTwinrEYgfDMS7u7buf/YxF0aA1VmS0omNoK7nmXNIoTqtb/IuRLWlJMCTgnS/fwtwGjUuYLUDAhb6hRbkn1KtofH9+KkvYU6MCFHHksVH+Qj/mE+BLcDSp2iuxPtIo1OxJwyIxtRBIv8uqtMuzZMr69FX948xktWVXviKWI/+pX2Obw3E0pOi1vJMcqTVCHUNdfbUoBUxLeLEXpHJ7e9VpPhYWu5N4okh8sRAzVAukK2W2YYRHqRYhzjGSF/CHJAps90cnyZgfxjAe+EEahcHmfBDlDp6AAzauCMtsSnwMJ/fBe7ntov2mZgEFA46JinzAxFpJvvKIJyUgNemVRbEcrVdzQDqx1ymSaN2hXKeaSBQ=
