@@ -5,7 +5,7 @@
   "main": "index.js",
   "author": "david@banham.id.au",
   "license": "ISC",
-    "repository": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/Prismatik/claytons.git"
   },
@@ -31,6 +31,8 @@
     "required_env": "^1.0.0",
     "restify": "^4.0.3",
     "rethinkdbdash": "^2.2.8",
-    "rimraf": "^2.4.4"
+    "rimraf": "^2.4.4",
+    "socket.io": "^1.3.7",
+    "socket.io-client": "^1.3.7"
   }
 }

@@ -17,6 +17,11 @@ const wrapResult = res => {
 
 const properties = Object.keys(schema.properties);
 
+const onlyProps = params => (p, prop) => {
+  p[prop] = params[prop];
+  return p
+}
+
 module.exports = {
   get: (params) => {
     const table = db.table('{{pluralName}}');
@@ -25,13 +30,20 @@ module.exports = {
       .then(wrapResult);
     }
 
-    const filterParams = properties.reduce((p, prop) => {
-      p[prop] = params[prop];
-      return p
-    }, {});
+    const filterParams = properties.reduce(onlyProps(params), {});
 
     return table.filter(filterParams).run()
     .then(wrapResult)
+  },
+  watch: (params) => {
+    const table = db.table('{{pluralName}}');
+    if (params && params.id) {
+      return table.get(params.id).changes({includeInitial: true, includeStates: true}).run();
+    }
+
+    const filterParams = properties.reduce(onlyProps(params), {});
+
+    return table.filter(filterParams).changes({includeInitial: true, includeStates: true}).run();
   },
   create: ({{name}}) => {
     const valid = validate({{name}});

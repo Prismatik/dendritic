@@ -2,6 +2,7 @@ const test = require('blue-tape');
 const fetch = require('node-fetch');
 const _ = require('lodash');
 const fixture = require('../fixtures/{{name}}');
+const IO = require('socket.io-client');
 
 const assertOk = (t) => {
   return (res) => {
@@ -157,5 +158,61 @@ test('DELETEing a {{name}} should actually delete it', (t) => {
   .then(body => fetch(url+'/{{pluralName}}/'+body.id))
   .then(res => {
     t.equal(res.status, 404);
+  });
+});
+
+test('opening a websocket connection to a {{name}} should return it', (t) => {
+  return single{{name}}Creator()
+  .then(body => {
+    return new Promise(resolve => {
+      const io = IO(url+'/{{pluralName}}', {query: 'id='+body.id, forceNew: true});
+      io.on('record', data => {
+        if (data.new_val) {
+          resolve(data.new_val);
+          io.disconnect();
+        };
+      });
+    })
+    .then(data => {
+      t.deepEqual(data, body);
+    });
+  });
+});
+
+test('opening a websocket connection to {{pluralName}} should return all of them', (t) => {
+  return {{name}}Creator(2)
+  .then(body => {
+    return new Promise(resolve => {
+      const io = IO(url+'/{{pluralName}}', {forceNew: true});
+      var count = 0;
+      io.on('record', data => {
+        if (data.new_val) {
+          count++;
+          if (count > 1) {
+            resolve(data.new_val);
+            io.disconnect();
+          }
+        };
+      });
+    });
+  });
+});
+
+test('websockets should accept the same filter params as GET requests', (t) => {
+  {{name}}Creator(2)
+  .then({{pluralName}} => {
+    const target = {{pluralName}}[0];
+    return new Promise(resolve => {
+      const io = IO(url+'/{{pluralName}}', {query: 'name='+target.name, forceNew: true});
+      io.on('record', data => {
+        if (data.new_val) {
+          t.deepEqual(data.new_val, target);
+        };
+        if (data.state && data.state === 'ready') {
+          io.disconnect();
+          t.end();
+        }
+      });
+    });
   });
 });

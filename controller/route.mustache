@@ -17,34 +17,47 @@ const respond = res => body => {
   return Promise.resolve(res.json(body));
 };
 
-module.exports = app => {
-  app.get('/{{pluralName}}', (req, res) => {
-    {{name}}.get(req.query)
-    .then(respond(res))
-    .catch( errHandlerFactory(res) )
-  });
+module.exports = {
+  http: app => {
+    app.get('/{{pluralName}}', (req, res) => {
+      {{name}}.get(req.query)
+      .then(respond(res))
+      .catch( errHandlerFactory(res) )
+    });
 
-  app.get('/{{pluralName}}/:id', (req, res) => {
-    {{name}}.get(_.assign({id: req.params.id}, req.query))
-    .then(respond(res))
-    .catch( errHandlerFactory(res) )
-  });
+    app.get('/{{pluralName}}/:id', (req, res) => {
+      {{name}}.get(_.assign({id: req.params.id}, req.query))
+      .then(respond(res))
+      .catch( errHandlerFactory(res) )
+    });
 
-  app.post('/{{pluralName}}', (req, res) => {
-    {{name}}.create(req.body)
-    .then(respond(res))
-    .catch( errHandlerFactory(res) )
-  });
+    app.post('/{{pluralName}}', (req, res) => {
+      {{name}}.create(req.body)
+      .then(respond(res))
+      .catch( errHandlerFactory(res) )
+    });
 
-  app.put('/{{pluralName}}/:id', (req, res) => {
-    {{name}}.update(req.body)
-    .then(respond(res))
-    .catch( errHandlerFactory(res) )
-  });
+    app.put('/{{pluralName}}/:id', (req, res) => {
+      {{name}}.update(req.body)
+      .then(respond(res))
+      .catch( errHandlerFactory(res) )
+    });
 
-  app.del('/{{pluralName}}/:id', (req, res) => {
-    {{name}}.delete(req.params.id)
-    .then(respond(res))
-    .catch( errHandlerFactory(res) )
-  });
+    app.del('/{{pluralName}}/:id', (req, res) => {
+      {{name}}.delete(req.params.id)
+      .then(respond(res))
+      .catch( errHandlerFactory(res) )
+    });
+  },
+  ws: io => {
+    const nsp = io.of('/{{pluralName}}');
+    nsp.on('connection', socket => {
+      {{name}}.watch(socket.handshake.query)
+      .then(cursor => {
+        cursor.each((err, data) => {
+          socket.emit('record', data);
+        });
+      });
+    });
+  }
 };
