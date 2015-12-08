@@ -1,6 +1,6 @@
 ## Claytons
 
-The framework you use when you're not using a framework.
+[The framework you use when you're not using a framework.](http://ozwords.org/?p=3240)
 
 Claytons is a scaffolder for HTTP APIs. It will give you the bones of an API using JSON Schema, Restify, RethinkDB, tape and promise-y functional ES6.
 
