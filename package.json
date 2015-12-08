@@ -22,6 +22,7 @@
     "rimraf": "^2.4.4"
   },
   "devDependencies": {
+    "bandname": "^1.0.0",
     "blue-tape": "^0.1.11",
     "istanbul": "^0.4.1",
     "jsen": "^0.6.0",
