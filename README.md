@@ -1,4 +1,5 @@
 ## Claytons
+[![Build Status](https://travis-ci.org/Prismatik/claytons.svg)](https://travis-ci.org/Prismatik/claytons)
 
 [The framework you use when you're not using a framework.](http://ozwords.org/?p=3240)
 
