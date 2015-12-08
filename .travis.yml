@@ -12,6 +12,7 @@ node_js:
 - '4.1'
 - '4.2'
 - '4'
+- '5'
 env:
 - SLOW_TEST=true CXX=g++-4.8
 addons:
