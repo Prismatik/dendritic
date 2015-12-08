@@ -1,4 +1,5 @@
 const jsen = require('jsen');
+const _ = require('lodash');
 
 const db = require('../lib/db.js');
 const schema = require('../schemas/{{name}}.json');
@@ -32,8 +33,13 @@ module.exports = {
 
     const filterParams = properties.reduce(onlyProps(params), {});
 
-    return table.filter(filterParams).run()
-    .then(wrapResult)
+    const query = ['skip', 'limit'].reduce((q, item) => {
+      if (params[item]) q = q[item](parseInt(params[item]));
+      return q;
+    }, table.filter(filterParams));
+
+    return query.run()
+    .then(wrapResult);
   },
   watch: (params) => {
     const table = db.table('{{pluralName}}');

@@ -121,6 +121,27 @@ test('GET /{{pluralName}} should return an array', (t) => {
   });
 });
 
+test('GET /{{pluralName}} should paginate if asked', (t) => {
+  return {{name}}Creator(5)
+  .then(() => getJSON('/{{pluralName}}?limit=2'))
+  .then(json => {
+    t.equal(json.length, 2);
+  });
+});
+
+test('GET /{{pluralName}} should skip if asked', (t) => {
+  return {{name}}Creator(5)
+  .then(() => getJSON('/{{pluralName}}?limit=2'))
+  .then(first => {
+    t.equal(first.length, 2);
+    return getJSON('/{{pluralName}}?limit=2&skip=2')
+    .then(second => {
+      t.equal(second.length, 2);
+      t.notDeepEqual(first, second);
+    });
+  });
+});
+
 test('POSTing a valid {{name}} should actually persist it', (t) => {
   return single{{name}}Creator()
   .then(spec => {
