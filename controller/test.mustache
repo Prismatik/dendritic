@@ -145,6 +145,19 @@ test('GET /{{pluralName}} should skip if asked', (t) => {
   });
 });
 
+test('GET /{{pluralName}} should orderBy if asked', (t) => {
+  return {{name}}Creator(15)
+  .then(() => getJSON('/{{pluralName}}?orderBy=name'))
+  .then(results => {
+    const reordered = _.clone(results).sort((a, b) => {
+      if (a.name > b.name) return 1;
+      if (a.name < b.name) return -1;
+      return 0;
+    });
+    t.deepEqual(reordered, results);
+  });
+});
+
 test('GET /{{pluralName}}?count=true&limit=n should return n matching docs with a count of all matching docs ', (t) => {
   return {{name}}Creator(10)
   .then(() => fetch(url+'/{{pluralName}}?count=true&limit=5'))

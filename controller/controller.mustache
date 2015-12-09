@@ -64,7 +64,7 @@ module.exports = {
     const filterParams = properties.reduce(onlyProps(params), {});
     const filteredTable = table.filter(filterParams);
 
-    const query = ['skip', 'limit'].reduce((q, item) => {
+    const query = ['orderBy', 'skip', 'limit'].reduce((q, item) => {
       if (params[item]) q = q[item](params[item]);
       return q;
     }, filteredTable);
