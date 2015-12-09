@@ -1,4 +1,4 @@
-const spawn = require('child_process').spawnSync;
+const exec = require('child_process').execSync;
 const bandname = require("bandname");
 const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
@@ -23,9 +23,9 @@ const appName = 'claytons_test_'+randomstring();
 const controllerName = randomstring();
 
 
-spawn('node', [index, 'base', appName, appName+'s'], opts);
-spawn('node', [index, 'controller', controllerName, controllerName+'s'], opts);
-if (process.env.SLOW_TEST) spawn('npm', ['install'], opts);
-spawn('npm', ['test'], opts);
+exec(['node', index, 'base', appName, appName+'s'].join(' '), opts);
+exec(['node', index, 'controller', controllerName, controllerName+'s'].join(' '), opts);
+if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
+exec(['npm', 'test'].join(' '), opts);
 
 rimraf.sync(dir);
