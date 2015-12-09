@@ -12,17 +12,6 @@ const firstChange = res => {
   }
 }
 
-const wrapResult = res => {
-  return {result: res}
-}
-
-const mergeCount = results => {
-  return {
-    result: results[0],
-    count: results[1]
-  };
-}
-
 const properties = Object.keys(schema.properties);
 
 const onlyProps = params => (p, prop) => {
@@ -35,26 +24,34 @@ module.exports = {
     const table = db.table('{{pluralName}}');
     if (params && params.id) {
       return table.get(params.id).run()
-      .then(wrapResult);
+      .then(res => { return {result: res} });
     }
 
     const filterParams = properties.reduce(onlyProps(params), {});
+    const filteredTable = table.filter(filterParams);
 
     const query = ['skip', 'limit'].reduce((q, item) => {
       if (params[item]) q = q[item](parseInt(params[item]));
       return q;
-    }, table.filter(filterParams)).run();
+    }, filteredTable);
 
-    if (params.count) {
-      return Promise.all([
-        query,
-        table.filter(filterParams).count().run()
-      ])
-      .then(mergeCount)
-    } else {
-      return query
-      .then(wrapResult);
-    }
+    const taggedQueries = [
+      {tag: 'result', q: query}
+    ]
+    .concat(
+      [
+        {tag: 'count', q: filteredTable.count()}
+      ]
+      .filter(x => params[x.tag])
+    );
+
+    return Promise.all(taggedQueries.map(x => x.q.run()))
+    .then(results => {
+      return results.reduce((response, result, i) => {
+        response[taggedQueries[i].tag] = result;
+        return response;
+      }, {});
+    });
   },
   watch: (params) => {
     const table = db.table('{{pluralName}}');
