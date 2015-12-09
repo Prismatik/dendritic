@@ -251,6 +251,27 @@ test('opening a websocket connection to {{pluralName}} should return all of them
   });
 });
 
+test('opening a websocket connection to {{pluralName}} should return changed documents', (t) => {
+  return single{{name}}Creator()
+  .then(body => {
+    return new Promise(resolve => {
+      const io = IO(url+'/{{pluralName}}', {forceNew: true});
+      io.on('state', data => {
+        if (data.state === 'ready') {
+          const target = _.assign({}, body, {name: 'ohai'});
+          io.on('record', data => {
+            t.deepEqual(data.new_val, target);
+            t.notDeepEqual(data.new_val, body);
+            io.disconnect();
+            resolve();
+          });
+          putter('/{{pluralName}}/'+body.id)(target)
+        };
+      });
+    });
+  });
+});
+
 test('websockets should accept the same filter params as GET requests', (t) => {
   {{name}}Creator(2)
   .then({{pluralName}} => {
