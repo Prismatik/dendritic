@@ -153,6 +153,16 @@ test('GET /{{pluralName}}?count=true&limit=n should return n matching docs with 
   });
 });
 
+test('GET /{{pluralName}}?limit=n should return n matching docs without a count of all matching docs ', (t) => {
+  return {{name}}Creator(10)
+  .then(() => fetch(url+'/{{pluralName}}?limit=5'))
+  .then(res => res.json())
+  .then(json => {
+    t.equal(json.result.length, 5);
+    t.ok(!json.count);
+  });
+});
+
 test('POSTing a valid {{name}} should actually persist it', (t) => {
   return single{{name}}Creator()
   .then(spec => {

@@ -40,14 +40,21 @@ module.exports = {
 
     const filterParams = properties.reduce(onlyProps(params), {});
 
-    return Promise.all([
-      ['skip', 'limit'].reduce((q, item) => {
-        if (params[item]) q = q[item](parseInt(params[item]));
-        return q;
-      }, table.filter(filterParams)).run(),
-      table.filter(filterParams).count().run()
-    ])
-    .then(mergeCount)
+    const query = ['skip', 'limit'].reduce((q, item) => {
+      if (params[item]) q = q[item](parseInt(params[item]));
+      return q;
+    }, table.filter(filterParams)).run();
+
+    if (params.count) {
+      return Promise.all([
+        query,
+        table.filter(filterParams).count().run()
+      ])
+      .then(mergeCount)
+    } else {
+      return query
+      .then(wrapResult);
+    }
   },
   watch: (params) => {
     const table = db.table('{{pluralName}}');
