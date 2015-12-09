@@ -78,7 +78,12 @@ module.exports = {
 
     const filterParams = properties.reduce(onlyProps(params), {});
 
-    return table.filter(filterParams).changes({includeInitial: true, includeStates: true}).run();
+    const query = ['limit'].reduce((q, item) => {
+      if (params[item]) q = q[item](parseInt(params[item]));
+      return q;
+    }, table.orderBy({index: 'id'}).filter(filterParams));
+
+    return query.changes({includeInitial: true, includeStates: true}).run();
   },
   create: ({{name}}) => {
     const valid = validate({{name}});

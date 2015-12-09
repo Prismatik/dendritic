@@ -289,3 +289,22 @@ test('websockets should accept the same filter params as GET requests', (t) => {
     });
   });
 });
+
+test('websockets should accept the same limit param as GET requests', (t) => {
+  {{name}}Creator(2)
+  .then({{pluralName}} => {
+    return new Promise(resolve => {
+      const io = IO(url+'/{{pluralName}}', {query: {limit: 1}, forceNew: true});
+      var count = 0;
+      io.on('record', data => {
+        count++;
+      });
+      io.on('state', data => {
+        if (data.state != 'ready') return;
+        io.disconnect();
+        t.equal(count, 1);
+        t.end();
+      });
+    });
+  });
+});
