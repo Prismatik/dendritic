@@ -142,6 +142,17 @@ test('GET /{{pluralName}} should skip if asked', (t) => {
   });
 });
 
+test('GET /{{pluralName}}?count=true&limit=n should return n matching docs with a count of all matching docs ', (t) => {
+  return {{name}}Creator(10)
+  .then(() => fetch(url+'/{{pluralName}}?count=true&limit=5'))
+  .then(res => res.json())
+  .then(json => {
+    t.equal(json.result.length, 5);
+    t.ok(json.count);
+    t.ok(json.count > 5);
+  });
+});
+
 test('POSTing a valid {{name}} should actually persist it', (t) => {
   return single{{name}}Creator()
   .then(spec => {

@@ -16,6 +16,13 @@ const wrapResult = res => {
   return {result: res}
 }
 
+const mergeCount = results => {
+  return {
+    result: results[0],
+    count: results[1]
+  };
+}
+
 const properties = Object.keys(schema.properties);
 
 const onlyProps = params => (p, prop) => {
@@ -33,13 +40,14 @@ module.exports = {
 
     const filterParams = properties.reduce(onlyProps(params), {});
 
-    const query = ['skip', 'limit'].reduce((q, item) => {
-      if (params[item]) q = q[item](parseInt(params[item]));
-      return q;
-    }, table.filter(filterParams));
-
-    return query.run()
-    .then(wrapResult);
+    return Promise.all([
+      ['skip', 'limit'].reduce((q, item) => {
+        if (params[item]) q = q[item](parseInt(params[item]));
+        return q;
+      }, table.filter(filterParams)).run(),
+      table.filter(filterParams).count().run()
+    ])
+    .then(mergeCount)
   },
   watch: (params) => {
     const table = db.table('{{pluralName}}');
