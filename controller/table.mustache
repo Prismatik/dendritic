@@ -9,9 +9,9 @@ module.exports = () => {
   .then(() => {
     db.table('{{pluralName}}').wait().run()
   })
-  //.then(() => r.table('entities').indexCreate('emails', { multi: true }).run())
+  //.then(() => db.table('{{pluralName}}').indexCreate('name').run())
   //.catch(err => {
-  //  if (err.message.indexOf('Index `emails` already exists') > -1 )return;
+  //  if (err.message.indexOf('Index `name` already exists') > -1 )return;
   //  throw err;
   //})
 }
