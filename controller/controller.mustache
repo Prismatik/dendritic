@@ -36,9 +36,22 @@ const stringToBool = params => {
   }, {});
 }
 
+const stringToNumber = params => {
+  return Object.keys(params).reduce((p, k) => {
+    const param = params[k];
+    const num = Number(param);
+    p[k] = param;
+    if (!isNaN(num)) p[k] = num;
+    return p;
+  }, {});
+}
+
+const normaliseParams = params => {
+  return stringToBool(stringToNumber(params));
+}
+
 module.exports = {
   get: (params) => {
-    params = _.assign({result: true}, stringToBool(params));
     const table = db.table('{{pluralName}}');
 
     if (params.id) {
@@ -46,11 +59,13 @@ module.exports = {
       .then(res => { return {result: res} });
     }
 
+    params = _.assign({result: true}, normaliseParams(params));
+
     const filterParams = properties.reduce(onlyProps(params), {});
     const filteredTable = table.filter(filterParams);
 
     const query = ['skip', 'limit'].reduce((q, item) => {
-      if (params[item]) q = q[item](parseInt(params[item]));
+      if (params[item]) q = q[item](params[item]);
       return q;
     }, filteredTable);
 
@@ -76,10 +91,12 @@ module.exports = {
       return table.get(params.id).changes({includeInitial: true, includeStates: true}).run();
     }
 
+    params = normaliseParams(params);
+
     const filterParams = properties.reduce(onlyProps(params), {});
 
     const query = ['limit'].reduce((q, item) => {
-      if (params[item]) q = q[item](parseInt(params[item]));
+      if (params[item]) q = q[item](params[item]);
       return q;
     }, table.orderBy({index: 'id'}).filter(filterParams));
 
