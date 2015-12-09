@@ -19,10 +19,29 @@ const onlyProps = params => (p, prop) => {
   return p
 }
 
+const stringToBool = params => {
+  return Object.keys(params).reduce((p, k) => {
+    const param = params[k];
+    switch (param) {
+      case 'true':
+        p[k] = true;
+        break;
+      case 'false':
+        p[k] = false;
+        break;
+      default:
+        p[k] = param;
+    }
+    return p;
+  }, {});
+}
+
 module.exports = {
   get: (params) => {
+    params = _.assign({result: true}, stringToBool(params));
     const table = db.table('{{pluralName}}');
-    if (params && params.id) {
+
+    if (params.id) {
       return table.get(params.id).run()
       .then(res => { return {result: res} });
     }
@@ -36,21 +55,19 @@ module.exports = {
     }, filteredTable);
 
     const taggedQueries = [
-      {tag: 'result', q: query}
-    ]
-    .concat(
-      [
-        {tag: 'count', q: filteredTable.count()}
-      ]
-      .filter(x => params[x.tag])
-    );
+      {tag: 'result', q: query},
+      {tag: 'count', q: filteredTable.count()}
+    ].filter(x => params[x.tag]);
 
     return Promise.all(taggedQueries.map(x => x.q.run()))
     .then(results => {
       return results.reduce((response, result, i) => {
-        response[taggedQueries[i].tag] = result;
+        const tag = taggedQueries[i].tag;
+        response[tag] = result;
+        if (tag === 'count' && result > 0) response.found = true;
+        if (tag === 'response' && result.length > 0) response.found = true;
         return response;
-      }, {});
+      }, {found: false});
     });
   },
   watch: (params) => {
@@ -77,6 +94,9 @@ module.exports = {
   },
   delete: (id) => {
     return db.table('{{pluralName}}').get(id).delete({returnChanges: true}).run()
+    .then(res => {
+      return res;
+    })
     .then(firstChange);
   }
 };

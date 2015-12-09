@@ -12,6 +12,9 @@ const assertOk = (t) => {
 
 const unwrapJSON = (res) => {
   return res.json()
+  .then(json => {
+    return json;
+  })
   .then(json => json.result);
 }
 
@@ -162,6 +165,18 @@ test('GET /{{pluralName}}?limit=n should return n matching docs without a count 
     t.ok(!json.count);
   });
 });
+
+test('GET /{{pluralName}}?count=true&result=false should return only a count with no matching docs', (t) => {
+  return {{name}}Creator(10)
+  .then(() => fetch(url+'/{{pluralName}}?count=true&result=false'))
+  .then(res => res.json())
+  .then(json => {
+    t.ok(!json.result, 'has no result');
+    t.ok(json.count, 'has a count');
+    t.ok(json.count > 5, 'count is greater than 5');
+  });
+});
+
 
 test('POSTing a valid {{name}} should actually persist it', (t) => {
   return single{{name}}Creator()
