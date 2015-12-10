@@ -154,7 +154,33 @@ test('GET /{{pluralName}} should orderBy if asked', (t) => {
       if (a.name < b.name) return -1;
       return 0;
     });
-    t.deepEqual(reordered, results);
+    t.deepEqual(_.pluck(reordered, 'name'), _.pluck(results, 'name'));
+  });
+});
+
+test('GET /{{pluralName}} should orderBy asc if asked', (t) => {
+  return {{name}}Creator(15)
+  .then(() => getJSON('/{{pluralName}}?orderBy=name&order=asc'))
+  .then(results => {
+    const reordered = _.clone(results).sort((a, b) => {
+      if (a.name > b.name) return 1;
+      if (a.name < b.name) return -1;
+      return 0;
+    });
+    t.deepEqual(_.pluck(reordered, 'name'), _.pluck(results, 'name'));
+  });
+});
+
+test('GET /{{pluralName}} should orderBy desc if asked', (t) => {
+  return {{name}}Creator(15)
+  .then(() => getJSON('/{{pluralName}}?orderBy=name&order=desc'))
+  .then(results => {
+    const reordered = _.clone(results).sort((a, b) => {
+      if (a.name < b.name) return 1;
+      if (a.name > b.name) return -1;
+      return 0;
+    });
+    t.deepEqual(_.pluck(reordered, 'name'), _.pluck(results, 'name'));
   });
 });
 
