@@ -62,10 +62,16 @@ module.exports = {
     params = _.assign({result: true, order: 'asc'}, normaliseParams(params));
 
     const filterParams = properties.reduce(onlyProps(params), {});
-    const filteredTable = params.orderBy ? table.filter(filterParams).orderBy(db[params.order](params.orderBy)) : table.filter(filterParams);
+    const filteredTable = table.filter(filterParams);
 
-    const query = ['skip', 'limit'].reduce((q, item) => {
-      if (params[item]) q = q[item](params[item]);
+    const query = ['orderBy', 'skip', 'limit'].reduce((q, item) => {
+      if (params[item]) {
+        if (item === 'orderBy') {
+          q = q[item](db[params.order](params[item]));
+        } else {
+          q = q[item](params[item]);
+        }
+      }
       return q;
     }, filteredTable);
 
