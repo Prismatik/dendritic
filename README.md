@@ -25,6 +25,5 @@ TODO:
 
 Add text explaining the assertion to all of the test assertions
 Add middleware folder for middleware plugins to base
-Add middleware to verify incoming JWTs
 Add special User model type with signin, out, password reset, etc
 Make it optional whether to use Auth or an internal user store
