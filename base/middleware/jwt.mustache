@@ -1,0 +1,31 @@
+const url = require('url');
+const jwt = require('jsonwebtoken');
+const restify = require('restify');
+
+module.exports = app => {
+  app.pre((req, res, next) => {
+    const parsed = url.parse(req.url, true);
+
+    // Expand this condition to match all routes you wish to protect, or to only exclude those you do not
+    if (parsed.pathname !== '/jwt/verify') return next();
+
+    if (req.header('Authorization')) {
+      const token = req.header('Authorization').split('Bearer ')[1];
+      try {
+        if (jwt.verify(token, process.env.JWT_SECRET)) return next();
+      } catch (e) {}
+    };
+
+    if (parsed.query.jwt) {
+      try {
+        if (jwt.verify(parsed.query.jwt, process.env.JWT_SECRET)) return next();
+      } catch (e) {}
+    };
+    return next(new restify.errors.UnauthorizedError("Invalid JWT"));
+  })
+
+  app.get('/jwt/verify', (req, res, next) => {
+    res.send(200);
+    return next();
+  });
+}

@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 node test.js",
-    "coverage": "RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 ./node_modules/.bin/istanbul cover test.js"
+    "test": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 node test.js",
+    "coverage": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 ./node_modules/.bin/istanbul cover test.js"
   },
   "license": "ISC",
   "dependencies": {
     "bandname": "^1.0.0",
     "jsen": "^0.6.0",
+    "jsonwebtoken": "^5.4.1",
     "lodash": "^3.10.1",
     "required_env": "^1.0.0",
     "restify": "^4.0.3",

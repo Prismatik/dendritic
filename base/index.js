@@ -20,6 +20,8 @@ module.exports = (name, pluralName) => {
     {n: 'setup'},
     {n: 'base', p: 'env'},
     {n: 'package', e: 'json'},
+    {n: 'jwt', p: 'tests/middleware'},
+    {n: 'jwt', p: 'middleware'},
   ].map(thing => _.extend({p: '', e: 'js'}, thing));
 
   things.forEach(thing => {
