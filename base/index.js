@@ -18,7 +18,7 @@ module.exports = (name, pluralName) => {
     {n: 'start'},
     {n: 'test'},
     {n: 'setup'},
-    {n: 'env'},
+    {n: 'base', p: 'env'},
     {n: 'package', e: 'json'},
   ].map(thing => _.extend({p: '', e: 'js'}, thing));
 
@@ -36,6 +36,7 @@ module.exports = (name, pluralName) => {
   });
 
   const dirs = [
+    'env',
     'routes'
   ].forEach(dir => mkdirp.sync(dir));
 

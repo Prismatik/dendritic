@@ -1,6 +1,10 @@
-require('root/env.js');
-const restify = require('restify');
 const fs = require('fs');
+
+require('required_env')(fs.readdirSync('./env').reduce((r, file) => {
+  return r.concat(require('./env/'+file));
+}, []))
+
+const restify = require('restify');
 
 const app = restify.createServer();
 const io = require('socket.io').listen(app.server);
