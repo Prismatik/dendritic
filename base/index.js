@@ -23,7 +23,8 @@ module.exports = (name, pluralName) => {
   ].map(thing => _.extend({p: '', e: 'js'}, thing));
 
   things.forEach(thing => {
-    const template = fs.readFileSync(__dirname + '/'+thing.n+'.mustache').toString();
+    const templatePath = path.join(__dirname, thing.p, thing.n+'.mustache');
+    const template = fs.readFileSync(templatePath).toString();
     const dir = path.join(process.cwd(), thing.p);
     const target = path.join(dir, thing.n+'.'+thing.e);
     console.log('writing', thing.n, 'to', target);
