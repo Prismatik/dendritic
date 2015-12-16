@@ -14,7 +14,7 @@ module.exports = (name, pluralName) => {
 
   const things = [
     {s: 'controller', p: 'controllers'},
-    {s: 'test', p: 'tests'},
+    {s: 'test', p: 'tests/controllers'},
     {s: 'route', p: 'routes'},
     {s: 'table', p: 'tables'},
     {s: 'fixture', p: 'fixtures'},

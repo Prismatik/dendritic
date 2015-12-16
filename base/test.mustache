@@ -1,4 +1,4 @@
-const fs = require('fs');
+const walkdir = require('walkdir');
 const path = require('path');
 const test = require('blue-tape');
 
@@ -9,11 +9,11 @@ const db = require('root/lib/db');
 const server = app.listen(process.env.PORT, () => {
   setup()
   .then(() => {
-    files = fs.readdirSync('./tests').filter(function(file) {
+    walkdir.sync('./tests').filter(function(file) {
       if (file.indexOf('swp') > -1) return false;
-      return file.indexOf('.js');
+      return file.indexOf('.js') > -1;
     }).forEach(function(file) {
-      require(path.resolve('./tests/'+file));
+      require(file);
     });
   })
   .then(() => {
