@@ -10,8 +10,6 @@ const server = app.listen(process.env.PORT, () => {
   setup()
   .then(() => {
     files = fs.readdirSync('./tests').filter(function(file) {
-      if (file === 'index.js') return false;
-      if (file === 'fixtures') return false;
       if (file.indexOf('swp') > -1) return false;
       return file.indexOf('.js');
     }).forEach(function(file) {
