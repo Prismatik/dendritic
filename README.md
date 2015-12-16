@@ -20,3 +20,11 @@ claytons controller singular plural
 ```
 
 And it will add routes, a controller and database bootstrapping. You'll have Create, Read, Update and Delete. You can pass filter params for any property of your model to search the database on GET. All updates will be checked against your JSON schema for validity.
+
+TODO:
+
+Add text explaining the assertion to all of the test assertions
+Add middleware folder for middleware plugins to base
+Add middleware to verify incoming JWTs
+Add special User model type with signin, out, password reset, etc
+Make it optional whether to use Auth or an internal user store
