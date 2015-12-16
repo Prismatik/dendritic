@@ -2,6 +2,14 @@ const url = require('url');
 const jwt = require('jsonwebtoken');
 const restify = require('restify');
 
+const verifier = token => {
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET);
+  } catch (e) {
+    return false;
+  }
+};
+
 module.exports = app => {
   app.pre((req, res, next) => {
     const parsed = url.parse(req.url, true);
@@ -11,16 +19,13 @@ module.exports = app => {
 
     if (req.header('Authorization')) {
       const token = req.header('Authorization').split('Bearer ')[1];
-      try {
-        if (jwt.verify(token, process.env.JWT_SECRET)) return next();
-      } catch (e) {}
+      if (verifier(token)) return next();
     };
 
     if (parsed.query.jwt) {
-      try {
-        if (jwt.verify(parsed.query.jwt, process.env.JWT_SECRET)) return next();
-      } catch (e) {}
+      if (verifier(parsed.query.jwt)) return next();
     };
+
     return next(new restify.errors.UnauthorizedError("Invalid JWT"));
   })
 
