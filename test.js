@@ -24,8 +24,8 @@ const controllerName = randomstring();
 
 
 exec(['node', index, 'base', appName, appName+'s'].join(' '), opts);
-exec(['node', index, 'controller', controllerName, controllerName+'s'].join(' '), opts);
 if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
+exec(['node', index, 'controller', controllerName, controllerName+'s'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
 
 rimraf.sync(dir);
