@@ -35,6 +35,10 @@ module.exports = (name, pluralName) => {
     fs.writeFileSync(target, rendered);
   });
 
+  const dirs = [
+    'routes'
+  ].forEach(dir => mkdirp.sync(dir));
+
   const modulesDir = path.join(process.cwd(), 'node_modules');
   if (!fs.existsSync(modulesDir)) mkdirp.sync(modulesDir);
   const target = path.join(modulesDir, 'root');
