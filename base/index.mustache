@@ -1,7 +1,6 @@
 require('root/env.js');
 const restify = require('restify');
 const fs = require('fs');
-const path = require('path');
 
 const app = restify.createServer();
 const io = require('socket.io').listen(app.server);
@@ -12,7 +11,7 @@ app.use(restify.queryParser());
 const db = require('root/lib/db.js');
 
 fs.readdirSync('./routes').map(name => {
-  const route = require(path.resolve('./routes', path.parse(name).name));
+  const route = require('./routes/'+name);
   route.http(app);
   route.ws(io);
 });
