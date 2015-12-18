@@ -318,7 +318,11 @@ test('websockets should accept the same filter params as GET requests', (t) => {
     const target = {{pluralName}}[0];
     const targetKey = Object.keys(target).filter(k => k !== 'id')[0];
     return new Promise(resolve => {
-      const io = IO(url+'/{{pluralName}}', {query: {name: target[targetKey]}, forceNew: true});
+      const query = [targetKey].reduce((r, k) => {
+        r[k] = target[k];
+        return r;
+      }, {});
+      const io = IO(url+'/{{pluralName}}', {query: query, forceNew: true});
       io.on('record', data => {
         t.deepEqual(data.new_val, target);
       });
