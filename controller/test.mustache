@@ -98,10 +98,11 @@ test('GET /{{pluralName}} should return an object with a .result property', (t) 
 test('GET /{{pluralName}} should accept search params in the querystring', (t) => {
   return {{name}}Creator(2)
   .then({{pluralName}} => {
-    return getJSON('/{{pluralName}}?name='+{{pluralName}}[0].name)
+    const target = Object.keys({{pluralName}}[0]).filter(k => k != 'id')[0];
+    return getJSON('/{{pluralName}}?'+target+'='+{{pluralName}}[0][target])
     .then(json => {
       t.equal(json.length, 1);
-      t.equal(json[0].name, {{pluralName}}[0].name);
+      t.equal(json[0][target], {{pluralName}}[0][target]);
     });
   });
 });
@@ -109,7 +110,7 @@ test('GET /{{pluralName}} should accept search params in the querystring', (t) =
 test('GET /{{pluralName}} should not match non-property search params in the querystring', (t) => {
   return {{name}}Creator(2)
   .then({{pluralName}} => {
-    return getJSON('/{{pluralName}}?foo='+{{pluralName}}[0].name)
+    return getJSON('/{{pluralName}}?foo='+{{pluralName}}[0].id)
     .then(json => {
       t.ok(json.length > 1);
     });
@@ -147,40 +148,40 @@ test('GET /{{pluralName}} should skip if asked', (t) => {
 
 test('GET /{{pluralName}} should orderBy if asked', (t) => {
   return {{name}}Creator(15)
-  .then(() => getJSON('/{{pluralName}}?orderBy=name'))
+  .then(() => getJSON('/{{pluralName}}?orderBy=id'))
   .then(results => {
     const reordered = _.clone(results).sort((a, b) => {
-      if (a.name > b.name) return 1;
-      if (a.name < b.name) return -1;
+      if (a.id > b.id) return 1;
+      if (a.id < b.id) return -1;
       return 0;
     });
-    t.deepEqual(_.pluck(reordered, 'name'), _.pluck(results, 'name'));
+    t.deepEqual(_.pluck(reordered, 'id'), _.pluck(results, 'id'));
   });
 });
 
 test('GET /{{pluralName}} should orderBy asc if asked', (t) => {
   return {{name}}Creator(15)
-  .then(() => getJSON('/{{pluralName}}?orderBy=name&order=asc'))
+  .then(() => getJSON('/{{pluralName}}?orderBy=id&order=asc'))
   .then(results => {
     const reordered = _.clone(results).sort((a, b) => {
-      if (a.name > b.name) return 1;
-      if (a.name < b.name) return -1;
+      if (a.id > b.id) return 1;
+      if (a.id < b.id) return -1;
       return 0;
     });
-    t.deepEqual(_.pluck(reordered, 'name'), _.pluck(results, 'name'));
+    t.deepEqual(_.pluck(reordered, 'id'), _.pluck(results, 'id'));
   });
 });
 
 test('GET /{{pluralName}} should orderBy desc if asked', (t) => {
   return {{name}}Creator(15)
-  .then(() => getJSON('/{{pluralName}}?orderBy=name&order=desc'))
+  .then(() => getJSON('/{{pluralName}}?orderBy=id&order=desc'))
   .then(results => {
     const reordered = _.clone(results).sort((a, b) => {
-      if (a.name < b.name) return 1;
-      if (a.name > b.name) return -1;
+      if (a.id < b.id) return 1;
+      if (a.id > b.id) return -1;
       return 0;
     });
-    t.deepEqual(_.pluck(reordered, 'name'), _.pluck(results, 'name'));
+    t.deepEqual(_.pluck(reordered, 'id'), _.pluck(results, 'id'));
   });
 });
 
@@ -222,7 +223,7 @@ test('POSTing a valid {{name}} should actually persist it', (t) => {
   .then(spec => {
     return getJSON('/{{pluralName}}/'+spec.id)
     .then((json) => {
-      t.equal(json.name, spec.name);
+      t.equal(json.id, spec.id);
     });
   });
 });
@@ -315,8 +316,9 @@ test('websockets should accept the same filter params as GET requests', (t) => {
   {{name}}Creator(2)
   .then({{pluralName}} => {
     const target = {{pluralName}}[0];
+    const targetKey = Object.keys(target).filter(k => k !== 'id')[0];
     return new Promise(resolve => {
-      const io = IO(url+'/{{pluralName}}', {query: {name: target.name}, forceNew: true});
+      const io = IO(url+'/{{pluralName}}', {query: {name: target[targetKey]}, forceNew: true});
       io.on('record', data => {
         t.deepEqual(data.new_val, target);
       });
