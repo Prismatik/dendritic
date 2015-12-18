@@ -2,7 +2,7 @@ const jsen = require('jsen');
 const _ = require('lodash');
 
 const db = require('../lib/db.js');
-const schema = require('../schemas/{{name}}.json');
+const schema = require('../schema.js').{{name}};
 const validate = jsen(schema);
 
 const firstChange = res => {
