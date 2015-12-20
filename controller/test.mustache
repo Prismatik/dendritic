@@ -12,9 +12,6 @@ const assertOk = (t) => {
 
 const unwrapJSON = (res) => {
   return res.json()
-  .then(json => {
-    return json;
-  })
   .then(json => json.result);
 }
 
