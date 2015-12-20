@@ -23,6 +23,8 @@ module.exports = (name, pluralName) => {
     {n: 'jwt', p: 'tests/middleware'},
     {n: 'jwt', p: 'middleware'},
     {n: 'schema'},
+    {n: 'schema', p: 'tests/routes'},
+    {n: 'schema', p: 'routes'},
   ].map(thing => _.extend({p: '', e: 'js'}, thing));
 
   things.forEach(thing => {
