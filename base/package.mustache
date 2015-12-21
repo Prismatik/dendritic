@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 node test.js",
-    "coverage": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 ./node_modules/.bin/istanbul cover test.js"
+    "coverage": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 ./node_modules/.bin/istanbul cover test.js",
+    "start": "node start",
+    "test": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 node test.js"
   },
   "license": "ISC",
   "dependencies": {
