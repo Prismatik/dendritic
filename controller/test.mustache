@@ -310,7 +310,7 @@ test('opening a websocket connection to {{pluralName}} should return changed doc
 });
 
 test('websockets should accept the same filter params as GET requests', (t) => {
-  {{name}}Creator(2)
+  return {{name}}Creator(2)
   .then({{pluralName}} => {
     const target = {{pluralName}}[0];
     const targetKey = Object.keys(target).filter(k => k !== 'id')[0];
@@ -333,7 +333,7 @@ test('websockets should accept the same filter params as GET requests', (t) => {
 });
 
 test('websockets should accept the same limit param as GET requests', (t) => {
-  {{name}}Creator(2)
+  return {{name}}Creator(2)
   .then({{pluralName}} => {
     return new Promise(resolve => {
       const io = IO(url+'/{{pluralName}}', {query: {limit: 1}, forceNew: true});
