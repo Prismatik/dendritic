@@ -350,3 +350,23 @@ test('websockets should accept the same limit param as GET requests', (t) => {
     });
   });
 });
+
+test('websockets should skip if asked', (t) => {
+  return {{name}}Creator(5)
+  .then(() => {
+    return new Promise(resolve => {
+      const io = IO(url+'/{{pluralName}}', {query: {limit: 1}, forceNew: true});
+      var first;
+      io.on('record', data => {
+        first = data;
+        io.disconnect();
+        const io2 = IO(url+'/{{pluralName}}', {query: {skip: 1}, forceNew: true});
+        io2.on('record', data => {
+          t.notDeepEqual(data, first);
+          io2.disconnect();
+          return resolve();
+        });
+      });
+    });
+  });
+});
