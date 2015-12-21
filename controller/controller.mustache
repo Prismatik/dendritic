@@ -1,7 +1,7 @@
 const jsen = require('jsen');
 const _ = require('lodash');
 
-const db = require('../lib/db.js');
+const r = require('../lib/db.js');
 const schema = require('../schema.js').{{name}};
 const validate = jsen(schema);
 
@@ -54,7 +54,7 @@ const buildQuery = (table, params) => {
   return ['orderBy', 'skip', 'limit'].reduce((q, item) => {
     if (params[item]) {
       if (item === 'orderBy') {
-        q = q[item](db[params.order](params[item]));
+        q = q[item](r[params.order](params[item]));
       } else {
         q = q[item](params[item]);
       }
@@ -65,7 +65,7 @@ const buildQuery = (table, params) => {
 
 module.exports = {
   get: (params) => {
-    const table = db.table('{{pluralName}}');
+    const table = r.table('{{pluralName}}');
 
     if (params.id) {
       return table.get(params.id).run()
@@ -96,7 +96,7 @@ module.exports = {
     });
   },
   watch: (params) => {
-    const table = db.table('{{pluralName}}');
+    const table = r.table('{{pluralName}}');
 
     if (params.id) {
       return table.get(params.id).changes({includeInitial: true, includeStates: true}).run();
@@ -109,22 +109,22 @@ module.exports = {
 
     const query = buildQuery(filteredTable, params);
 
-    return table.getAll(db.args(query.getField('id').coerceTo('array'))).changes({includeInitial: true, includeStates: true}).run();
+    return table.getAll(r.args(query.getField('id').coerceTo('array'))).changes({includeInitial: true, includeStates: true}).run();
   },
   create: ({{name}}) => {
     const valid = validate({{name}});
     if (!valid) return Promise.reject(valid);
-    return db.table('{{pluralName}}').insert({{name}}, {returnChanges: true}).run()
+    return r.table('{{pluralName}}').insert({{name}}, {returnChanges: true}).run()
     .then(firstChange);
   },
   update: ({{name}}) => {
     const valid = validate({{name}});
     if (!valid) return Promise.reject(valid);
-    return db.table('{{pluralName}}').update({{name}}, {returnChanges: true}).run()
+    return r.table('{{pluralName}}').update({{name}}, {returnChanges: true}).run()
     .then(firstChange);
   },
   delete: (id) => {
-    return db.table('{{pluralName}}').get(id).delete({returnChanges: true}).run()
+    return r.table('{{pluralName}}').get(id).delete({returnChanges: true}).run()
     .then(res => {
       return res;
     })

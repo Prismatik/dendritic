@@ -1,15 +1,15 @@
-const db = require('../lib/db.js');
+const r = require('../lib/db.js');
 
 module.exports = () => {
-  return db.tableCreate('{{pluralName}}').run()
+  return r.tableCreate('{{pluralName}}').run()
   .catch((err) => {
     if (err.message.split('\n')[0] === 'Table `'+process.env.RETHINK_NAME+'.{{pluralName}}` already exists in:') return;
     throw err;
   })
   .then(() => {
-    db.table('{{pluralName}}').wait().run()
+    r.table('{{pluralName}}').wait().run()
   })
-  //.then(() => db.table('{{pluralName}}').indexCreate('name').run())
+  //.then(() => r.table('{{pluralName}}').indexCreate('name').run())
   //.catch(err => {
   //  if (err.message.indexOf('Index `name` already exists') > -1 )return;
   //  throw err;
