@@ -50,6 +50,19 @@ const normaliseParams = params => {
   return stringToBool(stringToNumber(params));
 }
 
+const buildQuery = (table, params) => {
+  return ['orderBy', 'skip', 'limit'].reduce((q, item) => {
+    if (params[item]) {
+      if (item === 'orderBy') {
+        q = q[item](db[params.order](params[item]));
+      } else {
+        q = q[item](params[item]);
+      }
+    }
+    return q;
+  }, table);
+}
+
 module.exports = {
   get: (params) => {
     const table = db.table('{{pluralName}}');
@@ -64,16 +77,7 @@ module.exports = {
     const filterParams = properties.reduce(onlyProps(params), {});
     const filteredTable = table.filter(filterParams);
 
-    const query = ['orderBy', 'skip', 'limit'].reduce((q, item) => {
-      if (params[item]) {
-        if (item === 'orderBy') {
-          q = q[item](db[params.order](params[item]));
-        } else {
-          q = q[item](params[item]);
-        }
-      }
-      return q;
-    }, filteredTable);
+    const query = buildQuery(filteredTable, params);
 
     const taggedQueries = [
       {tag: 'result', q: query},
@@ -93,7 +97,8 @@ module.exports = {
   },
   watch: (params) => {
     const table = db.table('{{pluralName}}');
-    if (params && params.id) {
+
+    if (params.id) {
       return table.get(params.id).changes({includeInitial: true, includeStates: true}).run();
     }
 
@@ -102,16 +107,7 @@ module.exports = {
     const filterParams = properties.reduce(onlyProps(params), {});
     const filteredTable = table.filter(filterParams);
 
-    const query = ['orderBy', 'skip', 'limit'].reduce((q, item) => {
-      if (params[item]) {
-        if (item === 'orderBy') {
-          q = q[item](db[params.order](params[item]));
-        } else {
-          q = q[item](params[item]);
-        }
-      }
-      return q;
-    }, filteredTable);
+    const query = buildQuery(filteredTable, params);
 
     return table.getAll(db.args(query.getField('id').coerceTo('array'))).changes({includeInitial: true, includeStates: true}).run();
   },
