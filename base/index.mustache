@@ -12,8 +12,6 @@ const io = require('socket.io').listen(app.server);
 app.use(restify.bodyParser());
 app.use(restify.queryParser());
 
-const db = require('root/lib/db.js');
-
 fs.readdirSync('./middleware').map(name => {
   require('./middleware/'+name)(app);
 });
