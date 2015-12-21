@@ -24,6 +24,5 @@ And it will add routes, a controller and database bootstrapping. You'll have Cre
 TODO:
 
 Add text explaining the assertion to all of the test assertions
-Add middleware folder for middleware plugins to base
 Add special User model type with signin, out, password reset, etc
 Make it optional whether to use Auth or an internal user store
