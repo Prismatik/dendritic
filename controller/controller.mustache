@@ -97,14 +97,21 @@ module.exports = {
       return table.get(params.id).changes({includeInitial: true, includeStates: true}).run();
     }
 
-    params = normaliseParams(params);
+    params = _.assign({order: 'asc'}, normaliseParams(params));
 
     const filterParams = properties.reduce(onlyProps(params), {});
+    const filteredTable = table.filter(filterParams);
 
-    const query = ['skip', 'limit'].reduce((q, item) => {
-      if (params[item]) q = q[item](params[item]);
+    const query = ['orderBy', 'skip', 'limit'].reduce((q, item) => {
+      if (params[item]) {
+        if (item === 'orderBy') {
+          q = q[item](db[params.order](params[item]));
+        } else {
+          q = q[item](params[item]);
+        }
+      }
       return q;
-    }, table.orderBy({index: 'id'}).filter(filterParams));
+    }, filteredTable);
 
     return table.getAll(db.args(query.getField('id').coerceTo('array'))).changes({includeInitial: true, includeStates: true}).run();
   },
