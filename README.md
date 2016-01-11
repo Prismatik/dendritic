@@ -21,6 +21,9 @@ claytons controller singular plural
 
 And it will add routes, a controller and database bootstrapping. You'll have Create, Read, Update and Delete. You can pass filter params for any property of your model to search the database on GET. All updates will be checked against your JSON schema for validity.
 
+NOTES:
+Rethink must be version 2.2 or greater to run the resulting app and/or test suite. Anything earlier doesn't support atomic changefeeds (includeInitial).
+
 TODO:
 
 Add text explaining the assertion to all of the test assertions
