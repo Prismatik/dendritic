@@ -1,0 +1,28 @@
+const test = require('blue-tape');
+const fetch = require('node-fetch');
+
+const url = 'http://localhost:'+process.env.PORT+'/hyperschema';
+
+const assertOk = (t) => {
+  return (res) => {
+    return t.ok(res.ok, 'statusCode is 2xx');
+  }
+};
+
+const getJSON = (suffix) => {
+  return fetch(url+suffix)
+  .then(res => res.json());
+};
+
+test('GET /hyperschema should return 200', (t) => {
+  return fetch(url)
+  .then(assertOk(t));
+});
+
+test('GET /hyperschema should the full hyperschema', (t) => {
+  return getJSON('')
+  .then(json => {
+    console.log('json is', JSON.stringify(json, null, 2));
+    //t.deepEqual(json, schema);
+  })
+});

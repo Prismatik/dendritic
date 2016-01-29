@@ -1,0 +1,10 @@
+const hyperschema = require('root/hyperschema');
+
+module.exports = {
+  http: app => {
+    app.get('/hyperschema', (req, res) => {
+      res.json(hyperschema);
+    });
+  },
+  ws: () => {}
+};

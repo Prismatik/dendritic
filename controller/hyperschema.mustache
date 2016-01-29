@@ -1,0 +1,45 @@
+const fs = require('fs');
+const schema = require('root/schemas/{{name}}');
+
+const hyperschema = {
+  links: [
+    {
+      description: 'List {{pluralName}}',
+      href: '/{{pluralName}}',
+      method: 'POST',
+      rel: 'create',
+      title: 'Create',
+      targetSchema: {
+        $ref: '#{{name}}'
+      }
+    },
+    {
+      description: 'List {{pluralName}}',
+      href: '/{{pluralName}}',
+      method: 'GET',
+      rel: 'instances',
+      title: 'List',
+      targetSchema: {
+        items: {
+          $ref: '#{{name}}'
+        },
+        type: 'array'
+      }
+    },
+    {
+      description: 'List {{pluralName}}',
+      href: '/{{pluralName}}/{(#{{name}}%2Fid)}',
+      method: 'GET',
+      rel: 'instances',
+      title: 'List',
+      targetSchema: {
+        items: {
+          $ref: '#{{name}}'
+        },
+        type: 'array'
+      }
+    }
+  ]
+};
+
+module.exports = hyperschema;
