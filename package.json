@@ -1,5 +1,5 @@
 {
-  "name": "claytons",
+  "name": "redbeard",
   "version": "1.5.1",
   "description": "",
   "main": "index.js",
@@ -7,10 +7,10 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Prismatik/claytons.git"
+    "url": "https://github.com/Prismatik/redbeard.git"
   },
   "bin": {
-    "claytons": "./index.js"
+    "redbeard": "./index.js"
   },
   "scripts": {
     "test": "node test"

@@ -9,9 +9,9 @@ const randomstring = () => bandname().replace(' ', '_').replace(/-/g, '_');
 
 var dir;
 if (process.env.SLOW_TEST) {
-  dir = path.join(os.tmpdir(), 'claytons_tests', randomstring());
+  dir = path.join(os.tmpdir(), 'redbeard_tests', randomstring());
 } else {
-  dir = path.join(__dirname, 'claytons_tests', randomstring());
+  dir = path.join(__dirname, 'redbeard_tests', randomstring());
 }
 
 mkdirp.sync(dir);
@@ -19,7 +19,7 @@ mkdirp.sync(dir);
 const opts = {cwd: dir, stdio: 'inherit'};
 const index = path.join(__dirname, 'index.js');
 
-const appName = 'claytons_test_'+randomstring();
+const appName = 'redbeard_tests'+randomstring();
 const controllerName = randomstring();
 
 
