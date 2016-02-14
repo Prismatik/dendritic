@@ -13,6 +13,7 @@ module.exports = (name, pluralName) => {
   console.log('opts are', opts);
 
   const things = [
+    // n: name, p: path, e: extension
     {n: 'db', p: 'lib'},
     {n: 'index'},
     {n: 'start'},
