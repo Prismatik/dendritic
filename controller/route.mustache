@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const {{name}} = require('../controllers/{{name}}.js');
+const {{name}}Controller = require('../controllers/{{name}}.js');
 
 const errHandlerFactory = res => {
   return err => {
@@ -20,31 +20,31 @@ const respond = res => body => {
 module.exports = {
   http: app => {
     app.get('/{{pluralName}}', (req, res) => {
-      {{name}}.get(req.query)
+      {{name}}Controller.get(req.query)
       .then(respond(res))
       .catch( errHandlerFactory(res) )
     });
 
     app.get('/{{pluralName}}/:id', (req, res) => {
-      {{name}}.get(_.assign({id: req.params.id}, req.query))
+      {{name}}Controller.get(_.assign({id: req.params.id}, req.query))
       .then(respond(res))
       .catch( errHandlerFactory(res) )
     });
 
     app.post('/{{pluralName}}', (req, res) => {
-      {{name}}.create(req.body)
+      {{name}}Controller.create(req.body)
       .then(respond(res))
       .catch( errHandlerFactory(res) )
     });
 
     app.put('/{{pluralName}}/:id', (req, res) => {
-      {{name}}.update(req.body)
+      {{name}}Controller.update(req.body)
       .then(respond(res))
       .catch( errHandlerFactory(res) )
     });
 
     app.del('/{{pluralName}}/:id', (req, res) => {
-      {{name}}.delete(req.params.id)
+      {{name}}Controller.delete(req.params.id)
       .then(respond(res))
       .catch( errHandlerFactory(res) )
     });
@@ -52,7 +52,7 @@ module.exports = {
   ws: io => {
     const nsp = io.of('/{{pluralName}}');
     nsp.on('connection', socket => {
-      {{name}}.watch(socket.handshake.query)
+      {{name}}Controller.watch(socket.handshake.query)
       .then(cursor => {
         cursor.each((err, data) => {
           if (!data) return;
