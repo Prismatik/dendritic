@@ -26,6 +26,14 @@ Rethink must be version 2.2 or greater to run the resulting app and/or test suit
 
 TODO:
 
-Add text explaining the assertion to all of the test assertions
-Add special User model type with signin, out, password reset, etc
-Make it optional whether to use Auth or an internal user store
+* Add text explaining the assertion to all of the test assertions
+* Add special User model type with signin, out, password reset, etc
+* Make it optional whether to use Auth or an internal user store
+
+* Split controller code out into a lib.
+* Define a convention for database relationships in the schema ($rel)
+* Potentially use a before/after/each plugin for Tape, or just switch to Mocha
+* Investigate other routing/middleware frameworks. Express, Hapi, Koa, etc.
+* Add generator for auth middleware(s)
+* Figure out whether controller is the best terminology
+* Investigate a graphql implementation
