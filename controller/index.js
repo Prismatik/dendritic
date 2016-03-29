@@ -4,25 +4,18 @@ const mkdirp = require('mkdirp');
 const mustache = require('mustache');
 const _ = require('lodash');
 
-module.exports = (name, pluralName) => {
-  const opts = {
-    pluralName: pluralName,
-    name: name
-  };
-
-  console.log('opts are', opts);
-
+module.exports = (opts) => {
   const things = [
     // n: name, p: path, e: extension, t: target filename
     {n: 'lib/controller'},
     {n: 'lib/rethinkdb'},
     {n: 'lib/schema'},
-    {n: 'controller', p: 'controllers', t: name},
-    {n: 'test', p: 'tests/controllers', t: name},
-    {n: 'route', p: 'routes', t: name},
-    {n: 'table', p: 'tables', t: name},
-    {n: 'fixture', p: 'fixtures', t: name},
-    {n: 'schema', p: 'schemas', e: 'json', t: name},
+    {n: 'controller', p: 'controllers', t: opts.name},
+    {n: 'test', p: 'tests/controllers', t: opts.name},
+    {n: 'route', p: 'routes', t: opts.name},
+    {n: 'table', p: 'tables', t: opts.name},
+    {n: 'fixture', p: 'fixtures', t: opts.name},
+    {n: 'schema', p: 'schemas', e: 'json', t: opts.name},
   ].map(thing => _.extend({p: '', e: 'js', t: thing.n}, thing));
 
   things.forEach(thing => {

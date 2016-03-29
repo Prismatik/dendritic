@@ -36,6 +36,7 @@
     "rethinkdbdash": "^2.2.8",
     "socket.io": "^1.3.7",
     "socket.io-client": "^1.3.7",
-    "walkdir": "0.0.11"
+    "walkdir": "0.0.11",
+    "yargs": "^4.3.2"
   }
 }
