@@ -14,7 +14,7 @@
     }
   },
   <%#relationships%>
-  "<%relationship%>": {
+  "<%relation%>": {
     "type": "string",
     "faker": "random.uuid",
     "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
@@ -24,8 +24,8 @@
   "links": [
     <%#relationships%>
     {
-      "rel": "<%relationship%>",
-      "href": "/<%relationship%>/{<%relationship%>}"
+      "rel": "<%relation%>",
+      "href": "/<%relation%>/{<%relation%>}"
     }<%^isLast%>,<%/isLast%>
     <%/relationships%>
   ],
