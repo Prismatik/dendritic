@@ -1,0 +1,11 @@
+const jsen = require('jsen');
+const schema = require('../schema.js');
+
+exports.filter = (name, params) => {
+  return Object.keys(schema[name].properties).reduce((p, prop) => {
+    p[prop] = params[prop]
+    return p
+  }, {})
+}
+
+exports.validate = jsen(schema)
