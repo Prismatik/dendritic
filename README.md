@@ -29,8 +29,6 @@ TODO:
 * Add text explaining the assertion to all of the test assertions
 * Add special User model type with signin, out, password reset, etc
 * Make it optional whether to use Auth or an internal user store
-
-* Split controller code out into a lib.
 * Define a convention for database relationships in the schema ($rel)
 * Potentially use a before/after/each plugin for Tape, or just switch to Mocha
 * Investigate other routing/middleware frameworks. Express, Hapi, Koa, etc.
