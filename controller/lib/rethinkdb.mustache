@@ -1,12 +1,12 @@
-const r = require('./db.js');
+const r = require('./db');
 
 exports.firstChange = res => {
-  const change = res.changes[0]
+  const change = res.changes[0];
 
   return {
     result: change.new_val || change,
     old_val: change.old_val
-  }
+  };
 }
 
 exports.buildQuery = (table, params) => {
