@@ -1,0 +1,12 @@
+exports.normaliseParams = params => {
+  return Object.keys(params).reduce((p, k) => {
+    const param = params[k];
+
+    p[k] = param;
+    if (!isNaN(Number(param))) p[k] = Number(param);
+    if (param === 'true') p[k] = true;
+    if (param === 'false') p[k] = false;
+
+    return p;
+  }, {});
+}
