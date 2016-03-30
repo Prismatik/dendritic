@@ -13,19 +13,22 @@ module.exports = (name, pluralName) => {
   console.log('opts are', opts);
 
   const things = [
-    // n: name, p: path, e: extension
-    {n: 'controller', p: 'controllers'},
-    {n: 'test', p: 'tests/controllers'},
-    {n: 'route', p: 'routes'},
-    {n: 'table', p: 'tables'},
-    {n: 'fixture', p: 'fixtures'},
-    {n: 'schema', p: 'schemas', e: 'json'},
-  ].map(thing => _.extend({e: 'js'}, thing));
+    // n: name, p: path, e: extension, t: target filename
+    {n: 'lib/controller'},
+    {n: 'lib/rethinkdb'},
+    {n: 'lib/schema'},
+    {n: 'controller', p: 'controllers', t: name},
+    {n: 'test', p: 'tests/controllers', t: name},
+    {n: 'route', p: 'routes', t: name},
+    {n: 'table', p: 'tables', t: name},
+    {n: 'fixture', p: 'fixtures', t: name},
+    {n: 'schema', p: 'schemas', e: 'json', t: name},
+  ].map(thing => _.extend({p: '', e: 'js', t: thing.n}, thing));
 
   things.forEach(thing => {
     const template = fs.readFileSync(__dirname + '/'+thing.n+'.mustache').toString();
     const dir = path.join(process.cwd(), thing.p);
-    const target = path.join(dir, name+'.'+thing.e);
+    const target = path.join(dir, thing.t+'.'+thing.e);
     console.log('writing', thing.n, 'to', target);
     if (fs.existsSync(target)) return console.error(target, 'already exists. Not overwriting it');
 
