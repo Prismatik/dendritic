@@ -20,11 +20,13 @@ const opts = {cwd: dir, stdio: 'inherit'};
 const index = path.join(__dirname, 'index.js');
 
 const appName = 'redbeard_tests'+randomstring();
-const controllerName = randomstring();
+const controllerName1 = randomstring();
+const controllerName2 = randomstring();
 
 exec(['node', index, 'base', appName].join(' '), opts);
 if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
-exec(['node', index, 'controller', controllerName].join(' '), opts);
+exec(['node', index, 'controller', controllerName1].join(' '), opts);
+exec(['node', index, 'controller', controllerName2, '-r', controllerName1].join(' '), opts);
 exec(['node', index, 'cors'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
 

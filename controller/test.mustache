@@ -423,3 +423,24 @@ test('websockets should orderBy desc if asked', (t) => {
     });
   });
 });
+
+{{#relationships}}
+const {{name}}Fixture = require('../../fixtures/{{name}}');
+const {{name}}Poster = poster('/{{pluralName}}')
+
+const {{name}}Creator = times => {
+  return Promise.all(_.times(times, () => {
+    const data = {{name}}Fixture.valid();
+    return {{name}}Poster(data)
+    .then(unwrapJSON)
+  }));
+};
+
+const single{{name}}Creator = () => {{name}}Creator(1).then(pop);
+
+test('related entity must exist (can GET using :id)', (t) => {
+	return single{{name}}Creator()
+	.then(body => fetch(url+'/{{pluralName}}/'+body.id))
+	.then(assertOk(t));
+});
+{{/relationships}}
