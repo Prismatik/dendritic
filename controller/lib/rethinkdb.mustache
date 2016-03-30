@@ -1,0 +1,23 @@
+const r = require('./db');
+
+exports.firstChange = res => {
+  const change = res.changes[0];
+
+  return {
+    result: change.new_val || change,
+    old_val: change.old_val
+  };
+}
+
+exports.buildQuery = (table, params) => {
+  return ['orderBy', 'skip', 'limit'].reduce((q, item) => {
+    if (params[item]) {
+      if (item === 'orderBy') {
+        q = q[item](r[params.order](params[item]));
+      } else {
+        q = q[item](params[item]);
+      }
+    }
+    return q;
+  }, table);
+}
