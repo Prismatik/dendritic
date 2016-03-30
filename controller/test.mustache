@@ -3,6 +3,9 @@ const fetch = require('node-fetch');
 const _ = require('lodash');
 const fixture = require('../../fixtures/{{name}}');
 const IO = require('socket.io-client');
+{{#relationships}}
+const {{name}}Fixture = require('../../fixtures/{{name}}');
+{{/relationships}}
 
 const assertOk = (t) => {
   return (res) => {
@@ -425,7 +428,6 @@ test('websockets should orderBy desc if asked', (t) => {
 });
 
 {{#relationships}}
-const {{name}}Fixture = require('../../fixtures/{{name}}');
 const {{name}}Poster = poster('/{{pluralName}}')
 
 const {{name}}Creator = times => {
