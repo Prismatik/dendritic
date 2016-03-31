@@ -1,0 +1,48 @@
+const fs = require('fs');
+const _ = require('lodash');
+const path = require('path');
+const db = require('root/lib/db');
+
+const table = db.table('_migrations');
+
+const applyMigration = (migrations, then) => {
+  if (migrations.length === 0) return;
+  const m = migrations.shift();
+  m.func()
+  .then(() => {
+    return then(m.name);
+  })
+  .then(() => {
+    return applyMigration(migrations, then);
+  });
+};
+
+module.exports = {
+  up: () => {
+    const migrationFiles = fs.readdirSync('./migrations').filter(file => {
+      return file.indexOf('.js') > -1;
+    }).map(file => {
+      return file;
+    });
+
+    if (migrationFiles.length < 1) return;
+
+    return table.run()
+    .then(records => {
+      const existingMigrations = records.map(_.property('name'));
+      return _.difference(migrationFiles, existingMigrations);
+    })
+    .then(missingMigrations => {
+      const toBeApplied = missingMigrations.map(file => {
+        return {
+          func: require('root/migrations/'+file).up,
+          name: file
+        }
+      });
+
+      return applyMigration(toBeApplied, (name) => {
+        return table.insert({name: name}).run();
+      });
+    });
+  }
+};
