@@ -10,19 +10,19 @@ To use it:
 ```
 npm install -g redbeard
 mdkir my-new-project && cd my-new-project
-redbeard base project-name-singular project-name-plural
+redbeard base project-name-singular
 ```
-
 And you'll have a minimal, well thought-out base app scaffold. Next:
 
 ```
-redbeard controller singular plural
+redbeard controller model-name-singular
 ```
-
 And it will add routes, a controller and database bootstrapping. You'll have Create, Read, Update and Delete. You can pass filter params for any property of your model to search the database on GET. All updates will be checked against your JSON schema for validity.
 
 NOTES:
-Rethink must be version 2.2 or greater to run the resulting app and/or test suite. Anything earlier doesn't support atomic changefeeds (includeInitial).
+
+* Rethink must be version 2.2 or greater to run the resulting app and/or test suite. Anything earlier doesn't support atomic changefeeds (includeInitial).
+* Project names and model names should be singular, redbeard will pluralize these names as required.
 
 TODO:
 

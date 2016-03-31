@@ -22,10 +22,9 @@ const index = path.join(__dirname, 'index.js');
 const appName = 'redbeard_tests'+randomstring();
 const controllerName = randomstring();
 
-
-exec(['node', index, 'base', appName, appName+'s'].join(' '), opts);
+exec(['node', index, 'base', appName].join(' '), opts);
 if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
-exec(['node', index, 'controller', controllerName, controllerName+'s'].join(' '), opts);
+exec(['node', index, 'controller', controllerName].join(' '), opts);
 exec(['node', index, 'cors'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
 
