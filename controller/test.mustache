@@ -426,8 +426,8 @@ test('websockets should orderBy desc if asked', (t) => {
     });
   });
 });
-
 {{#relationships}}
+
 const {{name}}Poster = poster('/{{pluralName}}')
 
 const {{name}}Creator = times => {
@@ -444,5 +444,5 @@ test('related entity must exist (can GET using :id)', (t) => {
 	return single{{name}}Creator()
 	.then(body => fetch(url+'/{{pluralName}}/'+body.id))
 	.then(assertOk(t));
-});
+});{{^isLast}}\n{{/isLast}}
 {{/relationships}}
