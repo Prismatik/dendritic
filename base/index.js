@@ -23,6 +23,7 @@ module.exports = (name, pluralName) => {
     {n: 'package', e: 'json'},
     {n: 'jwt', p: 'tests/middleware'},
     {n: 'jwt', p: 'middleware'},
+    {n: 'cors', p: 'middleware'},
     {n: 'schema'},
     {n: 'schema', p: 'tests/routes'},
     {n: 'schema', p: 'routes'},
