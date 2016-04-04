@@ -3,6 +3,9 @@ const fetch = require('node-fetch');
 const _ = require('lodash');
 const fixture = require('../../fixtures/{{name}}');
 const IO = require('socket.io-client');
+{{#relationships}}
+const {{name}}Fixture = require('../../fixtures/{{name}}');
+{{/relationships}}
 
 const assertOk = (t) => {
   return (res) => {
@@ -423,3 +426,23 @@ test('websockets should orderBy desc if asked', (t) => {
     });
   });
 });
+{{#relationships}}
+
+const {{name}}Poster = poster('/{{pluralName}}')
+
+const {{name}}Creator = times => {
+  return Promise.all(_.times(times, () => {
+    const data = {{name}}Fixture.valid();
+    return {{name}}Poster(data)
+    .then(unwrapJSON)
+  }));
+};
+
+const single{{name}}Creator = () => {{name}}Creator(1).then(pop);
+
+test('related entity must exist (can GET using :id)', (t) => {
+	return single{{name}}Creator()
+	.then(body => fetch(url+'/{{pluralName}}/'+body.id))
+	.then(assertOk(t));
+});{{^isLast}}\n{{/isLast}}
+{{/relationships}}

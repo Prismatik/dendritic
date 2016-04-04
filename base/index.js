@@ -4,14 +4,7 @@ const mkdirp = require('mkdirp');
 const mustache = require('mustache');
 const _ = require('lodash');
 
-module.exports = (name, pluralName) => {
-  const opts = {
-    pluralName: pluralName,
-    name: name
-  };
-
-  console.log('opts are', opts);
-
+module.exports = (opts) => {
   const things = [
     // n: name, p: path, e: extension
     {n: 'db', p: 'lib'},

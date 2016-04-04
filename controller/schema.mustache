@@ -1,7 +1,8 @@
+{{=<% %>=}}
 {
   "type": "object",
-  "name": "{{name}}",
-  "pluralName": "{{pluralName}}",
+  "name": "<%name%>",
+  "pluralName": "<%pluralName%>",
   "properties": {
     "id": {
       "type": "string",
@@ -12,5 +13,22 @@
       "faker": "name.findName"
     }
   },
+  <%#relationships%>
+  "<%name%>": {
+    "type": "string",
+    "faker": "random.uuid",
+    "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+  },
+  <%/relationships%>
+  <%#hasRelationships%>
+  "links": [
+    <%#relationships%>
+    {
+      "rel": "<%pluralName%>",
+      "href": "/<%pluralName%>/{<%name%>}"
+    }<%^isLast%>,<%/isLast%>
+    <%/relationships%>
+  ],
+  <%/hasRelationships%>
   "required": ["name"]
 }

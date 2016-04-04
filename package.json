@@ -20,7 +20,8 @@
     "mkdirp": "^0.5.1",
     "mustache": "^2.2.0",
     "pluralize": "^1.2.1",
-    "rimraf": "^2.4.4"
+    "rimraf": "^2.4.4",
+    "yargs": "^4.3.2"
   },
   "devDependencies": {
     "bandname": "^1.0.0",
