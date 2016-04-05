@@ -1,9 +1,9 @@
 const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
-const db = require('root/lib/db');
+const r = require('root/lib/db');
 
-const table = db.table('_migrations');
+const table = r.table('_migrations');
 
 const applyMigration = (migrations, then) => {
   if (migrations.length === 0) return;
