@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "coverage": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 ./node_modules/.bin/istanbul cover test.js",
+    "migrate": "node ./bin/migrate.js",
     "migration": "node ./bin/migration.js",
     "start": "node start",
     "test": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 node test.js"

@@ -30,6 +30,7 @@ module.exports = (name, pluralName) => {
     {n: 'migrations', p: 'tables'},
     {n: 'migrate', p: 'lib'},
     {n: 'migration', p: 'bin'},
+    {n: 'migrate', p: 'bin'},
     {n: 'migration_template', p: 'bin', e: 'mustache'},
     {n: 'migration_test_template', p: 'bin', e: 'mustache'},
   ].map(thing => _.extend({p: '', e: 'js'}, thing));
