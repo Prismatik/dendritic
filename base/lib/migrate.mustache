@@ -17,21 +17,27 @@ const applyMigration = (migrations, then) => {
   });
 };
 
+const getMigrationFiles = () => {
+  return fs.readdirSync('./migrations').filter(file => {
+    return file.indexOf('.js') > -1;
+  }).map(file => {
+    return file;
+  });
+};
+
+const getMigrationRecords = () => {
+  return table.run()
+  .then(records => records.map(_.property('name')));
+};
+
 module.exports = {
   up: () => {
-    const migrationFiles = fs.readdirSync('./migrations').filter(file => {
-      return file.indexOf('.js') > -1;
-    }).map(file => {
-      return file;
-    });
+    const migrationFiles = getMigrationFiles();
 
     if (migrationFiles.length < 1) return;
 
-    return table.run()
-    .then(records => {
-      const existingMigrations = records.map(_.property('name'));
-      return _.difference(migrationFiles, existingMigrations);
-    })
+    return getMigrationRecords()
+    .then(existingMigrations => _.difference(migrationFiles, existingMigrations))
     .then(missingMigrations => {
       const toBeApplied = missingMigrations.map(file => {
         return {
@@ -41,8 +47,35 @@ module.exports = {
       });
 
       return applyMigration(toBeApplied, (name) => {
+        console.log('migrated up', name);
         return table.insert({name: name}).run();
       });
     });
+  },
+  down: (backstop) => {
+    const migrationFiles = getMigrationFiles();
+
+    if (migrationFiles.length < 1) return;
+
+    migrationFiles.splice(0, migrationFiles.indexOf(backstop));
+
+    return getMigrationRecords()
+    .then(existingMigrations => _.intersection(migrationFiles, existingMigrations))
+    .then(migrationsToDown => {
+      const toBeDowned = migrationsToDown.reverse()
+      .map(file => {
+        return {
+          func: require('root/migrations/'+file).down,
+          name: file
+        }
+      });
+
+      return applyMigration(toBeDowned, (name) => {
+        console.log('migrated down', name);
+        return table.get(name).delete().run();
+      });
+
+    })
+
   }
 };
