@@ -8,7 +8,7 @@ const table = r.table('_migrations');
 const applyMigration = (migrations, then) => {
   if (migrations.length === 0) return;
   const m = migrations.shift();
-  m.func()
+  return m.func()
   .then(() => {
     return then(m.name);
   })
