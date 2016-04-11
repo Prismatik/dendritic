@@ -1,11 +1,23 @@
 const jsen = require('jsen');
 const schema = require('../schema');
 
-exports.filter = (name, params) => {
-  return Object.keys(schema[name].properties).reduce((p, prop) => {
+exports.filter = (name, params, query) => {
+  const model = schema[name];
+
+  return Object.keys(model.properties).reduce((q, prop) => {
+    if (!params[prop]) return q;
+
+    if (model.properties[prop].indexed) {
+      console.log('params, prop', params, prop);
+      return q.getAll(params[prop], {
+        index: prop
+      });
+    };
+
+    const p = {};
     p[prop] = params[prop];
-    return p;
-  }, {});
+    return q.filter(p);
+  }, query);
 }
 
 exports.validate = jsen(schema)

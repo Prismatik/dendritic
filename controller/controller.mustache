@@ -15,7 +15,8 @@ module.exports = {
 
     params = _.assign({result: true, order: 'asc'}, controller.normaliseParams(params));
 
-    const filteredTable = table.filter(schema.filter('{{name}}', params));
+
+    const filteredTable = schema.filter('{{name}}', params, table);
     const query = rethinkdb.buildQuery(filteredTable, params);
 
     const taggedQueries = [
@@ -43,7 +44,7 @@ module.exports = {
 
     params = _.assign({order: 'asc'}, controller.normaliseParams(params));
 
-    const filteredTable = table.filter(schema.filter('{{name}}', params));
+    const filteredTable = schema.filter('{{name}}', params, table);
     const query = rethinkdb.buildQuery(filteredTable, params);
 
     return table.getAll(r.args(query.getField('id').coerceTo('array'))).changes({includeInitial: true, includeStates: true}).run();
