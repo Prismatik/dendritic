@@ -17,6 +17,9 @@ const respond = res => body => {
   return Promise.resolve(res.json(body));
 };
 
+const socketParams = ["EIO", "transport", "t", "b64"];
+const filterParams = params => _.omit(params, socketParams);
+
 module.exports = {
   http: app => {
     app.get('/{{pluralName}}', (req, res) => {
@@ -52,7 +55,8 @@ module.exports = {
   ws: io => {
     const nsp = io.of('/{{pluralName}}');
     nsp.on('connection', socket => {
-      {{name}}Controller.watch(socket.handshake.query)
+      const query = filterParams(socket.handshake.query);
+      {{name}}Controller.watch(query)
       .then(cursor => {
         cursor.each((err, data) => {
           if (!data) return;
