@@ -20,6 +20,12 @@ module.exports = (opts) => {
     {n: 'schema'},
     {n: 'schema', p: 'tests/routes'},
     {n: 'schema', p: 'routes'},
+    {n: 'migrations', p: 'tables'},
+    {n: 'migrate', p: 'lib'},
+    {n: 'migration', p: 'bin'},
+    {n: 'migrate', p: 'bin'},
+    {n: 'migration_template', p: 'bin', e: 'mustache'},
+    {n: 'migration_test_template', p: 'bin', e: 'mustache'},
   ].map(thing => _.extend({p: '', e: 'js'}, thing));
 
   things.forEach(thing => {
@@ -37,7 +43,8 @@ module.exports = (opts) => {
 
   const dirs = [
     'env',
-    'routes'
+    'routes',
+    'migrations'
   ].forEach(dir => mkdirp.sync(dir));
 
   const modulesDir = path.join(process.cwd(), 'node_modules');

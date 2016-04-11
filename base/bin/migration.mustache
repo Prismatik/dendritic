@@ -1,0 +1,22 @@
+const fs = require('fs');
+const mustache = require('mustache');
+
+const now = new Date().toISOString();
+const migrationName = now + '_' + process.argv[2];
+
+const opts = {migrationName: migrationName};
+
+const migrationTemplate = fs.readFileSync('./bin/migration_template.mustache').toString();
+const migrationTestTemplate = fs.readFileSync('./bin/migration_test_template.mustache').toString();
+
+const migrationFile = mustache.render(migrationTemplate, opts);
+const migrationTest = mustache.render(migrationTestTemplate, opts);
+
+try {
+  fs.mkdirSync('./tests/migrations/');
+} catch(e) {
+  if (e.code !== 'EEXIST') throw e;
+}
+
+fs.writeFileSync('./migrations/' + migrationName + '.js', migrationFile);
+fs.writeFileSync('./tests/migrations/' + migrationName + '.js', migrationTest);

@@ -1,0 +1,81 @@
+const fs = require('fs');
+const _ = require('lodash');
+const path = require('path');
+const r = require('root/lib/db');
+
+const table = r.table('_migrations');
+
+const applyMigration = (migrations, then) => {
+  if (migrations.length === 0) return;
+  const m = migrations.shift();
+  return m.func()
+  .then(() => {
+    return then(m.name);
+  })
+  .then(() => {
+    return applyMigration(migrations, then);
+  });
+};
+
+const getMigrationFiles = () => {
+  return fs.readdirSync('./migrations').filter(file => {
+    return file.indexOf('.js') > -1;
+  }).map(file => {
+    return file;
+  });
+};
+
+const getMigrationRecords = () => {
+  return table.run()
+  .then(records => records.map(_.property('name')));
+};
+
+module.exports = {
+  up: () => {
+    const migrationFiles = getMigrationFiles();
+
+    if (migrationFiles.length < 1) return;
+
+    return getMigrationRecords()
+    .then(existingMigrations => _.difference(migrationFiles, existingMigrations))
+    .then(missingMigrations => {
+      const toBeApplied = missingMigrations.map(file => {
+        return {
+          func: require('root/migrations/'+file).up,
+          name: file
+        }
+      });
+
+      return applyMigration(toBeApplied, (name) => {
+        console.log('migrated up', name);
+        return table.insert({name: name}).run();
+      });
+    });
+  },
+  down: (backstop) => {
+    const migrationFiles = getMigrationFiles();
+
+    if (migrationFiles.length < 1) return;
+
+    migrationFiles.splice(0, migrationFiles.indexOf(backstop));
+
+    return getMigrationRecords()
+    .then(existingMigrations => _.intersection(migrationFiles, existingMigrations))
+    .then(migrationsToDown => {
+      const toBeDowned = migrationsToDown.reverse()
+      .map(file => {
+        return {
+          func: require('root/migrations/'+file).down,
+          name: file
+        }
+      });
+
+      return applyMigration(toBeDowned, (name) => {
+        console.log('migrated down', name);
+        return table.get(name).delete().run();
+      });
+
+    })
+
+  }
+};

@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "coverage": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 ./node_modules/.bin/istanbul cover test.js",
+    "migrate": "node ./bin/migrate.js",
+    "migration": "node ./bin/migration.js",
     "start": "node start",
     "test": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 node test.js"
   },
@@ -24,6 +26,7 @@
     "blue-tape": "^0.1.11",
     "istanbul": "^0.4.1",
     "json-schema-faker": "^0.2.5",
+    "mustache": "^2.2.0",
     "node-fetch": "^1.3.3",
     "rimraf": "^2.4.4",
     "socket.io-client": "^1.3.7"
