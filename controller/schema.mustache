@@ -11,15 +11,15 @@
     "name": {
       "type": "string",
       "faker": "name.findName"
+    <%#relationships%>
+    },
+    "<%name%>": {
+      "type": "string",
+      "faker": "random.uuid",
+      "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+    <%/relationships%>
     }
   },
-  <%#relationships%>
-  "<%name%>": {
-    "type": "string",
-    "faker": "random.uuid",
-    "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-  },
-  <%/relationships%>
   <%#hasRelationships%>
   "links": [
     <%#relationships%>
