@@ -329,7 +329,7 @@ test('websockets should accept the same filter params as GET requests', (t) => {
       io.on('state', data => {
         if (data.state != 'ready') return;
         io.disconnect();
-        t.end();
+        return resolve();
       });
     });
   });
@@ -348,7 +348,7 @@ test('websockets should accept the same limit param as GET requests', (t) => {
         if (data.state != 'ready') return;
         io.disconnect();
         t.equal(count, 1);
-        t.end();
+        return resolve();
       });
     });
   });
