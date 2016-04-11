@@ -1,26 +1,50 @@
 const migrate = require('root/lib/migrate');
 const r = require('root/lib/db');
 
-const direction = process.argv[2];
+const commands = [
+  'up',
+  'down',
+  'release_mutex',
+  'show_mutex'
+];
+
+const command = process.argv[2];
 
 const barf = (msg) => {
   console.log(msg);
   process.exit(1);
 };
 
-if (!process.argv[2]) {
+if (!command) {
   barf('usage: npm run migrate [DIRECTION] [BACKSTOP]');
 };
 
-if (['up', 'down'].indexOf(direction) < 0) {
-  barf('migration direction must be up or down');
+if (commands.indexOf(command) < 0) {
+  barf('migration command must be one of: ' + commands.join(' '));
 };
 
-if (direction === 'up' && process.argv[3]) {
+if (command === 'up' && process.argv[3]) {
   barf('migrate up does not take an argument');
 };
 
-migrate[direction](process.argv[3])
+if (command === 'release_mutex' && process.argv[3]) {
+  barf('migrate release_mutex does not take an argument');
+};
+
+if (command === 'release_mutex') {
+  return migrate.releaseMutex()
+  .then(() => r.getPoolMaster().drain())
+  .then(() => process.exit());
+};
+
+if (command === 'show_mutex') {
+  return migrate.queryMutex()
+  .then(console.log)
+  .then(() => r.getPoolMaster().drain())
+  .then(() => process.exit());
+};
+
+migrate[command](process.argv[3])
 .then(() => {
   r.getPoolMaster().drain()
   .then(() => process.exit());
