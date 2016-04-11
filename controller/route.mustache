@@ -53,8 +53,14 @@ module.exports = {
     const nsp = io.of('/{{pluralName}}');
     nsp.on('connection', socket => {
       {{name}}Controller.watch(socket.handshake.query)
-      .then(cursor => {
-        cursor.each((err, data) => {
+      .then(data => {
+        if (data.unindexed) {
+          socket.emit('state', {
+            state: 'warning',
+            warning: 'You are filtering on an unindexed field.'
+          });
+        }
+        data.cursor.each((err, data) => {
           if (!data) return;
           if (data.state) return socket.emit('state', data);
           socket.emit('record', data);

@@ -39,7 +39,13 @@ module.exports = {
     const table = r.table('{{pluralName}}');
 
     if (params.id) {
-      return table.get(params.id).changes({includeInitial: true, includeStates: true}).run();
+      return table.get(params.id).changes({includeInitial: true, includeStates: true}).run()
+      .then(cursor => {
+        return {
+          cursor: cursor,
+          unindexed: false
+        };
+      });
     }
 
     params = _.assign({order: 'asc'}, controller.normaliseParams(params));
@@ -47,7 +53,13 @@ module.exports = {
     const filteredTable = schema.filter('{{name}}', params, table);
     const query = rethinkdb.buildQuery(filteredTable, params);
 
-    return table.getAll(r.args(query.getField('id').coerceTo('array'))).changes({includeInitial: true, includeStates: true}).run();
+    return table.getAll(r.args(query.getField('id').coerceTo('array'))).changes({includeInitial: true, includeStates: true}).run()
+    .then(cursor => {
+      return {
+        cursor: cursor,
+        unindexed: true
+      };
+    });
   },
   create: ({{name}}) => {
     const valid = schema.validate({{name}});
