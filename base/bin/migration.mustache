@@ -1,8 +1,16 @@
 const fs = require('fs');
 const mustache = require('mustache');
 
+const barf = (msg) => {
+  console.log(msg);
+  process.exit(1);
+};
+
+const migrationTag = process.argv[2];
+if (!migrationTag) barf('migration NAME <-- name is required');
+
 const now = new Date().toISOString();
-const migrationName = now + '_' + process.argv[2];
+const migrationName = now + '_' + migrationTag;
 
 const opts = {migrationName: migrationName};
 
@@ -15,7 +23,7 @@ const migrationTest = mustache.render(migrationTestTemplate, opts);
 try {
   fs.mkdirSync('./tests/migrations/');
 } catch(e) {
-  if (e.code !== 'EEXIST') throw e;
+  if (e.code !== 'EEXIST') barf(e);
 }
 
 fs.writeFileSync('./migrations/' + migrationName + '.js', migrationFile);
