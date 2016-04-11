@@ -3,7 +3,7 @@
 # top-most EditorConfig file
 root = true
 
-# Javascript style
-[*.js]
+# Javascript, JSON, mustache style
+[*.{js,json,mustache}]
 indent_style = space
 indent_size = 2
