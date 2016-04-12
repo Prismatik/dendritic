@@ -7,4 +7,8 @@ const schema = fs.readdirSync('./schemas').reduce((s, file) => {
   return s;
 }, {});
 
-module.exports = deref(schema);
+const getSchema = () => {
+  return deref(schema);
+}
+
+module.exports = getSchema;
