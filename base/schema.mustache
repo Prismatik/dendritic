@@ -3,7 +3,7 @@ const fs = require('fs');
 const deref = require('json-schema-deref-sync');
 const r = require('root/lib/db');
 
-var indexes = {}
+var indexes = {};
 
 const schema = fs.readdirSync('./schemas').reduce((s, file) => {
   const name = file.split('.json')[0];
@@ -13,8 +13,26 @@ const schema = fs.readdirSync('./schemas').reduce((s, file) => {
 
 const getIndexes = tableName => {
   return r.table(tableName).indexList().run()
-    .then(indexes => [tableName, indexes])
-}
+    .then(indexes => [tableName, indexes]);
+};
+
+// Note: This only adds the .indexed property to the schema's top level
+// properties and not any nested properties that it might have
+const indexModel = (indexes, properties) => {
+  return _.mapValues(properties, (prop, name) => {
+    if (_.includes(indexes, name)) prop.indexed = true;
+    else prop.indexed = false;
+    return prop;
+  });
+};
+
+const transformSchema = (indexes, schema) => {
+  return _.mapValues(schema, (model) => {
+    const modelIndexes = indexes[model.pluralName];
+    model.properties = indexModel(modelIndexes, model.properties);
+    return deref(model);
+  });
+};
 
 exports.setIndexes = () => {
   return r.tableList().run()
@@ -22,8 +40,7 @@ exports.setIndexes = () => {
   .then(tables => Promise.all(tables.map(getIndexes)))
   .then(_.zipObject)
   .then(result => indexes = result);
-}
+};
 
-exports.getSchema = () => {
-  return deref(schema);
-}
+exports.getSchema = () => transformSchema(indexes, schema);
+
