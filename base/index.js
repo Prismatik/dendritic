@@ -12,6 +12,7 @@ module.exports = (opts) => {
     {n: 'start'},
     {n: 'test'},
     {n: 'setup'},
+    {n: 'db', p: 'env'},
     {n: 'base', p: 'env'},
     {n: 'package', e: 'json'},
     {n: 'jwt', p: 'tests/middleware'},

@@ -1,4 +1,7 @@
+require('required_env')(require('root/env/db'));
+
 const fs = require('fs');
+const os = require('os');
 const _ = require('lodash');
 const path = require('path');
 const r = require('root/lib/db');
@@ -25,6 +28,25 @@ const getMigrationFiles = () => {
   });
 };
 
+const acquireMutex = () => {
+  return r.branch(table.get('migrations_running_mutex'),
+    r.error('mutex locked'),
+    table.insert({
+      hostname: os.hostname(),
+      name: 'migrations_running_mutex',
+      d: new Date().toISOString()
+    })
+  ).run();
+};
+
+const releaseMutex = () => {
+  return table.get('migrations_running_mutex').delete().run();
+};
+
+const queryMutex = () => {
+  return table.get('migrations_running_mutex').run();
+};
+
 const getMigrationRecords = () => {
   return table.run()
   .then(records => records.map(_.property('name')));
@@ -36,7 +58,8 @@ module.exports = {
 
     if (migrationFiles.length < 1) return;
 
-    return getMigrationRecords()
+    return acquireMutex()
+    .then(getMigrationRecords)
     .then(existingMigrations => _.difference(migrationFiles, existingMigrations))
     .then(missingMigrations => {
       const toBeApplied = missingMigrations.map(file => {
@@ -50,7 +73,8 @@ module.exports = {
         console.log('migrated up', name);
         return table.insert({name: name}).run();
       });
-    });
+    })
+    .then(releaseMutex);
   },
   down: (backstop) => {
     const migrationFiles = getMigrationFiles();
@@ -76,6 +100,8 @@ module.exports = {
       });
 
     })
-
-  }
+    .then(releaseMutex);
+  },
+  releaseMutex: releaseMutex,
+  queryMutex: queryMutex
 };
