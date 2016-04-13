@@ -1,5 +1,5 @@
 const generate = require('json-schema-faker');
-const appSchema = require('../schema.js')();
+const appSchema = require('../schema.js').getSchema();
 const schema = appSchema.{{name}};
 
 module.exports = {

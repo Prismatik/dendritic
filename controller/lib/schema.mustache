@@ -1,5 +1,5 @@
 const jsen = require('jsen');
-const schema = require('../schema')();
+const schema = require('../schema').getSchema();
 
 exports.filter = (name, params) => {
   return Object.keys(schema[name].properties).reduce((p, prop) => {

@@ -10,10 +10,6 @@ const tables = fs.readdirSync('./tables').map(table => {
   return require(path.resolve('./tables', path.parse(table).name));
 });
 
-const getIndexes = tableName => {
-  return r.table(tableName).indexList().run()
-    .then(indexes => [tableName, indexes])
-}
 
 module.exports = () => {
   return r.dbCreate(process.env.RETHINK_NAME).run()
@@ -29,10 +25,5 @@ module.exports = () => {
     if (process.env.AUTOMIGRATE === 'true') return migrate.up();
     return null;
   })
-  .then(() => {
-    return r.tableList().run()
-    .then(tables => Promise.all(tables.map(getIndexes)))
-    .then(_.zipObject)
-    .then(indexes => schema.indexes = indexes);
-  });
+  .then(schema.setIndexes);
 };
