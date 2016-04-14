@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const r = require('./db');
 
 exports.firstChange = res => {
@@ -22,4 +23,31 @@ exports.addTransformations = (table, params) => {
     }
     return q;
   }, table);
+}
+
+// TODO - filter using schema properties?
+const NOT_FILTERS = ['count', 'result', 'order', 'orderBy', 'skip', 'limit'];
+
+exports.buildQuery = (schema, table, params) => {
+  params = _.omit(params, NOT_FILTERS);
+
+  //if only id passed, run query using .get(x)
+  if (params.id && Object.keys(params).length === 1)
+    return table.get(params.id)
+
+  // NOTE: this only utilises the first indexed field that is found, the
+  // remainder are simply passed to filter
+  const fields = Object.keys(params);
+  const indexedField = fields.filter(f => {
+    const match = schema.properties[f] || {}
+    return match.indexed;
+  })[0]
+
+  if (indexedField != null) {
+    table = table.getAll(params[indexedField], {index: indexedField})
+    delete params[indexedField]
+  }
+  
+  if (!_.isEmpty(params)) table = table.filter(params)
+  return table
 }
