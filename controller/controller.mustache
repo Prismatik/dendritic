@@ -7,18 +7,22 @@ const schema = require('../lib/schema');
 const appSchema = require('../schema').getSchema();
 const modelSchema = appSchema['{{name}}'];
 
+var NOT_INDEXED = 'WARNING: query is not using an indexed field, changefeed';
+NOT_INDEXED += ' will not include new documents';
+
 module.exports = {
   get: (params) => {
     params = _.assign({result: true}, controller.normaliseParams(params));
+    const queryParams = schema.filter('{{name}}', params);
 
     const table = r.table('{{pluralName}}');
-    const indexBy = controller.getIndex(modelSchema, params);
+    const indexBy = controller.getIndex(modelSchema, queryParams);
 
-    const query = rethinkdb.buildQuery(table, indexBy, params);
-    const resultsQuery = rethinkdb.addTransformations(query, params);
+    const query = rethinkdb.buildQuery(table, indexBy, queryParams);
+    const tranformedQuery = rethinkdb.addTransformations(query, params);
 
     const taggedQueries = [
-      {tag: 'result', q: resultsQuery},
+      {tag: 'result', q: tranformedQuery},
       {tag: 'count', q: query.count()}
     ].filter(x => params[x.tag]);
 
@@ -34,18 +38,22 @@ module.exports = {
     });
   },
   watch: (params) => {
-    const table = r.table('{{pluralName}}');
+    params = controller.normaliseParams(params);
+    const queryParams = schema.filter('{{name}}', params);
 
-    if (params.id) {
-      return table.get(params.id).changes({includeInitial: true, includeStates: true}).run();
+    const changes = {includeInitial: true, includeStates: true};
+    const table = r.table('{{pluralName}}');
+    const indexBy = controller.getIndex(modelSchema, queryParams);
+
+    var query = rethinkdb.buildQuery(table, indexBy, queryParams);
+    query = rethinkdb.addTransformations(query, params);
+ 
+    if (!_.isEmpty(queryParams) && indexBy == null) {
+      console.log(NOT_INDEXED);
+      query = table.getAll(r.args(query.getField('id').coerceTo('array')));
     }
 
-    params = _.assign({order: 'asc'}, controller.normaliseParams(params));
-
-    const filteredTable = table.filter(schema.filter('{{name}}', params));
-    const query = rethinkdb.addTransformations(filteredTable, params);
-
-    return table.getAll(r.args(query.getField('id').coerceTo('array'))).changes({includeInitial: true, includeStates: true}).run();
+    return query.changes(changes).run();
   },
   create: ({{name}}) => {
     const valid = schema.validate({{name}});

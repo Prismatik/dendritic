@@ -25,13 +25,7 @@ exports.addTransformations = (table, params) => {
   }, table);
 }
 
-// TODO - filter using schema properties? and throw error if non-existent field
-// is passed via query
-const NOT_FILTERS = ['count', 'result', 'order', 'orderBy', 'skip', 'limit'];
-
 exports.buildQuery = (table, indexBy, params) => {
-  params = _.omit(params, NOT_FILTERS);
-
   //if only id passed, run query using .get(x)
   if (params.id && Object.keys(params).length === 1) return table.get(params.id);
 

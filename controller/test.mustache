@@ -107,18 +107,15 @@ test('GET /{{pluralName}} should accept search params in the querystring', (t) =
   });
 });
 
-// TODO throw 4xx when invalid property passed to query
-/*test.only('GET /{{pluralName}} should not match non-property search params in the querystring', (t) => {*/
-  /*return {{name}}Creator(2)*/
-  /*.then({{pluralName}} => {*/
-    /*console.log({{pluralName}});*/
-    /*return getJSON('/{{pluralName}}?foo='+{{pluralName}}[0].id)*/
-    /*.then(json => {*/
-      /*console.log("json", json)*/
-      /*t.ok(json.length > 1);*/
-    /*});*/
-  /*});*/
-/*});*/
+test('GET /{{pluralName}} should not match non-property search params in the querystring', (t) => {
+  return {{name}}Creator(2)
+  .then({{pluralName}} => {
+    return getJSON('/{{pluralName}}?foo='+{{pluralName}}[0].id)
+    .then(json => {
+      t.ok(json.length > 1);
+    });
+  });
+});
 
 test('GET /{{pluralName}} should return an array', (t) => {
   return single{{name}}Creator()
