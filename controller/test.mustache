@@ -190,7 +190,6 @@ test('GET /{{pluralName}}?count=true&limit=n should return n matching docs with 
   .then(() => fetch(url+'/{{pluralName}}?count=true&limit=5'))
   .then(res => res.json())
   .then(json => {
-    console.log("json", json)
     t.equal(json.result.length, 5);
     t.ok(json.count);
     t.ok(json.count > 5);
