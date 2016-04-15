@@ -11,8 +11,8 @@ module.exports = {
   get: (params) => {
     params = _.assign({result: true}, controller.normaliseParams(params));
 
-    const indexBy = controller.getIndex(modelSchema, params);
     const table = r.table('{{pluralName}}');
+    const indexBy = controller.getIndex(modelSchema, params);
 
     const query = rethinkdb.buildQuery(table, indexBy, params);
     const resultsQuery = rethinkdb.addTransformations(query, params);
