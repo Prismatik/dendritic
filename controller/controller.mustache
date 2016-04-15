@@ -10,10 +10,12 @@ const modelSchema = appSchema['{{name}}'];
 module.exports = {
   get: (params) => {
     params = _.assign({result: true}, controller.normaliseParams(params));
- 
+
+    const indexBy = controller.getIndex(modelSchema, params);
     const table = r.table('{{pluralName}}');
-    const query = rethinkdb.buildQuery(modelSchema, table, params);
-    const resultsQuery = rethinkdb.addTransformations(query, params)
+
+    const query = rethinkdb.buildQuery(table, indexBy, params);
+    const resultsQuery = rethinkdb.addTransformations(query, params);
 
     const taggedQueries = [
       {tag: 'result', q: resultsQuery},

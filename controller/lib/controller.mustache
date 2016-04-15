@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 exports.normaliseParams = params => {
   return Object.keys(params).reduce((p, k) => {
     const param = params[k];
@@ -9,4 +11,18 @@ exports.normaliseParams = params => {
 
     return p;
   }, {});
+}
+
+// return the first query param found that is indexed (id takes precedence)
+exports.getIndex = (schema, params) => {
+  if (params.id) return "id";
+  const fields = Object.keys(params);
+
+  const properties = schema.properties;
+  for (var key in params) {
+    if (params.hasOwnProperty(key)) { 
+      if (properties[key] && properties[key].indexed) return key;
+    }
+  }
+  return null;
 }
