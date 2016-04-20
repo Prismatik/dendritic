@@ -1,0 +1,65 @@
+const test = require('blue-tape');
+const rethinkdb = require('../../lib/rethinkdb');
+const r = require('../../lib/db');
+const UUID = '8f0834ed-ea58-4be9-8cea-ace9893f9b15';
+
+test('Given no params it should return the query unchanged', (t) => {
+  const query = r.table('test');
+  const result = rethinkdb.buildQuery(query, null, {});
+
+  t.equal(result.toString(), query.toString());
+  return t.end();
+})
+
+test('Given filters it should return a filtered query', (t) => {
+  const query = r.table('test');
+  const filters = {name: 'Darth Vader'}
+  const result = rethinkdb.buildQuery(query, null, filters);
+  const expected = query.filter(filters);
+
+  t.equal(result.toString(), expected.toString());
+  return t.end();
+})
+
+test('Given an indexed field use the index in the query', (t) => {
+  const query = r.table('test');
+  const filters = {name: 'Darth Vader'}
+  const result = rethinkdb.buildQuery(query, 'name', filters);
+  const expected = query.getAll('Darth Vader', {index: 'name'});
+
+  t.equal(result.toString(), expected.toString());
+  return t.end();
+})
+
+test('Given indexed and non-indexed fields it should use index and filter the rest', (t) => {
+  const query = r.table('test');
+  const filters = {
+    name: 'Darth Vader',
+    sith: true
+  };
+  const result = rethinkdb.buildQuery(query, 'name', filters);
+  const expected = query.getAll('Darth Vader', {index: 'name'}).filter({sith: true});
+
+  t.equal(result.toString(), expected.toString());
+  return t.end();
+})
+
+test('Must use .get(x) if an id and no other params provided', (t) => {
+  const query = r.table('test');
+  const filters = {id: UUID};
+  const result = rethinkdb.buildQuery(query, null, filters);
+  const expected = query.get(UUID);
+
+  t.equal(result.toString(), expected.toString());
+  return t.end();
+})
+
+test('Must use .filter(x) if an id and other params provided', (t) => {
+  const query = r.table('test');
+  const filters = {id: UUID, name: 'Luke Skywalker'};
+  const result = rethinkdb.buildQuery(query, null, filters);
+  const expected = query.filter(filters);
+
+  t.equal(result.toString(), expected.toString());
+  return t.end();
+})
