@@ -15,8 +15,8 @@ exports.normaliseParams = params => {
 
 // return the first query param found that is indexed (id takes precedence)
 exports.getIndex = (schema, params) => {
-  if (params.id) return "id";
   const fields = Object.keys(params);
+  if (params.id && fields['id'] && fields['id'].indexed) return 'id';
 
   const properties = schema.properties;
   for (var key in params) {
