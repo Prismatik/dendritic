@@ -10,7 +10,6 @@ const tables = fs.readdirSync('./tables').map(table => {
   return require(path.resolve('./tables', path.parse(table).name));
 });
 
-
 module.exports = () => {
   return r.dbCreate(process.env.RETHINK_NAME).run()
   .catch((err) => {
