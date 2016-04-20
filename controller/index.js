@@ -19,7 +19,7 @@ module.exports = (opts) => {
     {n: 'table', d: 'tables', t: opts.name},
     {n: 'fixture', d: 'fixtures', t: opts.name},
     {n: 'schema', d: 'schemas', t: opts.name, e: 'json'},
-  ].map(thing => _.extend({p: '', d: thing.p, t: thing.n, e: 'js'}, thing));
+  ].map(thing => _.extend({p: '', d: thing.p || '', t: thing.n, e: 'js'}, thing));
 
   things.forEach(thing => {
     const templatePath = path.join(__dirname, thing.p, thing.n+'.mustache');
