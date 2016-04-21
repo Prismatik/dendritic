@@ -30,8 +30,7 @@ module.exports = (opts) => {
     {p: 'tests/routes', n: 'schema'},
   ].map(thing => _.extend({p: '', d: thing.p || '', t: thing.n, e: 'js'}, thing));
 
-  const scaffoldFile = scaffold.bind(null, opts, __dirname);
-  files.forEach(scaffoldFile);
+  files.forEach(scaffold(opts, __dirname));
 
   const dirs = [
     'env',
