@@ -5,7 +5,7 @@ module.exports = () => {
   const files = [
     {p: 'middleware', n: 'cors'},
     {p: 'tests/middleware', n: 'cors'}
-  ].map(thing => _.extend({p: '', d: thing.p || '', t: thing.n, e: 'js'}, thing));
+  ].map(file => _.extend({p: '', d: file.p || '', t: file.n, e: 'js'}, file));
 
   files.forEach(scaffold({}, __dirname));
 };

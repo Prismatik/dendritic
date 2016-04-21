@@ -16,7 +16,7 @@ module.exports = (opts) => {
     {n: 'table', d: 'tables', t: opts.name},
     {n: 'fixture', d: 'fixtures', t: opts.name},
     {n: 'schema', d: 'schemas', t: opts.name, e: 'json'},
-  ].map(thing => _.extend({p: '', d: thing.p || '', t: thing.n, e: 'js'}, thing));
+  ].map(file => _.extend({p: '', d: file.p || '', t: file.n, e: 'js'}, file));
 
   files.forEach(scaffold(opts, __dirname));
 };
