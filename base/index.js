@@ -5,7 +5,7 @@ const mkdirp = require('mkdirp');
 const scaffold = require('../lib/scaffold');
 
 module.exports = (opts) => {
-  const things = [
+  const files = [
     // p: source path, n: filename
     // d: destination path, t: target filename, e: target extension
     {p: 'bin', n: 'migration'},
@@ -31,7 +31,7 @@ module.exports = (opts) => {
   ].map(thing => _.extend({p: '', d: thing.p || '', t: thing.n, e: 'js'}, thing));
 
   const scaffoldFile = scaffold.bind(null, opts, __dirname);
-  things.forEach(scaffoldFile);
+  files.forEach(scaffoldFile);
 
   const dirs = [
     'env',
