@@ -18,6 +18,6 @@ module.exports = (opts) => {
     {n: 'schema', d: 'schemas', t: opts.name, e: 'json'},
   ].map(thing => _.extend({p: '', d: thing.p || '', t: thing.n, e: 'js'}, thing));
 
-  const scaffoldFile = scaffold.bind(null, opts, __dirname)
+  const scaffoldFile = scaffold.bind(null, opts, __dirname);
   things.forEach(scaffoldFile);
 };
