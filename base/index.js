@@ -6,35 +6,37 @@ const _ = require('lodash');
 
 module.exports = (opts) => {
   const things = [
-    // n: name, p: path, e: extension
-    {n: 'db', p: 'lib'},
+    // p: source path, n: filename
+    // d: destination path, t: target filename, e: target extension
+    {p: 'bin', n: 'migration'},
+    {p: 'bin', n: 'migrate'},
+    {p: 'bin', n: 'migration_template', e: 'mustache'},
+    {p: 'bin', n: 'migration_test_template', e: 'mustache'},
+    {p: 'env', n: 'base'},
+    {p: 'env', n: 'db'},
+    {p: 'lib', n: 'db'},
+    {p: 'lib', n: 'migrate'},
     {n: 'index'},
+    {n: 'package', e: 'json'},
+    {n: 'schema'},
+    {n: 'setup'},
     {n: 'start'},
     {n: 'test'},
-    {n: 'setup'},
-    {n: 'db', p: 'env'},
-    {n: 'base', p: 'env'},
-    {n: 'package', e: 'json'},
-    {n: 'jwt', p: 'tests/middleware'},
-    {n: 'jwt', p: 'middleware'},
-    {n: 'cors', p: 'middleware'},
-    {n: 'schema'},
-    {n: 'schema', p: 'tests/routes'},
-    {n: 'schema', p: 'routes'},
-    {n: 'migrations', p: 'tables'},
-    {n: 'migrate', p: 'lib'},
-    {n: 'migration', p: 'bin'},
-    {n: 'migrate', p: 'bin'},
-    {n: 'migration_template', p: 'bin', e: 'mustache'},
-    {n: 'migration_test_template', p: 'bin', e: 'mustache'},
-  ].map(thing => _.extend({p: '', e: 'js'}, thing));
+    {p: 'middleware', n: 'jwt'},
+    {p: 'middleware', n: 'cors'},
+    {p: 'routes', n: 'schema'},
+    {p: 'tables', n: 'migrations'},
+    {p: 'tests/middleware', n: 'jwt'},
+    {p: 'tests/routes', n: 'schema'},
+  ].map(thing => _.extend({p: '', d: thing.p || '', t: thing.n, e: 'js'}, thing));
 
   things.forEach(thing => {
     const templatePath = path.join(__dirname, thing.p, thing.n+'.mustache');
     const template = fs.readFileSync(templatePath).toString();
-    const dir = path.join(process.cwd(), thing.p);
-    const target = path.join(dir, thing.n+'.'+thing.e);
-    console.log('writing', thing.n, 'to', target);
+
+    const dir = path.join(process.cwd(), thing.d);
+    const target = path.join(dir, thing.t+'.'+thing.e);
+
     if (fs.existsSync(target)) return console.error(target, 'already exists. Not overwriting it');
 
     mkdirp.sync(dir);

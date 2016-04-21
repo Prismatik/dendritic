@@ -13,7 +13,7 @@ const schema = fs.readdirSync('./schemas').reduce((s, file) => {
 
 const getIndexes = tableName => {
   return r.table(tableName).indexList().run()
-    .then(indexes => [tableName, indexes]);
+    .then(indexes => [tableName, indexes.concat("id")]);
 };
 
 // Note: This only adds the .indexed property to the schema's top level

@@ -373,59 +373,6 @@ test('websockets should skip if asked', (t) => {
     });
   });
 });
-
-test('websockets should orderBy asc if asked', (t) => {
-  // The websocket API won't return its results in order, but they will be pulled from the right part of the database
-  return {{name}}Creator(15)
-  .then(() => {
-    return new Promise(resolve => {
-      const io = IO(url+'/{{pluralName}}', {query: {orderBy: 'id', order: 'asc'}, forceNew: true});
-      const results = [];
-      io.on('record', data => {
-        results.push(data.new_val);
-      });
-      io.on('state', data => {
-        if (data.state !== 'ready') return;
-        io.disconnect();
-        const reordered = _.clone(results).sort((a, b) => {
-          if (a.id > b.id) return 1;
-          if (a.id < b.id) return -1;
-          return 0;
-        });
-        return resolve(getJSON('/{{pluralName}}?orderBy=id&order=asc')
-        .then(json => {
-          t.deepEqual(_.pluck(reordered, 'id'), _.pluck(json, 'id'));
-        }));
-      });
-    });
-  });
-});
-
-test('websockets should orderBy desc if asked', (t) => {
-  return {{name}}Creator(15)
-  .then(() => {
-    return new Promise(resolve => {
-      const io = IO(url+'/{{pluralName}}', {query: {orderBy: 'id', order: 'desc'}, forceNew: true});
-      const results = [];
-      io.on('record', data => {
-        results.push(data.new_val);
-      });
-      io.on('state', data => {
-        if (data.state !== 'ready') return;
-        io.disconnect();
-        const reordered = _.clone(results).sort((a, b) => {
-          if (a.id < b.id) return 1;
-          if (a.id > b.id) return -1;
-          return 0;
-        });
-        return resolve(getJSON('/{{pluralName}}?orderBy=id&order=desc')
-        .then(json => {
-          t.deepEqual(_.pluck(reordered, 'id'), _.pluck(json, 'id'));
-        }));
-      });
-    });
-  });
-});
 {{#relationships}}
 
 const {{name}}Poster = poster('/{{pluralName}}')

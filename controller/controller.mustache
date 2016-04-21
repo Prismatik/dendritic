@@ -4,23 +4,29 @@ const controller = require('../lib/controller');
 const rethinkdb = require('../lib/rethinkdb');
 const schema = require('../lib/schema');
 
+const appSchema = require('../schema').getSchema();
+const modelSchema = appSchema['{{name}}'];
+
+var NOT_INDEXED = 'WARNING: query is not using an indexed field, changefeed';
+NOT_INDEXED += ' will not include new documents';
+
+var SORT_LIMIT = 'WARNING: queries using skip and/or limit will not received';
+SORT_LIMIT = 'new documents in the changefeed';
+
 module.exports = {
   get: (params) => {
+    params = _.assign({result: true}, controller.normaliseParams(params));
+    const queryParams = schema.filter('{{name}}', params);
+
     const table = r.table('{{pluralName}}');
+    const indexBy = controller.getIndex(modelSchema, queryParams);
 
-    if (params.id) {
-      return table.get(params.id).run()
-      .then(res => { return {result: res} });
-    }
-
-    params = _.assign({result: true, order: 'asc'}, controller.normaliseParams(params));
-
-    const filteredTable = table.filter(schema.filter('{{name}}', params));
-    const query = rethinkdb.buildQuery(filteredTable, params);
+    const query = rethinkdb.buildQuery(table, indexBy, queryParams);
+    const tranformedQuery = rethinkdb.addTransformations(query, params);
 
     const taggedQueries = [
-      {tag: 'result', q: query},
-      {tag: 'count', q: filteredTable.count()}
+      {tag: 'result', q: tranformedQuery},
+      {tag: 'count', q: query.count()}
     ].filter(x => params[x.tag]);
 
     return Promise.all(taggedQueries.map(x => x.q.run()))
@@ -35,18 +41,28 @@ module.exports = {
     });
   },
   watch: (params) => {
-    const table = r.table('{{pluralName}}');
+    params = controller.normaliseParams(params);
+    const queryParams = schema.filter('{{name}}', params);
 
-    if (params.id) {
-      return table.get(params.id).changes({includeInitial: true, includeStates: true}).run();
+    const changes = {includeInitial: true, includeStates: true};
+    const table = r.table('{{pluralName}}');
+    const indexBy = controller.getIndex(modelSchema, queryParams);
+
+    var query = rethinkdb.buildQuery(table, indexBy, queryParams);
+    query = rethinkdb.addTransformations(query, params);
+ 
+    //if query params were passed but none were on an index field
+    if (!_.isEmpty(queryParams) && indexBy == null) {
+      console.log(NOT_INDEXED);
+      query = table.getAll(r.args(query.getField('id').coerceTo('array')));
     }
 
-    params = _.assign({order: 'asc'}, controller.normaliseParams(params));
+    if (params.limit || params.skip) {
+      console.log(SORT_LIMIT);
+      query = table.getAll(r.args(query.getField('id').coerceTo('array')));
+    }
 
-    const filteredTable = table.filter(schema.filter('{{name}}', params));
-    const query = rethinkdb.buildQuery(filteredTable, params);
-
-    return table.getAll(r.args(query.getField('id').coerceTo('array'))).changes({includeInitial: true, includeStates: true}).run();
+    return query.changes(changes).run();
   },
   create: ({{name}}) => {
     const valid = schema.validate({{name}});

@@ -1,0 +1,42 @@
+const test = require('blue-tape');
+const controller = require('../../lib/controller');
+
+const INDEXED = {indexed: true}
+const UUID = 'dc83f979-3485-49fc-b180-ba485d01a88f'
+
+test('Given params match an indexed property, must return property name', (t) => {
+  const schema = { properties: { name: INDEXED } }
+  const params = {farmBoy: true, name: 'Luke Skywalker', pilot: true};
+  const result = controller.getIndex(schema, params);
+
+  t.equal(result, "name");
+  return t.end();
+})
+
+test('Given params match multiple indexed properties, must one property name', (t) => {
+  const schema = { properties: { name: INDEXED, pilot: INDEXED } }
+  const params = {farmBoy: true, name: 'Luke Skywalker', pilot: true};
+  const result = controller.getIndex(schema, params);
+
+  // does not matter which indexed property is returned 
+  t.ok(['name', 'pilot'].indexOf(result) > -1)
+  return t.end();
+})
+
+test('Given params include id, must prioritise id for use as an index', (t) => {
+  const schema = { properties: { id: INDEXED, farmBoy: INDEXED } }
+  const params = {id: UUID, farmBoy: true};
+  const result = controller.getIndex(schema, params);
+
+  t.equal(result, "id");
+  return t.end();
+})
+
+test('Given params do not match an indexed property, must return undefined', (t) => {
+  const schema = { properties: { id: INDEXED } }
+  const params = {farmBoy: true, name: 'Luke Skywalker', pilot: true};
+  const result = controller.getIndex(schema, params);
+
+  t.deepEqual(result, undefined);
+  return t.end();
+})
