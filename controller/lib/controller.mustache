@@ -19,10 +19,5 @@ exports.getIndex = (schema, params) => {
   if (params.id && fields['id'] && fields['id'].indexed) return 'id';
 
   const properties = schema.properties;
-  for (var key in params) {
-    if (params.hasOwnProperty(key)) { 
-      if (properties[key] && properties[key].indexed) return key;
-    }
-  }
-  return null;
+  return _.findKey(params, (val, key) => properties[key] && properties[key].indexed)
 }

@@ -32,11 +32,11 @@ test('Given params include id, must prioritise id for use as an index', (t) => {
   return t.end();
 })
 
-test('Given params do not match an indexed property, must return null', (t) => {
+test('Given params do not match an indexed property, must return undefined', (t) => {
   const schema = { properties: { id: INDEXED } }
   const params = {farmBoy: true, name: 'Luke Skywalker', pilot: true};
   const result = controller.getIndex(schema, params);
 
-  t.deepEqual(result, null);
+  t.deepEqual(result, undefined);
   return t.end();
 })
