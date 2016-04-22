@@ -5,10 +5,13 @@
 
 Redbeard is a scaffolder and _light_ framework for HTTP APIs. It will give you the bones of an API using JSON Schema, Restify, RethinkDB, tape and promise-y functional ES6.
 
-To use it:
+### Development
 
-#### Initial Setup
+#### Requirements
 
+- Rethinkdb 3.0
+
+#### Install
 ```
 npm install -g redbeard
 mdkir my-new-project && cd my-new-project
@@ -42,8 +45,6 @@ This will add the necessary properties to your model schema as well as setup tes
 - - -
 
 NOTES:
-
-* Rethink must be version 2.2 or greater to run the resulting app and/or test suite. Anything earlier doesn't support atomic changefeeds (includeInitial).
 * Project names and model names should be singular, redbeard will pluralize these names as required.
 
 TODO:
