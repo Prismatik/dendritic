@@ -3,33 +3,67 @@ const rimraf = require("rimraf");
 const scaffold = require("../../lib/scaffold");
 
 const sourcePath = process.cwd() + "/test/files/lib";
-const outputPath = "/redbeard_tests/redbeard";
+const outputFolder = "/redbeard_tests/redbeard";
+const outputPath = process.cwd() + "/redbeard_tests/redbeard";
 
 describe("lib/scaffold", function() {
   describe(".scaffold", function() {
     afterEach(function() {
-      rimraf.sync(process.cwd() + outputPath);
+      rimraf.sync(outputPath);
     });
 
     it("must create destination folder", function() {
       scaffold({
         basePath: sourcePath,
-        files: [{n: "scaffold", d: outputPath}],
+        files: [{n: "scaffold", d: outputFolder}],
         mustacheOpts: {}
       });
       
-      const folder= fs.lstatSync(process.cwd() + outputPath);
+      const folder= fs.lstatSync(outputPath);
       folder.isDirectory().must.be.true();
     });
 
     it("must create target file", function() {
       scaffold({
         basePath: sourcePath,
-        files: [{n: "scaffold", d: outputPath}],
+        files: [{n: "scaffold", d: outputFolder}],
         mustacheOpts: {}
       });
       
-      const folder = fs.lstatSync(process.cwd() + outputPath + "/scaffold.js");
+      const folder = fs.lstatSync(outputPath + "/scaffold.js");
+      folder.isDirectory().must.be.false();
+    });
+
+    it("must allow specifying the target file name", function() {
+      scaffold({
+        basePath: sourcePath,
+        files: [{n: "scaffold", d: outputFolder, t: "yellowbeard"}],
+        mustacheOpts: {}
+      });
+      
+      const folder = fs.lstatSync(outputPath + "/yellowbeard.js");
+      folder.isDirectory().must.be.false();
+    });
+
+    it("must allow specifying the file extension", function() {
+      scaffold({
+        basePath: sourcePath,
+        files: [{n: "scaffold", d: outputFolder, e: "html"}],
+        mustacheOpts: {}
+      });
+      
+      const folder = fs.lstatSync(outputPath + "/scaffold.html");
+      folder.isDirectory().must.be.false();
+    });
+
+    it("must allow specifying the files path", function() {
+      scaffold({
+        basePath: process.cwd(),
+        files: [{p: "test/files/lib", n: "scaffold", d: outputFolder}],
+        mustacheOpts: {}
+      });
+      
+      const folder = fs.lstatSync(outputPath + "/scaffold.js");
       folder.isDirectory().must.be.false();
     });
 
@@ -46,7 +80,7 @@ describe("lib/scaffold", function() {
 
       scaffold({
         basePath: sourcePath,
-        files: [{n: "scaffold", d: outputPath}],
+        files: [{n: "scaffold", d: outputFolder}],
         mustacheOpts: mustacheOpts
       });
 
@@ -57,7 +91,7 @@ describe("lib/scaffold", function() {
       expected += '    <li><a href="#Blue">blue</a></li>\n';
       expected += '\n';
       
-      const file = fs.readFileSync(process.cwd() + outputPath + "/scaffold.js", "utf-8");
+      const file = fs.readFileSync(outputPath + "/scaffold.js", "utf-8");
       file.must.equal(expected);
     });
   });
