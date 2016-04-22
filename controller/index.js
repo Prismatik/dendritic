@@ -1,10 +1,10 @@
-const _ = require('lodash');
 const scaffold = require('../lib/scaffold');
 
+
 module.exports = (opts) => {
+  // p: source path, n: filename
+  // d: destination path, t: target filename, e: target extension
   const files = [
-    // p: source path, n: filename
-    // d: destination path, t: target filename, e: target extension
     {p: 'lib', n: 'controller'},
     {p: 'lib', n: 'rethinkdb'},
     {p: 'lib', n: 'schema'},
@@ -16,7 +16,7 @@ module.exports = (opts) => {
     {n: 'table', d: 'tables', t: opts.name},
     {n: 'fixture', d: 'fixtures', t: opts.name},
     {n: 'schema', d: 'schemas', t: opts.name, e: 'json'},
-  ].map(file => _.extend({p: '', d: file.p || '', t: file.n, e: 'js'}, file));
+  ];
 
-  files.forEach(scaffold(opts, __dirname));
+  scaffold({ basePath: __dirname, files: files, mustacheOpts: opts });
 };

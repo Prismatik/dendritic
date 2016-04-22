@@ -1,11 +1,13 @@
-const _ = require('lodash');
 const scaffold = require('../lib/scaffold');
 
-module.exports = () => {
+
+module.exports = (opts) => {
+  // p: source path, n: filename
+  // d: destination path, t: target filename, e: target extension
   const files = [
     {p: 'middleware', n: 'cors'},
     {p: 'tests/middleware', n: 'cors'}
-  ].map(file => _.extend({p: '', d: file.p || '', t: file.n, e: 'js'}, file));
+  ];
 
-  files.forEach(scaffold({}, __dirname));
+  scaffold({ basePath: __dirname, files: files, mustacheOpts: opts });
 };

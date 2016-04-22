@@ -1,13 +1,13 @@
-const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
 const scaffold = require('../lib/scaffold');
 
+
 module.exports = (opts) => {
+  // p: source path, n: filename
+  // d: destination path, t: target filename, e: target extension
   const files = [
-    // p: source path, n: filename
-    // d: destination path, t: target filename, e: target extension
     {p: 'bin', n: 'migration'},
     {p: 'bin', n: 'migrate'},
     {p: 'bin', n: 'migration_template', e: 'mustache'},
@@ -28,9 +28,9 @@ module.exports = (opts) => {
     {p: 'tables', n: 'migrations'},
     {p: 'tests/middleware', n: 'jwt'},
     {p: 'tests/routes', n: 'schema'},
-  ].map(file => _.extend({p: '', d: file.p || '', t: file.n, e: 'js'}, file));
+  ];
 
-  files.forEach(scaffold(opts, __dirname));
+  scaffold({ basePath: __dirname, files: files, mustacheOpts: opts });
 
   const dirs = [
     'env',
