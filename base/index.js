@@ -1,13 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
-const mustache = require('mustache');
-const _ = require('lodash');
+const scaffold = require('../lib/scaffold');
+
 
 module.exports = (opts) => {
-  const things = [
-    // p: source path, n: filename
-    // d: destination path, t: target filename, e: target extension
+  // p: source path, n: filename
+  // d: destination path, t: target filename, e: target extension
+  const files = [
     {p: 'bin', n: 'migration'},
     {p: 'bin', n: 'migrate'},
     {p: 'bin', n: 'migration_template', e: 'mustache'},
@@ -28,21 +28,9 @@ module.exports = (opts) => {
     {p: 'tables', n: 'migrations'},
     {p: 'tests/middleware', n: 'jwt'},
     {p: 'tests/routes', n: 'schema'},
-  ].map(thing => _.extend({p: '', d: thing.p || '', t: thing.n, e: 'js'}, thing));
+  ];
 
-  things.forEach(thing => {
-    const templatePath = path.join(__dirname, thing.p, thing.n+'.mustache');
-    const template = fs.readFileSync(templatePath).toString();
-
-    const dir = path.join(process.cwd(), thing.d);
-    const target = path.join(dir, thing.t+'.'+thing.e);
-
-    if (fs.existsSync(target)) return console.error(target, 'already exists. Not overwriting it');
-
-    mkdirp.sync(dir);
-    const rendered = mustache.render(template, opts);
-    fs.writeFileSync(target, rendered);
-  });
+  scaffold({ basePath: __dirname, files: files, mustacheOpts: opts });
 
   const dirs = [
     'env',
