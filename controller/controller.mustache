@@ -19,7 +19,8 @@ module.exports = {
     const queryParams = schema.filter('{{name}}', params);
 
     const table = r.table('{{pluralName}}');
-    const indexBy = controller.getIndex(modelSchema, queryParams);
+    const indexes = controller.getIndexes(modelSchema, queryParams);
+    const indexBy = _.contains(indexes, "id") ? "id" : indexes[0];
 
     const query = rethinkdb.buildQuery(table, indexBy, queryParams);
     const tranformedQuery = rethinkdb.addTransformations(query, params);
@@ -46,7 +47,8 @@ module.exports = {
 
     const changes = {includeInitial: true, includeStates: true};
     const table = r.table('{{pluralName}}');
-    const indexBy = controller.getIndex(modelSchema, queryParams);
+    const indexes = controller.getIndexes(modelSchema, queryParams);
+    const indexBy = _.contains(indexes, "id") ? "id" : indexes[0];
 
     var query = rethinkdb.buildQuery(table, indexBy, queryParams);
     query = rethinkdb.addTransformations(query, params);
