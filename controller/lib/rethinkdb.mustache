@@ -10,13 +10,14 @@ exports.firstChange = res => {
   };
 }
 
-exports.addTransformations = (table, params) => {
+exports.addTransformations = (table, indexes, params) => {
   return ['orderBy', 'skip', 'limit'].reduce((q, item) => {
     if (params[item]) {
-      //TODO - this does not use an index if there is one
       if (item === 'orderBy') {
         const order = params.order || 'asc'
-        q = q[item](r[order](params[item]));
+        const isIndexed = _.contains(indexes, "orderBy")
+        if (isIndexed) q = q[item]({index: r[order](params[item])});
+        else q = q[item](r[order](params[item]));
       } else {
         q = q[item](params[item]);
       }

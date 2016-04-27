@@ -23,7 +23,7 @@ module.exports = {
     const indexBy = _.contains(indexes, "id") ? "id" : indexes[0];
 
     const query = rethinkdb.buildQuery(table, indexBy, queryParams);
-    const tranformedQuery = rethinkdb.addTransformations(query, params);
+    const tranformedQuery = rethinkdb.addTransformations(query, indexes, params);
 
     const taggedQueries = [
       {tag: 'result', q: tranformedQuery},
@@ -51,7 +51,7 @@ module.exports = {
     const indexBy = _.contains(indexes, "id") ? "id" : indexes[0];
 
     var query = rethinkdb.buildQuery(table, indexBy, queryParams);
-    query = rethinkdb.addTransformations(query, params);
+    query = rethinkdb.addTransformations(query, indexes, params);
  
     //if query params were passed but none were on an index field
     if (!_.isEmpty(queryParams) && indexBy == null) {
