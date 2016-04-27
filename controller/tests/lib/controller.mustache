@@ -4,6 +4,7 @@ const controller = require('../../lib/controller');
 const INDEXED = {indexed: true}
 const UUID = 'dc83f979-3485-49fc-b180-ba485d01a88f'
 
+//.getIndexes
 test('Given params match indexed properties, must return all matches', (t) => {
   const schema = { properties: { favMilk: INDEXED, pilot: INDEXED } }
   const params = {
@@ -43,5 +44,52 @@ test('Given no params match indexed propertites, must return an empty array', (t
   const result = controller.getIndexes(schema, params);
 
   t.deepEqual(result, []);
+  return t.end();
+})
+
+//.isOptimised
+test('Given no params must return true', (t) => {
+  const result = controller.isOptimised([], []);
+  t.equal(result, true)
+  return t.end();
+})
+
+test('Given one param is indexed, must return true', (t) => {
+  const indexed = ['species']
+  const params = {furry: 'true', species: 'Wookie', name: 'Wally'}
+  const result = controller.isOptimised(indexed, params);
+  t.equal(result, true)
+  return t.end();
+})
+
+test('Given multiple params are indexed, must return true', (t) => {
+  const indexed = ['species','name']
+  const params = {furry: 'true', species: 'Wookie', name: 'Wally'}
+  const result = controller.isOptimised(indexed, params);
+  t.equal(result, true)
+  return t.end();
+})
+
+test('Given no params are indexed, must return false', (t) => {
+  const indexed = ['color','hasBowcaster']
+  const params = {furry: 'true', species: 'Wookie', name: 'Wally'}
+  const result = controller.isOptimised(indexed, params);
+  t.equal(result, false)
+  return t.end();
+})
+
+test('Given orderBy is used on an unindexed field, must return false', (t) => {
+  const indexed = ['species']
+  const params = {orderBy: "name"}
+  const result = controller.isOptimised(indexed, params);
+  t.equal(result, false)
+  return t.end();
+})
+
+test('Given orderBy is used on an indexed field, must return true', (t) => {
+  const indexed = ['name']
+  const params = {orderBy: "name"}
+  const result = controller.isOptimised(indexed, params);
+  t.equal(result, true)
   return t.end();
 })
