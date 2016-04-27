@@ -49,7 +49,7 @@ test('Given no params match indexed propertites, must return an empty array', (t
 
 //.isOptimised
 test('Given no params must return true', (t) => {
-  const result = controller.isOptimised([], []);
+  const result = controller.isQueryOptimised([], []);
   t.equal(result, true)
   return t.end();
 })
@@ -57,7 +57,7 @@ test('Given no params must return true', (t) => {
 test('Given one param is indexed, must return true', (t) => {
   const indexed = ['species']
   const params = {furry: 'true', species: 'Wookie', name: 'Wally'}
-  const result = controller.isOptimised(indexed, params);
+  const result = controller.isQueryOptimised(indexed, params);
   t.equal(result, true)
   return t.end();
 })
@@ -65,7 +65,7 @@ test('Given one param is indexed, must return true', (t) => {
 test('Given multiple params are indexed, must return true', (t) => {
   const indexed = ['species','name']
   const params = {furry: 'true', species: 'Wookie', name: 'Wally'}
-  const result = controller.isOptimised(indexed, params);
+  const result = controller.isQueryOptimised(indexed, params);
   t.equal(result, true)
   return t.end();
 })
@@ -73,7 +73,7 @@ test('Given multiple params are indexed, must return true', (t) => {
 test('Given no params are indexed, must return false', (t) => {
   const indexed = ['color','hasBowcaster']
   const params = {furry: 'true', species: 'Wookie', name: 'Wally'}
-  const result = controller.isOptimised(indexed, params);
+  const result = controller.isQueryOptimised(indexed, params);
   t.equal(result, false)
   return t.end();
 })
@@ -81,7 +81,7 @@ test('Given no params are indexed, must return false', (t) => {
 test('Given orderBy is used on an unindexed field, must return false', (t) => {
   const indexed = ['species']
   const params = {orderBy: "name"}
-  const result = controller.isOptimised(indexed, params);
+  const result = controller.isQueryOptimised(indexed, params);
   t.equal(result, false)
   return t.end();
 })
@@ -89,7 +89,7 @@ test('Given orderBy is used on an unindexed field, must return false', (t) => {
 test('Given orderBy is used on an indexed field, must return true', (t) => {
   const indexed = ['name']
   const params = {orderBy: "name"}
-  const result = controller.isOptimised(indexed, params);
+  const result = controller.isQueryOptimised(indexed, params);
   t.equal(result, true)
   return t.end();
 })

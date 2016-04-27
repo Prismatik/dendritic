@@ -20,12 +20,12 @@ exports.getIndexes = (schema, params) => {
   return fields.filter(f => props[f] && props[f].indexed).sort();
 }
 
-exports.isOptimised = (indexes, params) => {
-  return queryOptimised(indexes, params) && orderByOptimised(indexes, params)
+exports.isQueryOptimised = (indexes, params) => {
+  return filtersOptimised(indexes, params) && orderByOptimised(indexes, params)
 }
 
 // at least one field must use an index
-function queryOptimised(indexes, params) {
+function filtersOptimised(indexes, params) {
   const filtered = _.omit(params, "skip", "limit", "order", "orderBy");
   const fields = Object.keys(filtered);
   if (fields.length === 0) return true;

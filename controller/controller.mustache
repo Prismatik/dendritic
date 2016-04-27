@@ -51,7 +51,7 @@ module.exports = {
     query = rethinkdb.addTransformations(query, indexes, params);
  
     //if query params were passed but none were on an index field
-    if (!controller.isOptimised(indexes, params)) {
+    if (!controller.isQueryOptimised(indexes, params)) {
       console.log(NOT_OPTIMISED);
       query = table.getAll(r.args(query.getField('id').coerceTo('array')));
     }
