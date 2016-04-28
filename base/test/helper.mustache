@@ -1,4 +1,3 @@
-const walkdir = require('walkdir');
 const path = require('path');
 const must = require('must');
 
@@ -7,20 +6,11 @@ const app = require('root/index');
 const r = require('root/lib/db');
 
 const server = app.listen(process.env.PORT, () => {
-  setup()
-  .then(() => {
-    walkdir.sync('./test').filter(function(file) {
-      if (file.indexOf('swp') > -1) return false;
-      return file.indexOf('.js') > -1;
-    }).forEach(function(file) {
-      require(file);
-    });
-  })
-  .then(() => {
-    test('teardown', () => r.dbDrop('{{name}}'));
-    test('teardown', () => r.getPoolMaster().drain());
-    test('teardown', () => {
-      return Promise.resolve(app.close())
-    });
+  setup().then(() => {
+    after(() => Promise.all([
+      r.dbDrop('{{name}}'),
+      r.getPoolMaster().drain(),
+      Promise.resolve(app.close())
+    ]));
   });
 });
