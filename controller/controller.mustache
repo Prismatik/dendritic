@@ -7,7 +7,7 @@ const schema = require('../lib/schema');
 const appSchema = require('../schema').getSchema();
 const modelSchema = appSchema['{{name}}'];
 
-var NOT_OPTIMISED = "WARNING: query is optimised, changed feed will not";
+var NOT_OPTIMISED = "WARNING: query is not optimised, changed feed will not";
 NOT_OPTIMISED += " include any newly created documents.";
 
 module.exports = {
