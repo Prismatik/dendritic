@@ -1,6 +1,11 @@
 const _ = require('lodash');
 const r = require('./db');
 
+const limitRegexp = /\.limit\(([^\)]*)\)/m;
+const orderByRegexp = /\.orderBy\(([^\)]*)\)/m;
+const filterRegexp = /\.filter\(([^\)]*)\)/m;
+const skipRegexp = /\.skip\(([^\)]*)\)/m;
+
 exports.firstChange = res => {
   const change = res.changes[0];
 
@@ -10,13 +15,14 @@ exports.firstChange = res => {
   };
 }
 
-exports.addTransformations = (table, params) => {
+exports.addTransformations = (table, indexes, params) => {
   return ['orderBy', 'skip', 'limit'].reduce((q, item) => {
     if (params[item]) {
-      //TODO - this does not use an index if there is one
       if (item === 'orderBy') {
         const order = params.order || 'asc'
-        q = q[item](r[order](params[item]));
+        const isIndexed = _.contains(indexes, "orderBy")
+        if (isIndexed) q = q[item]({index: r[order](params[item])});
+        else q = q[item](r[order](params[item]));
       } else {
         q = q[item](params[item]);
       }
@@ -36,4 +42,25 @@ exports.buildQuery = (table, indexBy, params) => {
   
   if (!_.isEmpty(params)) table = table.filter(params);
   return table;
+}
+
+// refer changefeed limitations here:- 
+// https://rethinkdb.com/docs/changefeeds/javascript/
+// this prevents "RqlRuntimeError: Cannot call `changes` on an eager stream in"
+exports.isChangeFeedable = (query) => {
+  query = query.toString();
+
+  const orderBy = orderByRegexp.exec(query)
+  const limit = limitRegexp.test(query)
+  const skip = skipRegexp.test(query)
+  const filter = filterRegexp.exec(query)
+
+  //if filter is used, index must also be used (getAll)
+  if (orderBy && !limit) return false;
+  if (limit && !orderBy) return false;
+  // this issue is not documented but causes the same problem as limit without orderBy
+  if (skip && !orderBy) return false;
+  if (orderBy && orderBy[1].indexOf('index') === -1) return false;
+  if (filter && orderBy && filter.index > orderBy.index) return false;
+  return true;
 }

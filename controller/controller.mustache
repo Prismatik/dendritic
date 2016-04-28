@@ -7,11 +7,10 @@ const schema = require('../lib/schema');
 const appSchema = require('../schema').getSchema();
 const modelSchema = appSchema['{{name}}'];
 
-var NOT_INDEXED = 'WARNING: query is not using an indexed field, changefeed';
-NOT_INDEXED += ' will not include new documents';
-
-var SORT_LIMIT = 'WARNING: queries using skip and/or limit will not received';
-SORT_LIMIT = 'new documents in the changefeed';
+const LINK = 'https://rethinkdb.com/docs/changefeeds/javascript/'
+var RESTRICTED_FEED = "WARNING: Changefeed is restricted and will only"
+RESTRICTED_FEED += " include updates to existing documents, not newly created"
+RESTRICTED_FEED += " documents. Read more here: " + LINK;
 
 module.exports = {
   get: (params) => {
@@ -19,10 +18,11 @@ module.exports = {
     const queryParams = schema.filter('{{name}}', params);
 
     const table = r.table('{{pluralName}}');
-    const indexBy = controller.getIndex(modelSchema, queryParams);
+    const indexes = controller.getIndexes(modelSchema, queryParams);
+    const indexBy = _.contains(indexes, "id") ? "id" : indexes[0];
 
     const query = rethinkdb.buildQuery(table, indexBy, queryParams);
-    const tranformedQuery = rethinkdb.addTransformations(query, params);
+    const tranformedQuery = rethinkdb.addTransformations(query, indexes, params);
 
     const taggedQueries = [
       {tag: 'result', q: tranformedQuery},
@@ -46,19 +46,14 @@ module.exports = {
 
     const changes = {includeInitial: true, includeStates: true};
     const table = r.table('{{pluralName}}');
-    const indexBy = controller.getIndex(modelSchema, queryParams);
+    const indexes = controller.getIndexes(modelSchema, queryParams);
+    const indexBy = _.contains(indexes, "id") ? "id" : indexes[0];
 
     var query = rethinkdb.buildQuery(table, indexBy, queryParams);
-    query = rethinkdb.addTransformations(query, params);
+    query = rethinkdb.addTransformations(query, indexes, params);
  
-    //if query params were passed but none were on an index field
-    if (!_.isEmpty(queryParams) && indexBy == null) {
-      console.log(NOT_INDEXED);
-      query = table.getAll(r.args(query.getField('id').coerceTo('array')));
-    }
-
-    if (params.limit || params.skip) {
-      console.log(SORT_LIMIT);
+    if (!rethinkdb.isChangeFeedable(query)) {
+      console.log(RESTRICTED_FEED);
       query = table.getAll(r.args(query.getField('id').coerceTo('array')));
     }
 

@@ -4,39 +4,45 @@ const controller = require('../../lib/controller');
 const INDEXED = {indexed: true}
 const UUID = 'dc83f979-3485-49fc-b180-ba485d01a88f'
 
-test('Given params match an indexed property, must return property name', (t) => {
-  const schema = { properties: { name: INDEXED } }
-  const params = {farmBoy: true, name: 'Luke Skywalker', pilot: true};
-  const result = controller.getIndex(schema, params);
+//.getIndexes
+test('Given params match indexed properties, must return all matches', (t) => {
+  const schema = { properties: { favMilk: INDEXED, pilot: INDEXED } }
+  const params = {
+    favMilk: 'blue',
+    id: UUID,
+    name: 'Luke Skywalker',
+    pilot: true
+  };
+  const result = controller.getIndexes(schema, params);
 
-  t.equal(result, "name");
+  t.deepEqual(result, ["favMilk", "pilot"]);
   return t.end();
 })
 
-test('Given params match multiple indexed properties, must one property name', (t) => {
-  const schema = { properties: { name: INDEXED, pilot: INDEXED } }
-  const params = {farmBoy: true, name: 'Luke Skywalker', pilot: true};
-  const result = controller.getIndex(schema, params);
+test('Given indexed properties that are not in params must not return these', (t) => {
+  const schema = {
+    properties: {pilot: INDEXED, sonOfVader: INDEXED, saberColour: INDEXED}
+  }
+  const params = {
+    favMilk: 'blue',
+    id: UUID,
+    name: 'Luke Skywalker',
+    pilot: true
+  };
+  const result = controller.getIndexes(schema, params);
 
-  // does not matter which indexed property is returned 
-  t.ok(['name', 'pilot'].indexOf(result) > -1)
+  t.deepEqual(result, ["pilot"]);
   return t.end();
 })
 
-test('Given params include id, must prioritise id for use as an index', (t) => {
-  const schema = { properties: { id: INDEXED, farmBoy: INDEXED } }
-  const params = {id: UUID, farmBoy: true};
-  const result = controller.getIndex(schema, params);
+test('Given no params match indexed propertites, must return an empty array', (t) => {
+  const schema = { properties: { favMilk: INDEXED, pilot: INDEXED } }
+  const params = {
+    sonOfVader: true,
+    saberColour: 'green/blue'
+  };
+  const result = controller.getIndexes(schema, params);
 
-  t.equal(result, "id");
-  return t.end();
-})
-
-test('Given params do not match an indexed property, must return undefined', (t) => {
-  const schema = { properties: { id: INDEXED } }
-  const params = {farmBoy: true, name: 'Luke Skywalker', pilot: true};
-  const result = controller.getIndex(schema, params);
-
-  t.deepEqual(result, undefined);
+  t.deepEqual(result, []);
   return t.end();
 })
