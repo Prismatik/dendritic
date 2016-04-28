@@ -30,4 +30,4 @@ exec(['node', index, 'controller', controllerName2, '-r', controllerName1].join(
 exec(['node', index, 'cors'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
 
-rimraf.sync(dir);
+// rimraf.sync(dir);

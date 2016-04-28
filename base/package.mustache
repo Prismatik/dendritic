@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "coverage": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 ./node_modules/.bin/istanbul cover test.js",
+    "coverage": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 mocha test",
     "migrate": "node ./bin/migrate.js",
     "migration": "node ./bin/migration.js",
     "start": "node start",
-    "test": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 node test.js"
+    "test": "JWT_SECRET=foo RETHINK_HOST=localhost RETHINK_PORT=28015 RETHINK_NAME={{name}} PORT=3001 mocha test"
   },
   "license": "ISC",
   "dependencies": {
@@ -23,7 +23,8 @@
     "walkdir": "0.0.11"
   },
   "devDependencies": {
-    "blue-tape": "^0.1.11",
+    "mocha": "^2.4.5",
+    "must": "^0.13.1",
     "istanbul": "^0.4.1",
     "json-schema-faker": "^0.2.5",
     "mustache": "^2.2.0",

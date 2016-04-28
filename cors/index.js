@@ -6,7 +6,7 @@ module.exports = (opts) => {
   // d: destination path, t: target filename, e: target extension
   const files = [
     {p: 'middleware', n: 'cors'},
-    {p: 'tests/middleware', n: 'cors'}
+    {p: 'test/middleware', n: 'cors_test'}
   ];
 
   scaffold({ basePath: __dirname, files: files, mustacheOpts: opts });

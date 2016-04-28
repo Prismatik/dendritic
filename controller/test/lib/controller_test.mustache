@@ -1,0 +1,34 @@
+const controller = require('../../lib/controller');
+
+const INDEXED = {indexed: true};
+const UUID = 'dc83f979-3485-49fc-b180-ba485d01a88f';
+
+describe('controller test', () => {
+  it('returns property name when prams match an indexed property', () => {
+    const schema = { properties: { name: INDEXED } };
+    const params = {farmBoy: true, name: 'Luke Skywalker', pilot: true};
+
+    controller.getIndex(schema, params).must.eql('name');
+  });
+
+  it('returns one property name when params match multiple indexed properties', () => {
+    const schema = { properties: { name: INDEXED, pilot: INDEXED } }
+    const params = {farmBoy: true, name: 'Luke Skywalker', pilot: true};
+
+    controller.getIndex(schema, params).must.eql('name');
+  });
+
+  it('prioritises the id for use as an index when params include an id', () => {
+    const schema = { properties: { id: INDEXED, farmBoy: INDEXED } };
+    const params = {id: UUID, farmBoy: true};
+
+    controller.getIndex(schema, params).must.eql('id');
+  });
+
+  it('returns undefined when params do not match an indexed property', () => {
+    const schema = { properties: { id: INDEXED } };
+    const params = {farmBoy: true, name: 'Luke Skywalker', pilot: true};
+
+    (controller.getIndex(schema, params) === undefined).must.be.true();
+  });
+});

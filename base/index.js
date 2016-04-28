@@ -11,7 +11,7 @@ module.exports = (opts) => {
     {p: 'bin', n: 'migration'},
     {p: 'bin', n: 'migrate'},
     {p: 'bin', n: 'migration_template', e: 'mustache'},
-    {p: 'bin', n: 'migration_test_template', e: 'mustache'},
+    {p: 'bin', n: 'migration_template_test', e: 'mustache'},
     {p: 'env', n: 'base'},
     {p: 'env', n: 'db'},
     {p: 'lib', n: 'db'},
@@ -21,13 +21,14 @@ module.exports = (opts) => {
     {n: 'schema'},
     {n: 'setup'},
     {n: 'start'},
-    {n: 'test'},
     {p: 'middleware', n: 'jwt'},
     {p: 'middleware', n: 'cors'},
     {p: 'routes', n: 'schema'},
     {p: 'tables', n: 'migrations'},
-    {p: 'tests/middleware', n: 'jwt'},
-    {p: 'tests/routes', n: 'schema'},
+    {p: 'test', n: 'helper'},
+    {p: 'test', n: 'mocha.opts', t: 'mocha', e: 'opts'},
+    {p: 'test/middleware', n: 'jwt_test'},
+    {p: 'test/routes', n: 'schema_test'}
   ];
 
   scaffold({ basePath: __dirname, files: files, mustacheOpts: opts });
