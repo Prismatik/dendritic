@@ -7,8 +7,10 @@ const schema = require('../lib/schema');
 const appSchema = require('../schema').getSchema();
 const modelSchema = appSchema['{{name}}'];
 
-var NOT_OPTIMISED = "WARNING: query is not optimised, changed feed will not";
-NOT_OPTIMISED += " include any newly created documents.";
+const LINK = 'https://rethinkdb.com/docs/changefeeds/javascript/'
+var RESTRICTED_FEED = "WARNING: Changefeed is restricted and will only"
+RESTRICTED_FEED += " include updates to existing documents, not newly created"
+RESTRICTED_FEED += " documents. Read more here: " + LINK;
 
 module.exports = {
   get: (params) => {
@@ -50,9 +52,8 @@ module.exports = {
     var query = rethinkdb.buildQuery(table, indexBy, queryParams);
     query = rethinkdb.addTransformations(query, indexes, params);
  
-    //if query params were passed but none were on an index field
-    if (!controller.isQueryOptimised(indexes, params)) {
-      console.log(NOT_OPTIMISED);
+    if (!rethinkdb.isChangeFeedable(query)) {
+      console.log(RESTRICTED_FEED);
       query = table.getAll(r.args(query.getField('id').coerceTo('array')));
     }
 

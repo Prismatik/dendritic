@@ -125,3 +125,62 @@ test('Given orderBy and order is provided for indexed field, sort order must be 
   t.deepEqual(result.toString(), expected.toString());
   return t.end();
 })
+
+//.isChangeFeedbable
+test('Given a query using orderBy without limit, it must return false', (t) => {
+  const table = r.table('test');
+  const query = table.orderBy('name');
+
+  const result = rethinkdb.isChangeFeedable(query);
+  t.equal(result, false);
+  return t.end();
+})
+
+test('Given a query using limit without orderBy, it must return false', (t) => {
+  const table = r.table('test');
+  const query = table.limit(1);
+
+  const result = rethinkdb.isChangeFeedable(query);
+  t.equal(result, false);
+  return t.end();
+})
+
+test('Given a query using orderBy without an index, it must return false', (t) => {
+  const table = r.table('test');
+  const query = table.limit(1).orderBy('name');
+
+  const result = rethinkdb.isChangeFeedable(query);
+  t.equal(result, false);
+  return t.end();
+})
+
+test('Given a query using orderBy with an index, it must return true', (t) => {
+  const table = r.table('test');
+
+  const query = table.limit(1).orderBy({index: 'name'});
+  const result = rethinkdb.isChangeFeedable(query)
+  t.equal(result, true);
+
+  const query2 = table.limit(1).orderBy({index: r.desc('date')});
+  const result2 = rethinkdb.isChangeFeedable(query);
+  t.equal(result2, true);
+  return t.end();
+})
+
+test('Given a query using filter before orderBy, it must return true', (t) => {
+  const table = r.table('test');
+
+  const query = table.filter({name: 'Darh Vader'}).limit(1).orderBy({index: 'name'});
+  const result = rethinkdb.isChangeFeedable(query)
+  t.equal(result, true);
+  return t.end();
+})
+
+test('Given a query using filter after orderBy, it must return false', (t) => {
+  const table = r.table('test');
+
+  const query = table.limit(1).orderBy({index: 'name'}).filter({name: 'Darh Vader'});
+  const result = rethinkdb.isChangeFeedable(query)
+  t.equal(result, false);
+  return t.end();
+})

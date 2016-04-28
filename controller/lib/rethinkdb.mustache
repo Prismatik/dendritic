@@ -1,6 +1,10 @@
 const _ = require('lodash');
 const r = require('./db');
 
+const limitRegexp = /\.limit\(([^\)]*)\)/m;
+const orderByRegexp = /\.orderBy\(([^\)]*)\)/m;
+const filterRegexp = /\.filter\(([^\)]*)\)/m;
+
 exports.firstChange = res => {
   const change = res.changes[0];
 
@@ -37,4 +41,20 @@ exports.buildQuery = (table, indexBy, params) => {
   
   if (!_.isEmpty(params)) table = table.filter(params);
   return table;
+}
+
+// refer changefeed limitations here:- 
+// https://rethinkdb.com/docs/changefeeds/javascript/
+exports.isChangeFeedable = (query) => {
+  query = query.toString();
+
+  const limit = limitRegexp.exec(query)
+  const orderBy = orderByRegexp.exec(query)
+  const filter = filterRegexp.exec(query)
+
+  //if filter is used, index must also be used (getAll)
+  if (orderBy && !limit || limit && !orderBy) return false;
+  if (orderBy && orderBy[1].indexOf('index') === -1) return false;
+  if (filter && orderBy && filter.index > orderBy.index) return false;
+  return true;
 }
