@@ -145,6 +145,16 @@ test('Given a query using limit without orderBy, it must return false', (t) => {
   return t.end();
 })
 
+// this issue is not documented but causes the same problem as limit without orderBy
+test('Given a query using skip without orderBy, it must return false', (t) => {
+  const table = r.table('test');
+  const query = table.skip(1);
+
+  const result = rethinkdb.isChangeFeedable(query);
+  t.equal(result, false);
+  return t.end();
+})
+
 test('Given a query using orderBy without an index, it must return false', (t) => {
   const table = r.table('test');
   const query = table.limit(1).orderBy('name');
