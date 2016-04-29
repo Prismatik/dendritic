@@ -1,8 +1,8 @@
 const fetch = require('node-fetch');
-const jwt   = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 const token = jwt.sign({hello: 'world'}, process.env.JWT_SECRET);
-const url   = 'http://localhost:'+process.env.PORT+'/jwt/verify';
+const url = 'http://localhost:'+process.env.PORT+'/jwt/verify';
 
 describe('JWT authentication handling', () => {
   it('must accept a valid bearer token in a header', () => {
