@@ -9,11 +9,12 @@ const errHandlerFactory = res => {
   }
 };
 
-const respond = res => body => {
+const respond = (res, status) => body => {
   if (!body.result && !body.found) {
     res.status(404);
     return Promise.resolve(res.json({err: 'Not found'}));
   }
+  res.status(status || 200);
   return Promise.resolve(res.json(body));
 };
 
@@ -33,7 +34,7 @@ module.exports = {
 
     app.post('/{{pluralName}}', (req, res) => {
       {{name}}Controller.create(req.body)
-      .then(respond(res))
+      .then(respond(res, 201))
       .catch( errHandlerFactory(res) )
     });
 

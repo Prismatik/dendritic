@@ -1,0 +1,21 @@
+const path = require('path');
+const must = require('must');
+
+const setup = require('root/setup');
+const app = require('root/index');
+const r = require('root/lib/db');
+
+const server = app.listen(process.env.PORT, () => {
+  before(function() {
+    this.timeout(30000);
+
+    return setup()
+      .then(() => {
+        after(() => {
+          r.dbDrop('{{name}}')
+            .then(() => r.getPoolMaster().drain())
+            .then(() => Promise.resolve(app.close()))
+        });
+      });
+  });
+});
