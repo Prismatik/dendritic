@@ -11,6 +11,16 @@
     "name": {
       "type": "string",
       "faker": "name.findName"
+    <%#isUser%>
+    },
+    "email": {
+      "type": "string",
+      "faker": "internet.exampleEmail"
+    },
+    "password": {
+      "type": "string",
+      "faker": "internet.password"
+    <%/isUser%>
     <%#relationships%>
     },
     "<%name%>": {
@@ -30,5 +40,10 @@
     <%/relationships%>
   ],
   <%/hasRelationships%>
+  <%^isUser%>
   "required": ["name"]
+  <%/isUser%>
+  <%#isUser%>
+  "required": ["name", "email", "password"]
+  <%/isUser%>
 }
