@@ -3,7 +3,7 @@ const controller = require('../../lib/controller');
 const INDEXED = {indexed: true};
 const UUID = 'dc83f979-3485-49fc-b180-ba485d01a88f';
 
-describe('controller test', () => {
+describe('base controller test', () => {
   it('returns property name when prams match an indexed property', () => {
     const schema = { properties: { name: INDEXED } };
     const params = {farmBoy: true, name: 'Luke Skywalker', pilot: true};
