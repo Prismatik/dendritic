@@ -8,7 +8,6 @@ module.exports = (opts) => {
     {p: 'lib', n: 'controller'},
     {p: 'lib', n: 'rethinkdb'},
     {p: 'lib', n: 'schema'},
-    {p: 'test/lib', n: 'controller_test'},
     {n: 'controller', d: 'controllers', t: opts.name},
     {n: 'test', d: 'test/controllers', t: opts.name+'_test'},
     {n: 'route', d: 'routes', t: opts.name},
