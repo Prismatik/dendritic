@@ -15,7 +15,7 @@ const url = 'http://localhost:'+process.env.PORT;
 const statusEquals = code => res => {
   res.status.must.equal(code);
   return res;
-}
+};
 
 const unwrapOldVal = (res) => {
   return res.json()
@@ -55,7 +55,7 @@ const deleter = path => () => {
   });
 };
 
-const {{name}}Poster = poster('/{{pluralName}}')
+const {{name}}Poster = poster('/{{pluralName}}');
 
 const {{name}}Creator = times => {
   return Promise.all(_.times(times, () => {
@@ -69,8 +69,8 @@ const {{name}}Creator = times => {
     .then(pass => {
       data.password = pass;
       return {{name}}Poster(data)
-      .then(unwrapJSON)
-    })
+      .then(unwrapJSON);
+    });
     {{/isUser}}
   }));
 };
@@ -234,7 +234,7 @@ describe('{{name}} controller', () => {
 
   describe('PUT /{{pluralName}}/:id', () => {
     it('updates {{name}} and actually persists it', () => {
-      const update = {name: 'Something else'}
+      const update = {name: 'Something else'};
       return single{{name}}Creator()
         .then(body => putter('/{{pluralName}}/'+body.id)(update))
         .then(unwrapJSON)
@@ -244,7 +244,7 @@ describe('{{name}} controller', () => {
     {{#isUser}}
 
     it('PUTing an updated password should update the password hash', () => {
-      const update = {password: 'ABCD1234'}
+      const update = {password: 'ABCD1234'};
       return single{{name}}Creator()
       .then(body => putter('/{{pluralName}}/'+body.id)(update))
       .then(unwrapJSON)
@@ -279,7 +279,7 @@ describe('{{name}} controller', () => {
         .then(statusEquals(401))
         .then(res => res.json())
         .must.resolve.to.have.property('message', 'Unauthorized');
-    })
+    });
 
     it('returns 401 response with incorrect password', () => {
       const data = fixture.valid();
@@ -291,8 +291,8 @@ describe('{{name}} controller', () => {
           .then(statusEquals(401))
           .then(res => res.json())
           .must.resolve.to.have.property('message', 'Unauthorized');
-      })
-    })
+      });
+    });
 
     it('POST /{{pluralName}}/signin with correct credentials should return a valid jwt', () => {
       const data = fixture.valid();
@@ -308,8 +308,8 @@ describe('{{name}} controller', () => {
             json.result.token.must.not.be.null();
             json.result.user.must.eql(_.omit(user, 'password'));
           });
-      })
-    })
+      });
+    });
   });
   {{/isUser}}
 

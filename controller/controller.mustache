@@ -12,10 +12,10 @@ const password = require('password');
 const appSchema = require('../schema').getSchema();
 const modelSchema = appSchema['{{name}}'];
 
-const LINK = 'https://rethinkdb.com/docs/changefeeds/javascript/'
-var RESTRICTED_FEED = "WARNING: Changefeed is restricted and will only"
-RESTRICTED_FEED += " include updates to existing documents, not newly created"
-RESTRICTED_FEED += " documents. Read more here: " + LINK;
+const LINK = 'https://rethinkdb.com/docs/changefeeds/javascript/';
+var RESTRICTED_FEED = 'WARNING: Changefeed is restricted and will only';
+RESTRICTED_FEED += ' include updates to existing documents, not newly created';
+RESTRICTED_FEED += ' documents. Read more here: ' + LINK;
 
 module.exports = {
   get: (params) => {
@@ -87,7 +87,7 @@ module.exports = {
       if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
       return r.table('{{pluralName}}').insert(data, {returnChanges: true}).run()
       .then(rethinkdb.firstChange);
-    })
+    });
   },
   update: ({{name}}) => {
     var getHash;
@@ -99,8 +99,8 @@ module.exports = {
       const valid = schema.validate({{name}});
       if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
       return r.table('{{pluralName}}').update({{name}}, {returnChanges: true}).run()
-      .then(rethinkdb.firstChange)
-    })
+      .then(rethinkdb.firstChange);
+    });
   },
   {{/isUser}}
   delete: (id) => {
@@ -113,7 +113,7 @@ module.exports = {
   },
   signin: (email, pass) => {
     const table = r.table('{{pluralName}}');
-    const params = {email}
+    const params = {email};
     const indexes = controller.getIndexes(modelSchema, params);
     const indexBy = _.contains(indexes, 'email') ? 'email' : null;
 
