@@ -67,13 +67,13 @@ module.exports = {
   {{^isUser}}
   create: ({{name}}) => {
     const valid = schema.validate({{name}});
-    if (!valid) return Promise.reject(valid);
+    if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
     return r.table('{{pluralName}}').insert({{name}}, {returnChanges: true}).run()
     .then(rethinkdb.firstChange);
   },
   update: ({{name}}) => {
     const valid = schema.validate({{name}});
-    if (!valid) return Promise.reject(valid);
+    if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
     return r.table('{{pluralName}}').update({{name}}, {returnChanges: true}).run()
     .then(rethinkdb.firstChange);
   },
@@ -84,7 +84,7 @@ module.exports = {
     .then(hash => {
       const data = _.merge({{name}}, {password: hash});
       const valid = schema.validate(data);
-      if (!valid) return Promise.reject(valid);
+      if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
       return r.table('{{pluralName}}').insert(data, {returnChanges: true}).run()
       .then(rethinkdb.firstChange);
     })
@@ -97,7 +97,7 @@ module.exports = {
     return getHash.then(pass => {
       if (pass) {{name}}.password = pass;
       const valid = schema.validate({{name}});
-      if (!valid) return Promise.reject(valid);
+      if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
       return r.table('{{pluralName}}').update({{name}}, {returnChanges: true}).run()
       .then(rethinkdb.firstChange)
     })
@@ -121,12 +121,12 @@ module.exports = {
 
     return query.run()
     .then(users => {
-      if (users.length === 0) throw new httpError(401);
+      if (users.length === 0) throw new httpError('UNAUTHORIZED');
       const user = users[0];
       return password.verify(pass, user.password)
       .then(verified => {
         if (verified) return jwt.sign({ id: user.id, role: user.role });
-        throw new httpError(401);
+        throw new httpError('UNAUTHORIZED');
       })
       .then(token => { 
         return {

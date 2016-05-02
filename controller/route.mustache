@@ -3,7 +3,7 @@ const {{name}}Controller = require('../controllers/{{name}}.js');
 
 const errHandlerFactory = res => {
   return err => {
-    res.status(500 || err.code);
+    res.status(err.code || 500);
     res.json(err);
   }
 };
