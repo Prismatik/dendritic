@@ -276,9 +276,9 @@ describe('{{name}} controller', () => {
     it('returns 401 response with invalid email', () => {
       const signin = poster('/{{pluralName}}/signin');
       return signin({email: "notexist@example.com", password: "ABCD1234"})
-      .then(statusEquals(401))
-      .then(res => res.json())
-      .must.resolve.to.have.property('message', 'Unauthorized');
+        .then(statusEquals(401))
+        .then(res => res.json())
+        .must.resolve.to.have.property('message', 'Unauthorized');
     })
 
     it('returns 401 response with incorrect password', () => {
@@ -288,9 +288,9 @@ describe('{{name}} controller', () => {
       .then((user) => {
         const signin = poster('/{{pluralName}}/signin');
         return signin({email: data.email, password: "ABCD1234"})
-        .then(statusEquals(401))
-        .then(res => res.json())
-        .must.resolve.to.have.property('message', 'Unauthorized');
+          .then(statusEquals(401))
+          .then(res => res.json())
+          .must.resolve.to.have.property('message', 'Unauthorized');
       })
     })
 
@@ -301,13 +301,13 @@ describe('{{name}} controller', () => {
       .then((user) => {
         const signin = poster('/{{pluralName}}/signin');
         return signin({email: data.email, password: data.password})
-        .then(statusEquals(200))
-        .then(res => res.json())
-        .then(json => {
-          json.found.must.be.true();
-          json.result.token.must.not.be.null();
-          json.result.user.must.eql(_.omit(user, 'password'));
-        });
+          .then(statusEquals(200))
+          .then(res => res.json())
+          .then(json => {
+            json.found.must.be.true();
+            json.result.token.must.not.be.null();
+            json.result.user.must.eql(_.omit(user, 'password'));
+          });
       })
     })
   });
