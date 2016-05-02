@@ -27,6 +27,7 @@ exec(['node', index, 'base', appName].join(' '), opts);
 if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
 exec(['node', index, 'controller', controllerName1].join(' '), opts);
 exec(['node', index, 'controller', controllerName2, '-r', controllerName1].join(' '), opts);
+exec(['node', index, 'user', 'admin'].join(' '), opts);
 exec(['node', index, 'cors'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
 
