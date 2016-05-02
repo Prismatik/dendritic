@@ -16,5 +16,8 @@ module.exports = (opts) => {
     {n: 'schema', d: 'schemas', t: opts.name, e: 'json'},
   ];
 
+  // if user is scaffolded, jwt lib required
+  if (opts.isUser) files.push({p: 'lib', n: 'jwt'});
+
   scaffold({ basePath: __dirname, files: files, mustacheOpts: opts });
 };

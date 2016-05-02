@@ -35,10 +35,12 @@
     "mocha": "^2.4.5",
     "must": "^0.13.1",
     "node-fetch": "^1.3.3",
+    "password": "https://github.com/Prismatik/password.git",
     "required_env": "^1.0.0",
     "restify": "^4.0.3",
     "rethinkdbdash": "^2.2.8",
     "socket.io": "^1.3.7",
-    "socket.io-client": "^1.3.7"
+    "socket.io-client": "^1.3.7",
+    "standard-http-error": "^2.0.0"
   }
 }

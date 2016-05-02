@@ -3,8 +3,7 @@ const {{name}}Controller = require('../controllers/{{name}}.js');
 
 const errHandlerFactory = res => {
   return err => {
-    console.error('route error', err.message);
-    res.status(500);
+    res.status(500 || err.code);
     res.json(err);
   }
 };
@@ -49,6 +48,20 @@ module.exports = {
       .then(respond(res))
       .catch( errHandlerFactory(res) )
     });
+    {{#isUser}}
+
+    app.post('/{{pluralName}}/signin', (req, res) => {
+      {{name}}Controller.signin(req.body.email, req.body.password)
+      .then(respond(res))
+      .catch( errHandlerFactory(res) )
+    });
+
+    app.post('/{{pluralName}}/signout', (req, res) => {
+      {{name}}Controller.signout(req.body)
+      .then(respond(res))
+      .catch( errHandlerFactory(res) )
+    });
+    {{/isUser}}
   },
   ws: io => {
     const nsp = io.of('/{{pluralName}}');
