@@ -4,14 +4,14 @@ const UUID = '8f0834ed-ea58-4be9-8cea-ace9893f9b15';
 
 describe('lib/rethinkdb', function() {
   describe('.buildQuery', function() {
-    it('Given no params it should return the query unchanged', () => {
+    it('must return an unchanged query given no params', () => {
       const query = r.table('test');
       const result = rethinkdb.buildQuery(query, null, {});
 
       result.toString().must.equal(query.toString());
     })
 
-    it('Given filters it should return a filtered query', () => {
+    it('must return a filered query given filters', () => {
       const query = r.table('test');
       const filters = {name: 'Darth Vader'}
       const result = rethinkdb.buildQuery(query, null, filters);
@@ -20,7 +20,7 @@ describe('lib/rethinkdb', function() {
       result.toString().must.equal(expected.toString());
     })
 
-    it('Given an indexed field use the index in the query', () => {
+    it('must use an index when filters use an indexed property', () => {
       const query = r.table('test');
       const filters = {name: 'Darth Vader'}
       const result = rethinkdb.buildQuery(query, 'name', filters);
@@ -29,7 +29,7 @@ describe('lib/rethinkdb', function() {
       result.toString().must.equal(expected.toString());
     })
 
-    it('Given indexed and non-indexed fields it should use index and filter the rest', () => {
+    it('must use an index when filters use an indexed property and .filter(x) any others', () => {
       const query = r.table('test');
       const filters = {
         name: 'Darth Vader',
@@ -41,7 +41,7 @@ describe('lib/rethinkdb', function() {
       result.toString().must.equal(expected.toString());
     })
 
-    it('Must use .get(x) if an id and no other params provided', () => {
+    it('must use .get(x) when an id and no other params provided', () => {
       const query = r.table('test');
       const filters = {id: UUID};
       const result = rethinkdb.buildQuery(query, null, filters);
@@ -50,7 +50,7 @@ describe('lib/rethinkdb', function() {
       result.toString().must.equal(expected.toString());
     })
 
-    it('Must use .filter(x) if an id and other params provided', () => {
+    it('must use .filter(x) when an id and other params provided', () => {
       const query = r.table('test');
       const filters = {id: UUID, name: 'Luke Skywalker'};
       const result = rethinkdb.buildQuery(query, null, filters);
@@ -61,7 +61,7 @@ describe('lib/rethinkdb', function() {
   })
 
   describe('.addTransformations', function() {
-    it('Given skip in params, must apply this to the query', () => {
+    it('must apply .skip(x) when params contain skip', () => {
       const query = r.table('test');
       const params = {skip: 5};
       const result = rethinkdb.addTransformations(query, [], params);
@@ -70,7 +70,7 @@ describe('lib/rethinkdb', function() {
       result.toString().must.equal(expected.toString());
     })
 
-    it('Given limit in params, must apply this to the query', () => {
+    it('must apply .limit(x) when params contain limit', () => {
       const query = r.table('test');
       const params = {limit: 5};
       const result = rethinkdb.addTransformations(query, [], params);
@@ -79,7 +79,7 @@ describe('lib/rethinkdb', function() {
       result.toString().must.equal(expected.toString());
     })
 
-    it('Given orderBy in params, must apply this to query and default to ascending', () => {
+    it('must apply .orderBy(x) when params contain orderBy and default to ascending', () => {
       const query = r.table('test');
       const params = {orderBy: "name"};
       const result = rethinkdb.addTransformations(query, [], params);
@@ -88,7 +88,7 @@ describe('lib/rethinkdb', function() {
       result.toString().must.equal(expected.toString());
     })
 
-    it('Given order is provided, must sort accordingly', () => {
+    it('must apply sort order to orderBy when params contain order', () => {
       const query = r.table('test');
       const params = {orderBy: "name", order: "desc"};
       const result = rethinkdb.addTransformations(query, [], params);
@@ -97,7 +97,7 @@ describe('lib/rethinkdb', function() {
       result.toString().must.equal(expected.toString());
     })
 
-    it('Given orderBy is provided and field is indexed, it must use index', () => {
+    it('must apply an index to orderBy when using an indexed property', () => {
       const query = r.table('test');
       const params = {orderBy: "name"};
       const result = rethinkdb.addTransformations(query, ["orderBy"], params);
@@ -106,7 +106,7 @@ describe('lib/rethinkdb', function() {
       result.toString().must.equal(expected.toString());
     })
 
-    it('Given orderBy and order is provided for indexed field, sort order must be used', () => {
+    it('must apply an index and sort order to orderBy when using an indexed property', () => {
       const query = r.table('test');
       const params = {orderBy: "name", order: "desc"};
       const result = rethinkdb.addTransformations(query, ["orderBy"], params);
@@ -117,7 +117,7 @@ describe('lib/rethinkdb', function() {
   })
 
   describe('.isChangeFeedable', function() {
-    it('Given a query using orderBy without limit, it must return false', () => {
+    it('must return false when given a query using orderBy without limit', () => {
       const table = r.table('test');
       const query = table.orderBy('name');
 
@@ -125,7 +125,7 @@ describe('lib/rethinkdb', function() {
       result.must.equal(result, false);
     })
 
-    it('Given a query using limit without orderBy, it must return false', () => {
+    it('must return false when given a query using limit without orderBy', () => {
       const table = r.table('test');
       const query = table.limit(1);
 
@@ -134,7 +134,7 @@ describe('lib/rethinkdb', function() {
     })
 
     // this issue is not documented but causes the same problem as limit without orderBy
-    it('Given a query using skip without orderBy, it must return false', () => {
+    it('must return false when given a query using skip without orderBy', () => {
       const table = r.table('test');
       const query = table.skip(1);
 
@@ -142,7 +142,7 @@ describe('lib/rethinkdb', function() {
       result.must.equal(false);
     })
 
-    it('Given a query using orderBy without an index, it must return false', () => {
+    it('must return false when given a query using orderBy without an index', () => {
       const table = r.table('test');
       const query = table.limit(1).orderBy('name');
 
@@ -150,7 +150,7 @@ describe('lib/rethinkdb', function() {
       result.must.equal(false);
     })
 
-    it('Given a query using orderBy with an index, it must return true', () => {
+    it('must return true when given a query using orderBy with an index', () => {
       const table = r.table('test');
 
       const query = table.limit(1).orderBy({index: 'name'});
@@ -162,7 +162,7 @@ describe('lib/rethinkdb', function() {
       result.must.equal(true);
     })
 
-    it('Given a query using filter before orderBy, it must return true', () => {
+    it('must return true when given a filter before limit and orderBy', () => {
       const table = r.table('test');
 
       const query = table.filter({name: 'Darh Vader'}).limit(1).orderBy({index: 'name'});
@@ -170,7 +170,7 @@ describe('lib/rethinkdb', function() {
       result.must.equal(true);
     })
 
-    it('Given a query using filter after orderBy, it must return false', () => {
+    it('must return false when given a filter after limit and orderBy', () => {
       const table = r.table('test');
 
       const query = table.limit(1).orderBy({index: 'name'}).filter({name: 'Darh Vader'});
