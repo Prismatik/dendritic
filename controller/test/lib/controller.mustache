@@ -1,0 +1,44 @@
+const controller = require('../../lib/controller');
+
+const INDEXED = {indexed: true}
+const UUID = 'dc83f979-3485-49fc-b180-ba485d01a88f'
+
+describe('lib/controller', function() {
+  describe('.getIndexes', function() {
+    it('Given params match indexed properties, must return all matches', () => {
+      const schema = { properties: { favMilk: INDEXED, pilot: INDEXED } }
+      const params = {
+        favMilk: 'blue',
+        id: UUID,
+        name: 'Luke Skywalker',
+        pilot: true
+      };
+      const result = controller.getIndexes(schema, params);
+      result.must.eql(["favMilk", "pilot"]);
+    })
+
+    it('Given indexed properties that are not in params must not return these', () => {
+      const schema = {
+        properties: {pilot: INDEXED, sonOfVader: INDEXED, saberColour: INDEXED}
+      }
+      const params = {
+        favMilk: 'blue',
+        id: UUID,
+        name: 'Luke Skywalker',
+        pilot: true
+      };
+      const result = controller.getIndexes(schema, params);
+      result.must.eql(["pilot"]);
+    })
+
+    it('Given no params match indexed propertites, must return an empty array', () => {
+      const schema = { properties: { favMilk: INDEXED, pilot: INDEXED } }
+      const params = {
+        sonOfVader: true,
+        saberColour: 'green/blue'
+      };
+      const result = controller.getIndexes(schema, params);
+      result.must.eql([]);
+    })
+  })
+})

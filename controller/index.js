@@ -1,6 +1,5 @@
 const scaffold = require('../lib/scaffold');
 
-
 module.exports = (opts) => {
   // p: source path, n: filename
   // d: destination path, t: target filename, e: target extension
@@ -8,6 +7,8 @@ module.exports = (opts) => {
     {p: 'lib', n: 'controller'},
     {p: 'lib', n: 'rethinkdb'},
     {p: 'lib', n: 'schema'},
+    {p: 'test/lib', n: 'controller'},
+    {p: 'test/lib', n: 'rethinkdb'},
     {n: 'controller', d: 'controllers', t: opts.name},
     {n: 'test', d: 'test/controllers', t: opts.name+'_test'},
     {n: 'route', d: 'routes', t: opts.name},
