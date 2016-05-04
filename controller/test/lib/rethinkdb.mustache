@@ -1,0 +1,181 @@
+const rethinkdb = require('../../lib/rethinkdb');
+const r = require('../../lib/db');
+const UUID = '8f0834ed-ea58-4be9-8cea-ace9893f9b15';
+
+describe('lib/rethinkdb', function() {
+  describe('.buildQuery', function() {
+    it('Given no params it should return the query unchanged', () => {
+      const query = r.table('test');
+      const result = rethinkdb.buildQuery(query, null, {});
+
+      result.toString().must.equal(query.toString());
+    })
+
+    it('Given filters it should return a filtered query', () => {
+      const query = r.table('test');
+      const filters = {name: 'Darth Vader'}
+      const result = rethinkdb.buildQuery(query, null, filters);
+      const expected = query.filter(filters);
+
+      result.toString().must.equal(expected.toString());
+    })
+
+    it('Given an indexed field use the index in the query', () => {
+      const query = r.table('test');
+      const filters = {name: 'Darth Vader'}
+      const result = rethinkdb.buildQuery(query, 'name', filters);
+      const expected = query.getAll('Darth Vader', {index: 'name'});
+
+      result.toString().must.equal(expected.toString());
+    })
+
+    it('Given indexed and non-indexed fields it should use index and filter the rest', () => {
+      const query = r.table('test');
+      const filters = {
+        name: 'Darth Vader',
+        sith: true
+      };
+      const result = rethinkdb.buildQuery(query, 'name', filters);
+      const expected = query.getAll('Darth Vader', {index: 'name'}).filter({sith: true});
+
+      result.toString().must.equal(expected.toString());
+    })
+
+    it('Must use .get(x) if an id and no other params provided', () => {
+      const query = r.table('test');
+      const filters = {id: UUID};
+      const result = rethinkdb.buildQuery(query, null, filters);
+      const expected = query.get(UUID);
+
+      result.toString().must.equal(expected.toString());
+    })
+
+    it('Must use .filter(x) if an id and other params provided', () => {
+      const query = r.table('test');
+      const filters = {id: UUID, name: 'Luke Skywalker'};
+      const result = rethinkdb.buildQuery(query, null, filters);
+      const expected = query.filter(filters);
+
+      result.toString().must.equal(expected.toString());
+    })
+  })
+
+  describe('.addTransformations', function() {
+    it('Given skip in params, must apply this to the query', () => {
+      const query = r.table('test');
+      const params = {skip: 5};
+      const result = rethinkdb.addTransformations(query, [], params);
+
+      const expected = query.skip(5);
+      result.toString().must.equal(expected.toString());
+    })
+
+    it('Given limit in params, must apply this to the query', () => {
+      const query = r.table('test');
+      const params = {limit: 5};
+      const result = rethinkdb.addTransformations(query, [], params);
+
+      const expected = query.limit(5);
+      result.toString().must.equal(expected.toString());
+    })
+
+    it('Given orderBy in params, must apply this to query and default to ascending', () => {
+      const query = r.table('test');
+      const params = {orderBy: "name"};
+      const result = rethinkdb.addTransformations(query, [], params);
+
+      const expected = query.orderBy(r.asc("name"));
+      result.toString().must.equal(expected.toString());
+    })
+
+    it('Given order is provided, must sort accordingly', () => {
+      const query = r.table('test');
+      const params = {orderBy: "name", order: "desc"};
+      const result = rethinkdb.addTransformations(query, [], params);
+
+      const expected = query.orderBy(r.desc("name"));
+      result.toString().must.equal(expected.toString());
+    })
+
+    it('Given orderBy is provided and field is indexed, it must use index', () => {
+      const query = r.table('test');
+      const params = {orderBy: "name"};
+      const result = rethinkdb.addTransformations(query, ["orderBy"], params);
+
+      const expected = query.orderBy({index: r.asc("name")});
+      result.toString().must.equal(expected.toString());
+    })
+
+    it('Given orderBy and order is provided for indexed field, sort order must be used', () => {
+      const query = r.table('test');
+      const params = {orderBy: "name", order: "desc"};
+      const result = rethinkdb.addTransformations(query, ["orderBy"], params);
+
+      const expected = query.orderBy({index: r.desc("name")});
+      result.toString().must.equal(expected.toString());
+    })
+  })
+
+  describe('.isChangeFeedable', function() {
+    it('Given a query using orderBy without limit, it must return false', () => {
+      const table = r.table('test');
+      const query = table.orderBy('name');
+
+      const result = rethinkdb.isChangeFeedable(query);
+      result.must.equal(result, false);
+    })
+
+    it('Given a query using limit without orderBy, it must return false', () => {
+      const table = r.table('test');
+      const query = table.limit(1);
+
+      const result = rethinkdb.isChangeFeedable(query);
+      result.must.equal(result, false);
+    })
+
+    // this issue is not documented but causes the same problem as limit without orderBy
+    it('Given a query using skip without orderBy, it must return false', () => {
+      const table = r.table('test');
+      const query = table.skip(1);
+
+      const result = rethinkdb.isChangeFeedable(query);
+      result.must.equal(false);
+    })
+
+    it('Given a query using orderBy without an index, it must return false', () => {
+      const table = r.table('test');
+      const query = table.limit(1).orderBy('name');
+
+      const result = rethinkdb.isChangeFeedable(query);
+      result.must.equal(false);
+    })
+
+    it('Given a query using orderBy with an index, it must return true', () => {
+      const table = r.table('test');
+
+      const query = table.limit(1).orderBy({index: 'name'});
+      const result = rethinkdb.isChangeFeedable(query)
+      result.must.equal(true);
+
+      const query2 = table.limit(1).orderBy({index: r.desc('date')});
+      const result2 = rethinkdb.isChangeFeedable(query);
+      result.must.equal(true);
+    })
+
+    it('Given a query using filter before orderBy, it must return true', () => {
+      const table = r.table('test');
+
+      const query = table.filter({name: 'Darh Vader'}).limit(1).orderBy({index: 'name'});
+      const result = rethinkdb.isChangeFeedable(query)
+      result.must.equal(true);
+    })
+
+    it('Given a query using filter after orderBy, it must return false', () => {
+      const table = r.table('test');
+
+      const query = table.limit(1).orderBy({index: 'name'}).filter({name: 'Darh Vader'});
+      const result = rethinkdb.isChangeFeedable(query)
+      result.must.equal(false);
+    })
+  })
+})
