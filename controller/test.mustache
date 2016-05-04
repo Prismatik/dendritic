@@ -1,5 +1,6 @@
 "use strict";
 const fetch = require('node-fetch');
+const querystring = require('querystring');
 const _ = require('lodash');
 const fixture = require('../../fixtures/{{name}}');
 const IO = require('socket.io-client');
@@ -62,13 +63,13 @@ const pop = data => data[0];
 const single{{name}}Creator = () => {{name}}Creator(1).then(pop);
 
 {{#relationships}}
-const {{name}}Poster = poster('/{{pluralName}}')
+const {{name}}Poster = poster('/{{pluralName}}');
 
 const {{name}}Creator = times => {
   return Promise.all(_.times(times, () => {
     const data = {{name}}Fixture.valid();
     return {{name}}Poster(data)
-    .then(unwrapJSON)
+    .then(unwrapJSON);
   }));
 };
 
@@ -95,8 +96,10 @@ describe('{{name}} controller', () => {
         .then(entries => {
           const record   = entries[0];
           const property = Object.keys(record).filter(k => k != 'id')[0];
+          if (!property) return; // if no properties other than id skip test
+          const queryStr = querystring.stringify({[property]: record[property]});
 
-          return getJSON('/{{pluralName}}?'+property+'='+record[property])
+          return getJSON('/{{pluralName}}'+'?'+queryStr)
             .then(json => json.map(entry => entry[property]))
             .must.resolve.to.eql([record[property]]);
         });
@@ -207,9 +210,9 @@ describe('{{name}} controller', () => {
 
     {{#relationships}}
     it('saves related entity (can GET using :id)', () => {
-    	return single{{name}}Creator()
-    	  .then(body => fetch(url+'/{{pluralName}}/'+body.id))
-    	  .must.resolve.to.have.property('status', 200);
+      return single{{name}}Creator()
+        .then(body => fetch(url+'/{{pluralName}}/'+body.id))
+        .must.resolve.to.have.property('status', 200);
     });
     {{/relationships}}
   });

@@ -6,9 +6,15 @@ const schema = require('../schema').getSchema();
 exports.filter = (name, params) => {
   const properties = schema[name].properties;
   return _.reduce(params, (result, value, key) => {
-    if (properties[key]) result[key] = value;
-    return result
-  }, {})
-}
+    const schemaProp = properties[key];
+    if (schemaProp) {
+      // query string will not be cast into an array if a single value was
+      // provided convert it back to an array so query is successful
+      if (schemaProp.type === 'array' && !_.isArray(value)) value = [value];
+      result[key] = value;
+    }
+    return result;
+  }, {});
+};
 
-exports.validate = jsen(schema)
+exports.validate = jsen(schema);
