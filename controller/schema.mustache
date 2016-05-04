@@ -11,23 +11,37 @@
     "name": {
       "type": "string",
       "faker": "name.findName"
-    <%#relationships%>
+    <%#singularRelationships%>
     },
     "<%name%>": {
       "type": "string",
-      "faker": "random.uuid",
       "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-    <%/relationships%>
+    <%/singularRelationships%>
+    <%#multiRelationships%>
+    },
+    "<%pluralName%>": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+      }
+    <%/multiRelationships%>
     }
   },
   <%#hasRelationships%>
   "links": [
-    <%#relationships%>
+    <%#singularRelationships%>
     {
       "rel": "<%name%>",
       "href": "/<%pluralName%>/{<%name%>}"
+    }<%^isLast%>,<%/isLast%><%#isLast%><%#hasMultiRelationships%>,<%/hasMultiRelationships%><%/isLast%>
+    <%/singularRelationships%>
+    <%#multiRelationships%>
+    {
+      "rel": "<%name%>",
+      "href": "/<%pluralName%>/{<%pluralName%>[]}"
     }<%^isLast%>,<%/isLast%>
-    <%/relationships%>
+    <%/multiRelationships%>
   ],
   <%/hasRelationships%>
   "required": ["name"]
