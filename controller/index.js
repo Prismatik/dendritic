@@ -1,11 +1,10 @@
 const fs = require('fs');
 const _ = require("lodash");
 const scaffold = require('../lib/scaffold');
+const package = require('../lib/package');
 
-const userPackageJson = {
-  "dependencies": {
-    "password": "git+https://github.com/Prismatik/password.git"
-  }
+const userDependencies = {
+  "password": "git+https://github.com/Prismatik/password.git"
 };
 
 module.exports = (opts) => {
@@ -27,9 +26,7 @@ module.exports = (opts) => {
 
   if (opts.isUser) {
     // if user is scaffolded, add user specific dependencies
-    const package = JSON.parse(fs.readFileSync('package.JSON'));
-    const updated = _.merge(package, userPackageJson);
-    fs.writeFileSync('package.json', JSON.stringify(updated));
+    package.addDependencies(userDependencies);
 
     // if user is scaffolded, jwt lib required
     files.push({p: 'lib', n: 'jwt'});
