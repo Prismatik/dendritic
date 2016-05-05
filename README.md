@@ -42,15 +42,24 @@ Finally providing a model-name when running the command is optional, the model n
 
 ##### Defining Relationships
 
-When creating controllers you also automatically create relationships to other models using the `-r` switch. As with controller model names, the related model names must be singular.
+When creating controllers you also automatically create relationships to other models using the `-s` or `-m` switch.
+
+* `-s` is used for singular relationships (model stores a singular uuid)
+* `-m` is used for multiple relationships (model stores an array of uuids)
+
+As with controller model names, the related model names must be singular.
 
 For example:-
 
 ```
-redbeard controller product -r category,order,warehouse
+redbeard controller product -s category,wholesaler
+```
+OR
+```
+redbeard controller product -m purchaser,location
 ```
 
-This will add the necessary properties to your model schema as well as setup tests to ensure the related model exists.
+This will add the necessary properties to your model schema as well as setup tests to ensure the related model exists (endpoint can be accessed via a GET request).
 
 - - -
 

@@ -18,7 +18,7 @@ describe('lib/scaffold', function() {
         files: [{n: 'scaffold', d: outputFolder}],
         mustacheOpts: {}
       });
-      
+
       const folder= fs.lstatSync(outputPath);
       folder.isDirectory().must.be.true();
     });
@@ -29,7 +29,7 @@ describe('lib/scaffold', function() {
         files: [{n: 'scaffold', d: outputFolder}],
         mustacheOpts: {}
       });
-      
+
       const folder = fs.lstatSync(outputPath + '/scaffold.js');
       folder.isDirectory().must.be.false();
     });
@@ -40,7 +40,7 @@ describe('lib/scaffold', function() {
         files: [{n: 'scaffold', d: outputFolder, t: 'yellowbeard'}],
         mustacheOpts: {}
       });
-      
+
       const folder = fs.lstatSync(outputPath + '/yellowbeard.js');
       folder.isDirectory().must.be.false();
     });
@@ -51,9 +51,20 @@ describe('lib/scaffold', function() {
         files: [{n: 'scaffold', d: outputFolder, e: 'html'}],
         mustacheOpts: {}
       });
-      
+
       const folder = fs.lstatSync(outputPath + '/scaffold.html');
       folder.isDirectory().must.be.false();
+    });
+
+    it('must create file with no extension', function() {
+      scaffold({
+        basePath: sourcePath,
+        files: [{n: 'scaffold', d: outputFolder, e: ''}],
+        mustacheOpts: {}
+      });
+
+      const file = fs.lstatSync(outputPath + '/scaffold');
+      file.isFile().must.be.true();
     });
 
     it('must allow specifying the files path', function() {
@@ -62,7 +73,7 @@ describe('lib/scaffold', function() {
         files: [{p: 'test/files/lib', n: 'scaffold', d: outputFolder}],
         mustacheOpts: {}
       });
-      
+
       const folder = fs.lstatSync(outputPath + '/scaffold.js');
       folder.isDirectory().must.be.false();
     });

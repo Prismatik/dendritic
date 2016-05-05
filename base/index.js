@@ -3,7 +3,6 @@ const path = require('path');
 const mkdirp = require('mkdirp');
 const scaffold = require('../lib/scaffold');
 
-
 module.exports = (opts) => {
   // p: source path, n: filename
   // d: destination path, t: target filename, e: target extension
@@ -28,7 +27,8 @@ module.exports = (opts) => {
     {p: 'test', n: 'helper'},
     {p: 'test', n: 'mocha.opts', t: 'mocha', e: 'opts'},
     {p: 'test/middleware', n: 'jwt_test'},
-    {p: 'test/routes', n: 'schema_test'}
+    {p: 'test/routes', n: 'schema_test'},
+    {n: '.gitignore', e: ''}
   ];
 
   scaffold({ basePath: __dirname, files: files, mustacheOpts: opts });
