@@ -61,6 +61,8 @@ redbeard controller product -m purchaser,location
 
 This will add the necessary properties to your model schema as well as setup tests to ensure the related model exists (endpoint can be accessed via a GET request).
 
+Note: You can also use this switch when creating users since users are effectively just a special type of controller / schema i.e. `redbeard user -s license -m vehicle`
+
 - - -
 
 NOTES:
