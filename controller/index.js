@@ -1,5 +1,3 @@
-const fs = require('fs');
-const _ = require("lodash");
 const scaffold = require('../lib/scaffold');
 const package = require('../lib/package');
 
@@ -11,6 +9,7 @@ module.exports = (opts) => {
   // p: source path, n: filename
   // d: destination path, t: target filename, e: target extension
   const files = [
+    {p: 'constants', n: 'warnings'},
     {p: 'lib', n: 'controller'},
     {p: 'lib', n: 'rethinkdb'},
     {p: 'lib', n: 'schema'},

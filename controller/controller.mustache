@@ -1,9 +1,10 @@
 const _ = require('lodash');
+const httpError = require('standard-http-error');
 const r = require('../lib/db');
 const controller = require('../lib/controller');
 const rethinkdb = require('../lib/rethinkdb');
 const schema = require('../lib/schema');
-const httpError = require('standard-http-error');
+const warnings = require('../constants/warnings');
 {{#isUser}}
 const jwt = require('../lib/jwt');
 const password = require('password');
@@ -11,11 +12,6 @@ const password = require('password');
 
 const appSchema = require('../schema').getSchema();
 const modelSchema = appSchema['{{name}}'];
-
-const LINK = 'https://rethinkdb.com/docs/changefeeds/javascript/';
-var RESTRICTED_FEED = 'WARNING: Changefeed is restricted and will only';
-RESTRICTED_FEED += ' include updates to existing documents, not newly created';
-RESTRICTED_FEED += ' documents. Read more here: ' + LINK;
 
 module.exports = {
   get: (params) => {
@@ -58,7 +54,7 @@ module.exports = {
     query = rethinkdb.addTransformations(query, indexes, params);
  
     if (!rethinkdb.isChangeFeedable(query)) {
-      console.log(RESTRICTED_FEED);
+      console.log(warnings.RESTRICTED_FEED);
       query = table.getAll(r.args(query.getField('id').coerceTo('array')));
     }
 
