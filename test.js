@@ -25,11 +25,11 @@ const controllerName2 = randomstring();
 const userName = randomstring()+'_user';
 
 exec(['node', index, 'base', appName].join(' '), opts);
-if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
 exec(['node', index, 'controller', controllerName1].join(' '), opts);
 exec(['node', index, 'controller', controllerName2, '-s', controllerName1].join(' '), opts);
 exec(['node', index, 'user', userName, '-m', controllerName2].join(' '), opts);
 exec(['node', index, 'cors'].join(' '), opts);
+if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
 
 rimraf.sync(dir);
