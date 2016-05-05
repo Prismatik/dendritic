@@ -4,6 +4,9 @@ services:
     build: .
     environment:
       RETHINK_HOST: rethinkdb
+      SHELL: /bin/sh
+    volumes:
+      - .:/opt/hostapp
     depends_on:
       - rethinkdb
     links:
