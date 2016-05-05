@@ -43,5 +43,4 @@ module.exports = (opts) => {
   if (!fs.existsSync(modulesDir)) mkdirp.sync(modulesDir);
   const target = path.join(modulesDir, 'root');
   if (!fs.existsSync(target)) fs.symlinkSync('..', target);
-
 };

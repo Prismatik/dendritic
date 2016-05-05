@@ -25,7 +25,8 @@ module.exports = (opts) => {
 
   if (opts.isUser) {
     // if user is scaffolded, add user specific dependencies
-    package.addDependencies(userDependencies);
+    const packagePath = opts.path + '/package.json';
+    package.addDependencies(packagePath, userDependencies);
 
     // if user is scaffolded, jwt lib required
     files.push({p: 'lib', n: 'jwt'});
