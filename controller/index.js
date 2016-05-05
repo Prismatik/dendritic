@@ -1,5 +1,12 @@
+const fs = require('fs');
+const _ = require("lodash");
 const scaffold = require('../lib/scaffold');
 
+const userPackageJson = {
+  "dependencies": {
+    "password": "git+https://github.com/Prismatik/password.git"
+  }
+};
 
 module.exports = (opts) => {
   // p: source path, n: filename
@@ -16,8 +23,15 @@ module.exports = (opts) => {
     {n: 'schema', d: 'schemas', t: opts.name, e: 'json'},
   ];
 
-  // if user is scaffolded, jwt lib required
-  if (opts.isUser) files.push({p: 'lib', n: 'jwt'});
+  if (opts.isUser) {
+    // if user is scaffolded, add user specific dependencies
+    const package = JSON.parse(fs.readFileSync('package.JSON'));
+    const updated = _.merge(package, userPackageJson);
+    fs.writeFileSync('package.json', JSON.stringify(updated));
+
+    // if user is scaffolded, jwt lib required
+    files.push({p: 'lib', n: 'jwt'});
+  };
 
   scaffold({ basePath: __dirname, files: files, mustacheOpts: opts });
 };
