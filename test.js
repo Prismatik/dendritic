@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const exec = require('child_process').execSync;
 const bandname = require("bandname");
 const mkdirp = require('mkdirp');
@@ -32,6 +33,6 @@ exec(['node', index, 'cors'].join(' '), opts);
 if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
 exec(['cp', 'example.env', '.env'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
-exec(['npm', 'run', 'testredbeard'].join(' '), {stdio: 'inherit'});
+exec(['npm', 'run', 'testredbeard'].join(' '), _.omit(opts, 'cwd'));
 
 rimraf.sync(dir);
