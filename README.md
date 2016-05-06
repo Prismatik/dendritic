@@ -67,6 +67,7 @@ Note: You can also use this switch when creating users since users are effective
 
 NOTES:
 * Project names and model names should be singular, redbeard will pluralize these names as required.
+* There is a default .env file at example.env. You may `cp example.env .env` when developing locally, but you should never commit this to source control. The risk is that it doesn't get overridden in production and testing variables leak to prod.
 
 TODO:
 

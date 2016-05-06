@@ -13,6 +13,7 @@ module.exports = (opts) => {
     {p: 'bin', n: 'migration_template_test', e: 'mustache'},
     {p: 'env', n: 'base'},
     {p: 'env', n: 'db'},
+    {n: 'dotenv', t: 'example.env', e: ''},
     {p: 'lib', n: 'db'},
     {p: 'lib', n: 'migrate'},
     {n: 'index'},

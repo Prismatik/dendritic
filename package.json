@@ -13,9 +13,10 @@
     "redbeard": "./index.js"
   },
   "scripts": {
-    "test": "npm run testapp; npm run testredbeard",
-    "testapp": "node test",
-    "testredbeard": "node_modules/.bin/mocha ./test"
+    "test": "node test",
+    "testredbeard": "mocha",
+    "watch": "chokidar './*' -c 'npm test' --initial",
+    "dockertest": "docker-compose run --workdir \"/opt/hostapp\" redbeard npm run watch"
   },
   "dependencies": {
     "lodash": "^3.10.1",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "bandname": "^1.0.0",
+    "dotenv": "^2.0.0",
     "istanbul": "^0.4.1",
     "jsen": "^0.6.0",
     "json-schema-deref-sync": "^0.2.8",

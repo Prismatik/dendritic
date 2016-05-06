@@ -30,6 +30,8 @@ exec(['node', index, 'controller', controllerName2, '-s', controllerName1].join(
 exec(['node', index, 'user', userName, '-m', controllerName2].join(' '), opts);
 exec(['node', index, 'cors'].join(' '), opts);
 if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
+exec(['cp', 'example.env', '.env'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
+exec(['npm', 'run', 'testredbeard'].join(' '), {stdio: 'inherit'});
 
 rimraf.sync(dir);
