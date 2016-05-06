@@ -1,5 +1,4 @@
 const fs = require("fs");
-const rimraf = require('rimraf');
 const package = require('../../lib/package');
 
 describe("lib/package", function() {
@@ -13,7 +12,9 @@ describe("lib/package", function() {
       return copyFile(source, dest, done);
     });
 
-    afterEach(function() { rimraf.sync(dest); });
+    afterEach(function(done) {
+      fs.unlink(dest, done);
+    });
 
     it("must add dependencies to file provided", function() {
       const moduleName = 'sweet_module';
