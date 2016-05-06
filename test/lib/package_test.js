@@ -1,9 +1,10 @@
 const fs = require("fs");
+const path = require("path");
 const package = require('../../lib/package');
 
 describe("lib/package", function() {
   describe(".addDependencies", function() {
-    const root = process.cwd();
+    const root = path.resolve(__dirname, '../..');
     const source = root + '/test/files/lib/package.json';
     const dest = root + '/redbeard_tests/package.json';
 
