@@ -1,0 +1,15 @@
+version: '2'
+services:
+  redbeard:
+    build: .
+    environment:
+      RETHINK_HOST: rethinkdb
+      SHELL: /bin/sh
+    volumes:
+      - .:/opt/hostapp
+    depends_on:
+      - rethinkdb
+    links:
+      - rethinkdb
+  rethinkdb:
+    image: rethinkdb
