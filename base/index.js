@@ -37,7 +37,8 @@ module.exports = (opts) => {
   const dirs = [
     'env',
     'routes',
-    'migrations'
+    'migrations',
+    'schemas'
   ].forEach(dir => mkdirp.sync(dir));
 
   const modulesDir = path.join(process.cwd(), 'node_modules');
