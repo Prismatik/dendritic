@@ -8,6 +8,11 @@ describe("lib/package", function() {
     const source = root + '/test/files/lib/package.json';
     const dest = root + '/redbeard_tests/package.json';
 
+    console.log("root", root);
+    console.log("source", source);
+    console.log("dest", dest);
+    console.log("__dirname", __dirname);
+
     // copy package.json to /redbeard_tests
     beforeEach(function(done) {
       return copyFile(source, dest, done);
