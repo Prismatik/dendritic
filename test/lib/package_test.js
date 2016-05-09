@@ -37,6 +37,8 @@ describe("lib/package", function() {
 });
 
 function copyFile(source, dest, done) {
-  const copyFile = fs.createReadStream(source).pipe(fs.createWriteStream(dest));
-  copyFile.on('close', done);
+  const readStream = fs.createReadStream(source);
+  readStream.on('err', done);
+  readStream.on('close', () => done());
+  readStream.pipe(fs.createWriteStream(dest));
 }
