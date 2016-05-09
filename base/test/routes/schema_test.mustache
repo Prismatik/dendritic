@@ -1,5 +1,5 @@
 const fetch  = require('node-fetch');
-const schema = require('root/schema').getSchema();
+const schema = require('schema').getSchema();
 const url    = 'http://localhost:'+process.env.PORT+'/schema';
 
 describe('/schema route', () => {

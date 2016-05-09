@@ -2,9 +2,9 @@ const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 
-const r = require('root/lib/db');
-const migrate = require('root/lib/migrate');
-const schema = require('root/schema');
+const r = require('lib/db');
+const migrate = require('lib/migrate');
+const schema = require('schema');
 
 const tables = fs.readdirSync('./tables').map(table => {
   return require(path.resolve('./tables', path.parse(table).name));
