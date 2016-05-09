@@ -1,6 +1,5 @@
 const Router = require('express').Router;
 const jwt = require('express-jwt');
-const schema = require('root/schema').getSchema();
 
 const OPTS = {
   secret: process.env.JWT_SECRET,
