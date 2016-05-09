@@ -7,7 +7,7 @@ const schema = require('../lib/schema');
 const warnings = require('../constants/warnings');
 {{#isUser}}
 const jwt = require('../lib/jwt');
-const password = require('password');
+const password = require('simple-password');
 {{/isUser}}
 
 const appSchema = require('../schema').getSchema();
