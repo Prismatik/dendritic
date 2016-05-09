@@ -26,6 +26,16 @@ redbeard controller model-name-singular
 ```
 And it will add routes, a controller and database bootstrapping. You'll have Create, Read, Update and Delete. You can pass filter params for any property of your model to search the database on GET. All updates will be checked against your JSON schema for validity.
 
+#### Creating Users
+
+```
+redbeard user [model-name-singular]
+```
+
+This will create a controller (as above) but with additions to cater for a user model. This includes an email and password property on the schema, modified controller logic to ensure when a password is provided this is hashed and saved and also a sign in route which returns a JWT for use in authentication.
+
+Finally providing a model-name when running the command is optional, the model name will default to user, but an alternative can be provided i.e. `admin`.
+
 - - -
 
 #### Options (switches)
@@ -50,6 +60,8 @@ redbeard controller product -m purchaser,location
 ```
 
 This will add the necessary properties to your model schema as well as setup tests to ensure the related model exists (endpoint can be accessed via a GET request).
+
+Note: You can also use this switch when creating users since users are effectively just a special type of controller / schema i.e. `redbeard user -s license -m vehicle`
 
 - - -
 

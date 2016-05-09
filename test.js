@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const exec = require('child_process').execSync;
 const bandname = require("bandname");
 const mkdirp = require('mkdirp');
@@ -22,16 +23,16 @@ const index = path.join(__dirname, 'index.js');
 const appName = 'redbeard_tests'+randomstring();
 const controllerName1 = randomstring();
 const controllerName2 = randomstring();
-const controllerName3 = randomstring();
+const userName = randomstring()+'_user';
 
 exec(['node', index, 'base', appName].join(' '), opts);
-if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
 exec(['node', index, 'controller', controllerName1].join(' '), opts);
 exec(['node', index, 'controller', controllerName2, '-s', controllerName1].join(' '), opts);
-exec(['node', index, 'controller', controllerName3, '-m', controllerName2].join(' '), opts);
+exec(['node', index, 'user', userName, '-m', controllerName2].join(' '), opts);
 exec(['node', index, 'cors'].join(' '), opts);
+if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
 exec(['cp', 'example.env', '.env'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
-exec(['npm', 'run', 'testredbeard'].join(' '), {stdio: 'inherit'});
+exec(['npm', 'run', 'testredbeard'].join(' '), _.omit(opts, 'cwd'));
 
 rimraf.sync(dir);
