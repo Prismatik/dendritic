@@ -1,68 +1,10 @@
+const Router = require('express').Router;
 const _ = require('lodash');
 const {{name}}Controller = require('../controllers/{{name}}.js');
-
-const errHandlerFactory = res => {
-  return err => {
-    res.status(err.code || 500);
-    res.json(err);
-  }
-};
-
-const respond = (res, status) => body => {
-  if (!body.result && !body.found) {
-    res.status(404);
-    return Promise.resolve(res.json({err: 'Not found'}));
-  }
-  res.status(status || 200);
-  return Promise.resolve(res.json(body));
-};
+const router = Router();
 
 module.exports = {
-  http: app => {
-    app.get('/{{pluralName}}', (req, res) => {
-      {{name}}Controller.get(req.query)
-      .then(respond(res))
-      .catch( errHandlerFactory(res) )
-    });
-
-    app.get('/{{pluralName}}/:id', (req, res) => {
-      {{name}}Controller.get(_.assign({id: req.params.id}, req.query))
-      .then(respond(res))
-      .catch( errHandlerFactory(res) )
-    });
-
-    app.post('/{{pluralName}}', (req, res) => {
-      {{name}}Controller.create(req.body)
-      .then(respond(res, 201))
-      .catch( errHandlerFactory(res) )
-    });
-
-    app.put('/{{pluralName}}/:id', (req, res) => {
-      {{name}}Controller.update(req.body)
-      .then(respond(res))
-      .catch( errHandlerFactory(res) )
-    });
-
-    app.del('/{{pluralName}}/:id', (req, res) => {
-      {{name}}Controller.delete(req.params.id)
-      .then(respond(res))
-      .catch( errHandlerFactory(res) )
-    });
-    {{#isUser}}
-
-    app.post('/{{pluralName}}/signin', (req, res) => {
-      {{name}}Controller.signin(req.body.email, req.body.password)
-      .then(respond(res))
-      .catch( errHandlerFactory(res) )
-    });
-
-    app.post('/{{pluralName}}/signout', (req, res) => {
-      {{name}}Controller.signout(req.body)
-      .then(respond(res))
-      .catch( errHandlerFactory(res) )
-    });
-    {{/isUser}}
-  },
+  http: router,
   ws: io => {
     const nsp = io.of('/{{pluralName}}');
     nsp.on('connection', socket => {
@@ -76,4 +18,61 @@ module.exports = {
       });
     });
   }
+};
+
+router
+  .get('/{{pluralName}}', (req, res) => {
+    {{name}}Controller.get(req.query)
+    .then(respond(res))
+    .catch(errHandlerFactory(res));
+  })
+  .get('/{{pluralName}}/:id', (req, res) => {
+    {{name}}Controller.get(_.assign({id: req.params.id}, req.query))
+    .then(respond(res))
+    .catch(errHandlerFactory(res));
+  })
+  .post('/{{pluralName}}', (req, res) => {
+    {{name}}Controller.create(req.body)
+    .then(respond(res, 201))
+    .catch(errHandlerFactory(res));
+  })
+  .put('/{{pluralName}}/:id', (req, res) => {
+    {{name}}Controller.update(req.body)
+    .then(respond(res))
+    .catch(errHandlerFactory(res));
+  })
+  .delete('/{{pluralName}}/:id', (req, res) => {
+    {{name}}Controller.delete(req.params.id)
+    .then(respond(res))
+    .catch(errHandlerFactory(res))
+  });
+
+{{#isUser}}
+router
+  .post('/{{pluralName}}/signin', (req, res) => {
+    {{name}}Controller.signin(req.body.email, req.body.password)
+    .then(respond(res))
+    .catch( errHandlerFactory(res) )
+  })
+  .post('/{{pluralName}}/signout', (req, res) => {
+    {{name}}Controller.signout(req.body)
+    .then(respond(res))
+    .catch( errHandlerFactory(res) )
+  });
+{{/isUser}}
+
+const errHandlerFactory = res => {
+  return err => {
+    res.status(err.code || 500);
+    res.json(err);
+  };
+};
+
+const respond = (res, status) => body => {
+  if (!body.result && !body.found) {
+    res.status(404);
+    return Promise.resolve(res.json({err: 'Not found'}));
+  }
+  res.status(status || 200);
+  return Promise.resolve(res.json(body));
 };

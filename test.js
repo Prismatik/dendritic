@@ -1,6 +1,6 @@
-const _ = require("lodash");
+const _ = require('lodash');
 const exec = require('child_process').execSync;
-const bandname = require("bandname");
+const bandname = require('bandname');
 const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
 const path = require('path');
@@ -29,7 +29,6 @@ exec(['node', index, 'base', appName].join(' '), opts);
 exec(['node', index, 'controller', controllerName1].join(' '), opts);
 exec(['node', index, 'controller', controllerName2, '-s', controllerName1].join(' '), opts);
 exec(['node', index, 'user', userName, '-m', controllerName2].join(' '), opts);
-exec(['node', index, 'cors'].join(' '), opts);
 if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
 exec(['cp', 'example.env', '.env'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);

@@ -317,7 +317,7 @@ describe('{{name}} controller', () => {
   {{/isUser}}
 
   describe('Socket connection', () => {
-    it.skip('allows to open a web-socket connection and returns a single record', () => {
+    it('allows to open a web-socket connection and returns a single record', () => {
       return single{{name}}Creator()
         .then(body => {
           return new Promise(resolve => {

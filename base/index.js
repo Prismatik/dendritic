@@ -21,13 +21,12 @@ module.exports = (opts) => {
     {n: 'schema'},
     {n: 'setup'},
     {n: 'start'},
-    {p: 'middleware', n: 'jwt'},
-    {p: 'middleware', n: 'cors'},
+    {p: 'routes', n: 'jwt'},
     {p: 'routes', n: 'schema'},
     {p: 'tables', n: 'migrations'},
     {p: 'test', n: 'helper'},
     {p: 'test', n: 'mocha.opts', t: 'mocha', e: 'opts'},
-    {p: 'test/middleware', n: 'jwt_test'},
+    {p: 'test/routes', n: 'jwt_test'},
     {p: 'test/routes', n: 'schema_test'},
     {n: '.gitignore', e: ''}
   ];
@@ -36,8 +35,9 @@ module.exports = (opts) => {
 
   const dirs = [
     'env',
-    'routes',
+    'middleware',
     'migrations',
+    'routes',
     'schemas'
   ].forEach(dir => mkdirp.sync(dir));
 
