@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:4
+FROM node:4
 
 MAINTAINER Prismatik Pty. Ltd. <david@prismatik.com.au>
 
