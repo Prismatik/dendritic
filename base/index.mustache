@@ -16,6 +16,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
+fs.readdirSync('./middleware').forEach(name => {
+  app.use(require('./middleware/' + name));
+});
+
 fs.readdirSync('./routes').forEach(name => {
   const route = require('./routes/'+name);
   app.use(route.http);
