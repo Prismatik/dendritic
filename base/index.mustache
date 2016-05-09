@@ -6,6 +6,7 @@ require('required_env')(fs.readdirSync('./env').reduce((r, file) => {
   return r.concat(require('./env/'+file));
 }, []));
 
+const cors = require('cors');
 const app = require('express')();
 const bodyParser = require('body-parser');
 const server = require('http').createServer(app);
@@ -13,6 +14,7 @@ const io = require('socket.io')(server);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cors());
 
 fs.readdirSync('./routes').forEach(name => {
   const route = require('./routes/'+name);

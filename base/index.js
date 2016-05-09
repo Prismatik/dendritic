@@ -22,7 +22,6 @@ module.exports = (opts) => {
     {n: 'setup'},
     {n: 'start'},
     {p: 'middleware', n: 'jwt'},
-    {p: 'middleware', n: 'cors'},
     {p: 'routes', n: 'schema'},
     {p: 'tables', n: 'migrations'},
     {p: 'test', n: 'helper'},
