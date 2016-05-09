@@ -5,7 +5,7 @@ const _ = require('lodash');
 const fixture = require('../../fixtures/{{name}}');
 const IO = require('socket.io-client');
 {{#isUser}}
-const password = require('password');
+const password = require('simple-password');
 {{/isUser}}
 {{#relationships}}
 const {{name}}Fixture = require('../../fixtures/{{name}}');
