@@ -1,10 +1,8 @@
+const Router = require('express').Router;
 const schema = require('root/schema').getSchema();
 
 module.exports = {
-  http: app => {
-    app.get('/schema', (req, res) => {
-      res.json(schema);
-    });
-  },
+  http: Router()
+    .get('/schema', (req, res) => res.json(schema)),
   ws: () => {}
 };
