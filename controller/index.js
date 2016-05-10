@@ -2,7 +2,7 @@ const scaffold = require('../lib/scaffold');
 const package = require('../lib/package');
 
 const userDependencies = {
-  "password": "git+https://github.com/Prismatik/password.git"
+  "simple-password": "^1.0.1"
 };
 
 module.exports = (opts) => {
