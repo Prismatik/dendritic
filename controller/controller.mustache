@@ -70,7 +70,7 @@ module.exports = {
   update: ({{name}}) => {
     const valid = schema.validate({{name}});
     if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
-    return r.table('{{pluralName}}').update({{name}}, {returnChanges: true}).run()
+    return r.table('{{pluralName}}').get({{name}}.id).update({{name}}, {returnChanges: true}).run()
     .then(rethinkdb.firstChange);
   },
   {{/isUser}}
@@ -94,7 +94,7 @@ module.exports = {
       if (pass) {{name}}.password = pass;
       const valid = schema.validate({{name}});
       if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
-      return r.table('{{pluralName}}').update({{name}}, {returnChanges: true}).run()
+      return r.table('{{pluralName}}').get({{name}}.id).update({{name}}, {returnChanges: true}).run()
       .then(rethinkdb.firstChange);
     });
   },
