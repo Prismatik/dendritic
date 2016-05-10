@@ -1,12 +1,4 @@
-require('dotenv').config();
-require('app-module-path').addPath(__dirname);
-
 const fs = require('fs');
-
-require('required_env')(fs.readdirSync('./env').reduce((r, file) => {
-  return r.concat(require('./env/'+file));
-}, []));
-
 const cors = require('cors');
 const app = require('express')();
 const bodyParser = require('body-parser');

@@ -1,11 +1,11 @@
+const path = require('path');
 require('dotenv').config();
+require('app-module-path').addPath(path.join(__dirname, '..'));
 require('required_env')(require('env/db'));
-require('app-module-path').addPath(__dirname);
 
 const fs = require('fs');
 const os = require('os');
 const _ = require('lodash');
-const path = require('path');
 const r = require('lib/db');
 
 const table = r.table('_migrations');
