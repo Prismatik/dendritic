@@ -15,8 +15,8 @@
   "scripts": {
     "test": "node test",
     "testredbeard": "mocha",
-    "watch": "chokidar './*' -c 'npm test' --initial",
-    "dockertest": "docker-compose run --workdir \"/opt/hostapp\" redbeard npm rebuild && npm run watch"
+    "watch": "chokidar '.' -c 'npm test' -i '/node_modules|redbeard_tests/' -d 2000",
+    "dockertest": "docker-compose run --workdir '\/opt\/app\/hostapp' redbeard npm run watch"
   },
   "dependencies": {
     "lodash": "^3.10.1",

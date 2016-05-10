@@ -6,7 +6,7 @@ services:
       RETHINK_HOST: rethinkdb
       SHELL: /bin/sh
     volumes:
-      - .:/opt/hostapp
+      - .:/opt/app/hostapp
     depends_on:
       - rethinkdb
     links:
