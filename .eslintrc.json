@@ -1,0 +1,7 @@
+{
+  "extends": "prismatik",
+  "rules": {
+    "global-require": "off",
+    "import/no-unresolved": "off"
+  }
+}
