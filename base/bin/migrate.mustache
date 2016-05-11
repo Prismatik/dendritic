@@ -32,13 +32,13 @@ if (command === 'release_mutex' && process.argv[3]) {
 };
 
 if (command === 'release_mutex') {
-  return migrate.releaseMutex()
+  migrate.releaseMutex();
   .then(() => r.getPoolMaster().drain())
   .then(() => process.exit());
 };
 
 if (command === 'show_mutex') {
-  return migrate.queryMutex()
+  migrate.queryMutex();
   .then(console.log)
   .then(() => r.getPoolMaster().drain())
   .then(() => process.exit());

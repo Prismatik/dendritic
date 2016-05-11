@@ -15,11 +15,11 @@ describe('lib/controller', function() {
       };
       const result = controller.getIndexes(schema, params);
       result.must.eql(["favMilk", "pilot"]);
-    })
+    });
 
     it('Given indexed properties that are not in params must not return these', () => {
       const schema = {
-        properties: {pilot: INDEXED, sonOfVader: INDEXED, saberColour: INDEXED}
+        properties: { pilot: INDEXED, sonOfVader: INDEXED, saberColour: INDEXED }
       }
       const params = {
         favMilk: 'blue',
@@ -29,7 +29,7 @@ describe('lib/controller', function() {
       };
       const result = controller.getIndexes(schema, params);
       result.must.eql(["pilot"]);
-    })
+    });
 
     it('Given no params match indexed propertites, must return an empty array', () => {
       const schema = { properties: { favMilk: INDEXED, pilot: INDEXED } }
@@ -39,6 +39,6 @@ describe('lib/controller', function() {
       };
       const result = controller.getIndexes(schema, params);
       result.must.eql([]);
-    })
-  })
-})
+    });
+  });
+});

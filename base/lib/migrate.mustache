@@ -64,16 +64,14 @@ module.exports = {
     .then(getMigrationRecords)
     .then(existingMigrations => _.difference(migrationFiles, existingMigrations))
     .then(missingMigrations => {
-      const toBeApplied = missingMigrations.map(file => {
-        return {
-          func: require('migrations/'+file).up,
-          name: file
-        }
-      });
+      const toBeApplied = missingMigrations.map(file => ({
+        func: require(`migrations/${file}`).up,
+        name: file
+      }));
 
       return applyMigration(toBeApplied, (name) => {
         console.log('migrated up', name);
-        return table.insert({name: name}).run();
+        return table.insert({ name }).run();
       });
     })
     .then(releaseMutex);
@@ -89,21 +87,18 @@ module.exports = {
     .then(existingMigrations => _.intersection(migrationFiles, existingMigrations))
     .then(migrationsToDown => {
       const toBeDowned = migrationsToDown.reverse()
-      .map(file => {
-        return {
-          func: require('migrations/'+file).down,
-          name: file
-        }
-      });
+      .map(file => ({
+        func: require(`migrations/${file}`).down,
+        name: file
+      }));
 
       return applyMigration(toBeDowned, (name) => {
         console.log('migrated down', name);
         return table.get(name).delete().run();
       });
-
     })
     .then(releaseMutex);
   },
-  releaseMutex: releaseMutex,
-  queryMutex: queryMutex
+  releaseMutex,
+  queryMutex
 };

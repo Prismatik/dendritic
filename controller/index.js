@@ -2,7 +2,7 @@ const scaffold = require('../lib/scaffold');
 const package = require('../lib/package');
 
 const userDependencies = {
-  "simple-password": "^1.0.1"
+  'simple-password': '^1.0.1'
 };
 
 module.exports = (opts) => {
@@ -25,7 +25,7 @@ module.exports = (opts) => {
 
   if (opts.isUser) {
     // if user is scaffolded, add user specific dependencies
-    const packagePath = opts.path + '/package.json';
+    const packagePath = `${opts.path}/package.json`;
     package.addDependencies(packagePath, userDependencies);
 
     // if user is scaffolded, jwt lib required

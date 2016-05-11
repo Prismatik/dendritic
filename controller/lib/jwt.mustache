@@ -12,4 +12,4 @@ exports.verify = function(token, opts) {
 
 exports.sign = function(data, expires) {
   return jwt.sign(data, process.env.JWT_SECRET, expires);
-}
+};

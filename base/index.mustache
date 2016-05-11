@@ -19,7 +19,7 @@ fs.readdirSync('./routes').forEach(name => {
   route.ws(io);
 });
 
-app.use(function (err, req, res, next) {
+app.use(function (err, req, res) {
   if (err.name === 'UnauthorizedError') {
     res.status(401).send('Invalid token');
   }

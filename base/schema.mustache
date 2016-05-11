@@ -3,11 +3,11 @@ const fs = require('fs');
 const deref = require('json-schema-deref-sync');
 const r = require('lib/db');
 
-var indexes = {};
+let indexes = {};
 
 const schema = fs.readdirSync('./schemas').reduce((s, file) => {
   const name = file.split('.json')[0];
-  s[name] = require('./schemas/'+file);
+  s[name] = require(`./schemas/${file}`);
   return s;
 }, {});
 
