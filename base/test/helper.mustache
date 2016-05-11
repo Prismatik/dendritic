@@ -10,7 +10,7 @@ const app = require('index');
 const r = require('lib/db');
 
 app.listen(process.env.PORT, () => {
-  before(function () {
+  before(function() {
     this.timeout(30000);
 
     return setup()

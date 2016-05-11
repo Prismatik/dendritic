@@ -2,8 +2,10 @@
   "extends": "prismatik",
   "rules": {
     "arrow-body-style": "off",
+    "camelcase": "off",
     "global-require": "off",
     "import/no-unresolved": "off",
+    "new-cap": "off",
     "no-param-reassign": "off"
   }
 }

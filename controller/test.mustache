@@ -1,4 +1,3 @@
-"use strict";
 const fetch = require('node-fetch');
 const querystring = require('querystring');
 const _ = require('lodash');
@@ -11,12 +10,14 @@ const password = require('simple-password');
 const {{name}}Fixture = require('../../fixtures/{{name}}');
 {{/relationships}}
 
-const url = 'http://localhost:'+process.env.PORT;
+const url = `http://localhost:${process.env.PORT}`;
 
+{{#isUser}}
 const statusEquals = code => res => {
   res.status.must.equal(code);
   return res;
 };
+{{/isUser}}
 
 const unwrapOldVal = (res) => {
   return res.json()
@@ -29,18 +30,18 @@ const unwrapJSON = (res) => {
 };
 
 const getJSON = (path) => {
-  return fetch(url+path)
+  return fetch(url + path)
   .then(unwrapJSON);
 };
 
 const sender = method => path => data => {
-  return fetch(url+path, {
-    method: method,
+  return fetch(url + path, {
+    method,
     headers: {
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify( data )
+    body: JSON.stringify(data)
   });
 };
 
@@ -48,10 +49,10 @@ const poster = sender('post');
 const putter = sender('put');
 
 const deleter = path => () => {
-  return fetch(url+path, {
+  return fetch(url + path, {
     method: 'delete',
     headers: {
-      'Accept': 'application/json',
+      Accept: 'application/json',
     }
   });
 };
@@ -63,7 +64,7 @@ const {{name}}Creator = times => {
     const data = fixture.valid();
     {{^isUser}}
     return {{name}}Poster(data)
-    .then(unwrapJSON)
+    .then(unwrapJSON);
     {{/isUser}}
     {{#isUser}}
     return password.create(data.password, 10)
@@ -98,13 +99,13 @@ describe('{{name}} controller', () => {
   describe('GET /{{pluralName}}', () => {
     it('returns 200 ok', () => {
       return single{{name}}Creator()
-        .then(() => fetch(url+'/{{pluralName}}'))
+        .then(() => fetch(`${url}/{{pluralName}}`))
         .must.resolve.to.have.property('status', 200);
     });
 
     it('return an object with a .result property', () => {
       return single{{name}}Creator()
-        .then(() => fetch(url+'/{{pluralName}}'))
+        .then(() => fetch(`${url}/{{pluralName}}`))
         .then(res => res.json())
         .must.resolve.to.be.object();
     });
@@ -112,12 +113,12 @@ describe('{{name}} controller', () => {
     it('accepts search params in the querystring', () => {
       return {{name}}Creator(2)
         .then(entries => {
-          const record   = entries[0];
-          const property = Object.keys(record).filter(k => k != 'id')[0];
+          const record = entries[0];
+          const property = Object.keys(record).filter(k => k !== 'id')[0];
           if (!property) return; // if no properties other than id skip test
-          const queryStr = querystring.stringify({[property]: record[property]});
+          const queryStr = querystring.stringify({ [property]: record[property] });
 
-          return getJSON('/{{pluralName}}'+'?'+queryStr)
+          return getJSON(`/{{pluralName}}?${queryStr}`)
             .then(json => json.map(entry => entry[property]))
             .must.resolve.to.eql([record[property]]);
         });
@@ -125,7 +126,7 @@ describe('{{name}} controller', () => {
 
     it('does not match non-property search params in the querystring', () => {
       return {{name}}Creator(2)
-        .then({{pluralName}} => getJSON('/{{pluralName}}?foo='+{{pluralName}}[0].id))
+        .then({{pluralName}} => getJSON(`/{{pluralName}}?foo=${{{pluralName}}}[0].id}`))
         .then(entries => entries.length)
         .must.resolve.to.be.gt(1);
     });
@@ -292,7 +293,7 @@ describe('{{name}} controller', () => {
   describe('POST /{{pluralName}}/signin', () => {
     it('returns 401 response with invalid email', () => {
       const signin = poster('/{{pluralName}}/signin');
-      return signin({email: "notexist@example.com", password: "ABCD1234"})
+      return signin({email: 'notexist@example.com', password: 'ABCD1234'})
         .then(statusEquals(401))
         .then(res => res.json())
         .must.resolve.to.have.property('message', 'Unauthorized');
@@ -304,7 +305,7 @@ describe('{{name}} controller', () => {
       .then(unwrapJSON)
       .then((user) => {
         const signin = poster('/{{pluralName}}/signin');
-        return signin({email: data.email, password: "ABCD1234"})
+        return signin({email: data.email, password: 'ABCD1234'})
           .then(statusEquals(401))
           .then(res => res.json())
           .must.resolve.to.have.property('message', 'Unauthorized');

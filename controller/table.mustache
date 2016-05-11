@@ -8,10 +8,5 @@ module.exports = () => {
   })
   .then(() => {
     r.table('{{pluralName}}').wait().run()
-  })
-  //.then(() => r.table('{{pluralName}}').indexCreate('name').run())
-  //.catch(err => {
-  //  if (err.message.indexOf('Index `name` already exists') > -1 )return;
-  //  throw err;
-  //})
-}
+  });
+};
