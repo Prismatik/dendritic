@@ -23,7 +23,7 @@ And you'll have a minimal, well thought-out base app scaffold. Next:
 ### Creating Controllers
 
 ```
-redbeard controller model-name-singular
+redbeard model model-name-singular
 ```
 And it will add routes, a controller and database bootstrapping. You'll have
 Create, Read, Update and Delete. You can pass filter params for any property
@@ -38,16 +38,16 @@ models using the `-s` or `-m` switch.
 * `-s` is used for singular relationships (model stores a singular uuid)
 * `-m` is used for multiple relationships (model stores an array of uuids)
 
-As with controller model names, the related model names must be singular.
+As with model names, the related model names must be singular.
 
 For example:-
 
 ```
-redbeard controller product -s category,wholesaler
+redbeard model product -s category,wholesaler
 ```
 OR
 ```
-redbeard controller product -m purchaser,location
+redbeard model product -m purchaser,location
 ```
 
 This will add the necessary properties to your model schema as well as setup

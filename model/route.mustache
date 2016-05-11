@@ -1,6 +1,6 @@
 const Router = require('express').Router;
 const _ = require('lodash');
-const {{name}}Controller = require('../controllers/{{name}}.js');
+const {{name}}Model = require('../models/{{name}}.js');
 const router = Router();
 
 const errHandlerFactory = res => {
@@ -24,7 +24,7 @@ module.exports = {
   socket: io => {
     const nsp = io.of('/{{pluralName}}');
     nsp.on('connection', socket => {
-      {{name}}Controller.watch(socket.handshake.query)
+      {{name}}Model.watch(socket.handshake.query)
       .then(cursor => {
         cursor.each((err, data) => {
           if (!data) return null;
@@ -38,27 +38,27 @@ module.exports = {
 
 router
   .get('/{{pluralName}}', (req, res) => {
-    {{name}}Controller.get(req.query)
+    {{name}}Model.get(req.query)
     .then(respond(res))
     .catch(errHandlerFactory(res));
   })
   .get('/{{pluralName}}/:id', (req, res) => {
-    {{name}}Controller.get(_.assign({ id: req.params.id }, req.query))
+    {{name}}Model.get(_.assign({ id: req.params.id }, req.query))
     .then(respond(res))
     .catch(errHandlerFactory(res));
   })
   .post('/{{pluralName}}', (req, res) => {
-    {{name}}Controller.create(req.body)
+    {{name}}Model.create(req.body)
     .then(respond(res, 201))
     .catch(errHandlerFactory(res));
   })
   .put('/{{pluralName}}/:id', (req, res) => {
-    {{name}}Controller.update(req.body)
+    {{name}}Model.update(req.body)
     .then(respond(res))
     .catch(errHandlerFactory(res));
   })
   .delete('/{{pluralName}}/:id', (req, res) => {
-    {{name}}Controller.delete(req.params.id)
+    {{name}}Model.delete(req.params.id)
     .then(respond(res))
     .catch(errHandlerFactory(res));
   });
@@ -66,12 +66,12 @@ router
 {{#isUser}}
 router
   .post('/{{pluralName}}/signin', (req, res) => {
-    {{name}}Controller.signin(req.body.email, req.body.password)
+    {{name}}Model.signin(req.body.email, req.body.password)
     .then(respond(res))
     .catch(errHandlerFactory(res));
   })
   .post('/{{pluralName}}/signout', (req, res) => {
-    {{name}}Controller.signout(req.body)
+    {{name}}Model.signout(req.body)
     .then(respond(res))
     .catch(errHandlerFactory(res));
   });

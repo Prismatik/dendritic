@@ -1,9 +1,9 @@
-const controller = require('../../lib/controller');
+const model = require('../../lib/model');
 
 const INDEXED = { indexed: true };
 const UUID = 'dc83f979-3485-49fc-b180-ba485d01a88f';
 
-describe('lib/controller', () => {
+describe('lib/model', () => {
   describe('.getIndexes', () => {
     it('Given params match indexed properties, must return all matches', () => {
       const schema = { properties: { favMilk: INDEXED, pilot: INDEXED } };
@@ -13,7 +13,7 @@ describe('lib/controller', () => {
         name: 'Luke Skywalker',
         pilot: true
       };
-      const result = controller.getIndexes(schema, params);
+      const result = model.getIndexes(schema, params);
       result.must.eql(['favMilk', 'pilot']);
     });
 
@@ -27,7 +27,7 @@ describe('lib/controller', () => {
         name: 'Luke Skywalker',
         pilot: true
       };
-      const result = controller.getIndexes(schema, params);
+      const result = model.getIndexes(schema, params);
       result.must.eql(['pilot']);
     });
 
@@ -37,7 +37,7 @@ describe('lib/controller', () => {
         sonOfVader: true,
         saberColour: 'green/blue'
       };
-      const result = controller.getIndexes(schema, params);
+      const result = model.getIndexes(schema, params);
       result.must.eql([]);
     });
   });

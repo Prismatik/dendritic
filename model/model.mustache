@@ -2,7 +2,7 @@ const _ = require('lodash');
 const httpError = require('standard-http-error');
 const uuid = require('uuid');
 const r = require('../lib/db');
-const controller = require('../lib/controller');
+const model = require('../lib/model');
 const rethinkdb = require('../lib/rethinkdb');
 const schema = require('../lib/schema');
 const warnings = require('../constants/warnings');
@@ -16,11 +16,11 @@ const modelSchema = appSchema.{{name}};
 
 module.exports = {
   get: (params) => {
-    params = _.assign({ result: true }, controller.normaliseParams(params));
+    params = _.assign({ result: true }, model.normaliseParams(params));
     const queryParams = schema.filter('{{name}}', params);
 
     const table = r.table('{{pluralName}}');
-    const indexes = controller.getIndexes(modelSchema, queryParams);
+    const indexes = model.getIndexes(modelSchema, queryParams);
     const indexBy = _.contains(indexes, 'id') ? 'id' : indexes[0];
 
     const query = rethinkdb.buildQuery(table, indexBy, queryParams);
@@ -43,12 +43,12 @@ module.exports = {
     });
   },
   watch: (params) => {
-    params = controller.normaliseParams(params);
+    params = model.normaliseParams(params);
     const queryParams = schema.filter('{{name}}', params);
 
     const changes = { includeInitial: true, includeStates: true };
     const table = r.table('{{pluralName}}');
-    const indexes = controller.getIndexes(modelSchema, queryParams);
+    const indexes = model.getIndexes(modelSchema, queryParams);
     const indexBy = _.contains(indexes, 'id') ? 'id' : indexes[0];
 
     let query = rethinkdb.buildQuery(table, indexBy, queryParams);
@@ -134,7 +134,7 @@ module.exports = {
   signin: (email, pass) => {
     const table = r.table('{{pluralName}}');
     const params = { email };
-    const indexes = controller.getIndexes(modelSchema, params);
+    const indexes = model.getIndexes(modelSchema, params);
     const indexBy = _.contains(indexes, 'email') ? 'email' : null;
 
     const query = rethinkdb.buildQuery(table, indexBy, params);
