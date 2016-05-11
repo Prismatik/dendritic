@@ -13,6 +13,7 @@
     "redbeard": "./index.js"
   },
   "scripts": {
+    "lint": "./node_modules/.bin/eslint .",
     "test": "node test",
     "testredbeard": "mocha",
     "watch": "chokidar '.' -c 'npm test' -i '/node_modules|redbeard_tests/' -d 2000",
