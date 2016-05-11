@@ -16,7 +16,6 @@
     "json-schema-deref-sync": "^0.2.8",
     "jsonwebtoken": "^5.4.1",
     "lodash": "^3.10.1",
-    "required_env": "^1.0.0",
     "restify": "^4.0.3",
     "rethinkdbdash": "^2.2.8",
     "socket.io": "^1.3.7",
