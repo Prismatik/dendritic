@@ -20,6 +20,18 @@ const statusEquals = code => res => {
 };
 
 <%/isUser%>
+const asc = (a, b) => {
+  if (a.id > b.id) return 1;
+  if (a.id < b.id) return -1;
+  return 0;
+};
+
+const desc = (a, b) => {
+  if (a.id < b.id) return 1;
+  if (a.id > b.id) return -1;
+  return 0;
+};
+
 const unwrapOldVal = (res) => {
   return res.json()
   .then(json => json.old_val);
@@ -127,7 +139,10 @@ describe('<%name%> controller', () => {
 
     it('does not match non-property search params in the querystring', () => {
       return <%name%>Creator(2)
-        .then(<%pluralName%> => getJSON(`/<%pluralName%>?foo=${<%pluralName%>}[0].id}`))
+        .then(<%pluralName%> => {
+          const id = <%pluralName%>[0].id;
+          return getJSON(`/<%pluralName%>?foo=${id}`);
+        })
         .then(entries => entries.length)
         .must.resolve.to.be.gt(1);
     });
@@ -155,9 +170,7 @@ describe('<%name%> controller', () => {
       return <%name%>Creator(15)
         .then(() => getJSON('/<%pluralName%>?orderBy=id'))
         .then(results => {
-          const reordered = _.clone(results).sort((a, b) => {
-            return a.id > b.id ? 1 : a.id < b.id ? -1 : 0;
-          });
+          const reordered = _.clone(results).sort(asc);
 
           _.pluck(reordered, 'id').must.eql(_.pluck(results, 'id'));
         });
@@ -167,9 +180,7 @@ describe('<%name%> controller', () => {
       return <%name%>Creator(15)
         .then(() => getJSON('/<%pluralName%>?orderBy=id&order=desc'))
         .then(results => {
-          const reordered = _.clone(results).sort((a, b) => {
-            return a.id < b.id ? 1 : a.id > b.id ? -1 : 0;
-          });
+          const reordered = _.clone(results).sort(desc);
 
           _.pluck(reordered, 'id').must.eql(_.pluck(results, 'id'));
         });
@@ -177,7 +188,7 @@ describe('<%name%> controller', () => {
 
     it('returns n matching docs with a count of all matching docs', () => {
       return <%name%>Creator(10)
-        .then(() => fetch(url+'/<%pluralName%>?count=true&limit=5'))
+        .then(() => fetch(`${url}/<%pluralName%>?count=true&limit=5`))
         .then(res => res.json())
         .then(json => {
           json.result.must.have.length(5);
@@ -187,7 +198,7 @@ describe('<%name%> controller', () => {
 
     it('returns n matching docs without a count of all matching docs ', () => {
       return <%name%>Creator(10)
-        .then(() => fetch(url+'/<%pluralName%>?limit=5'))
+        .then(() => fetch(`${url}/<%pluralName%>?limit=5`))
         .then(res => res.json())
         .then(json => {
           json.result.must.have.length(5);
@@ -197,7 +208,7 @@ describe('<%name%> controller', () => {
 
     it('returns only a count with no matching docs', () => {
       return <%name%>Creator(10)
-        .then(() => fetch(url+'/<%pluralName%>?count=true&result=false'))
+        .then(() => fetch(`${url}/<%pluralName%>?count=true&result=false`))
         .then(res => res.json())
         .then(json => {
           json.must.not.have.property('result');
@@ -209,7 +220,7 @@ describe('<%name%> controller', () => {
   describe('GET /<%pluralName%>/:id', () => {
     it('returns 200 with the record data', () => {
       return single<%name%>Creator()
-        .then(record => fetch(url+'/<%pluralName%>/'+record.id))
+        .then(record => fetch(`${url}/<%pluralName%>/${record.id}`))
         .must.resolve.to.have.property('status', 200);
     });
   });
@@ -223,15 +234,15 @@ describe('<%name%> controller', () => {
     it('actually persists the data', () => {
       return single<%name%>Creator()
         .then(record => {
-          return getJSON('/<%pluralName%>/'+record.id)
+          return getJSON(`/<%pluralName%>/${record.id}`)
             .must.resolve.to.have.property('id', record.id);
         });
     });
-
     <%#relationships%>
+
     it('saves related entity (can GET using :id)', () => {
       return single<%name%>Creator()
-        .then(body => fetch(url+'/<%pluralName%>/'+body.id))
+        .then(body => fetch(`${url}/<%pluralName%>/${body.id}`))
         .must.resolve.to.have.property('status', 200);
     });
     <%/relationships%>
@@ -241,9 +252,9 @@ describe('<%name%> controller', () => {
     it('updates <%name%> and actually persists it', () => {
       const update = { name: 'Something else' };
       return single<%name%>Creator()
-        .then(body => putter('/<%pluralName%>/'+body.id)(_.merge(body, update)))
+        .then(body => putter(`/<%pluralName%>/${body.id}`)(_.merge(body, update)))
         .then(unwrapJSON)
-        .then(body => getJSON('/<%pluralName%>/'+body.id))
+        .then(body => getJSON(`/<%pluralName%>/${body.id}`))
         .must.resolve.to.have.property('name', update.name);
     });
 
@@ -265,9 +276,9 @@ describe('<%name%> controller', () => {
     it('PUTing an updated password should update the password hash', () => {
       const update = { password: 'ABCD1234' };
       return single<%name%>Creator()
-      .then(body => putter('/<%pluralName%>/'+body.id)(_.merge(body, update)))
+      .then(body => putter(`/<%pluralName%>/${body.id}`)(_.merge(body, update)))
       .then(unwrapJSON)
-      .then(body => getJSON('/<%pluralName%>/'+body.id))
+      .then(body => getJSON(`/<%pluralName%>/${body.id}`))
       .then(json => password.verify(update.password, json.password))
       .must.resolve.to.equal(true);
     });
@@ -277,15 +288,15 @@ describe('<%name%> controller', () => {
   describe('DELETE /<%pluralName%>/:id', () => {
     it('returns 200 ok response', () => {
       return single<%name%>Creator()
-        .then(body => deleter('/<%pluralName%>/'+body.id)())
+        .then(body => deleter(`/<%pluralName%>/${body.id}`)())
         .must.resolve.to.have.property('status', 200);
     });
 
     it('actually deletes the record', () => {
       return single<%name%>Creator()
-        .then(body => deleter('/<%pluralName%>/'+body.id)())
+        .then(body => deleter(`/<%pluralName%>/${body.id}`)())
         .then(unwrapOldVal)
-        .then(body => fetch(url+'/<%pluralName%>/'+body.id))
+        .then(body => fetch(`${url}/<%pluralName%>/${body.id}`))
         .must.resolve.to.have.property('status', 404);
     });
   });
@@ -294,7 +305,7 @@ describe('<%name%> controller', () => {
   describe('POST /<%pluralName%>/signin', () => {
     it('returns 401 response with invalid email', () => {
       const signin = poster('/<%pluralName%>/signin');
-      return signin({email: 'notexist@example.com', password: 'ABCD1234'})
+      return signin({ email: 'notexist@example.com', password: 'ABCD1234' })
         .then(statusEquals(401))
         .then(res => res.json())
         .must.resolve.to.have.property('message', 'Unauthorized');
@@ -304,22 +315,23 @@ describe('<%name%> controller', () => {
       const data = fixture.valid();
       return <%name%>Poster(data)
       .then(unwrapJSON)
-      .then((user) => {
+      .then(() => {
         const signin = poster('/<%pluralName%>/signin');
-        return signin({email: data.email, password: 'ABCD1234'})
+        return signin({ email: data.email, password: 'ABCD1234' })
           .then(statusEquals(401))
           .then(res => res.json())
           .must.resolve.to.have.property('message', 'Unauthorized');
       });
     });
 
-    it('POST /<%pluralName%>/signin with correct credentials should return a valid jwt', () => {
+    it('POST /<%pluralName%>/signin with correct credentials should return a valid jwt',
+    () => {
       const data = fixture.valid();
       return <%name%>Poster(data)
       .then(unwrapJSON)
       .then((user) => {
         const signin = poster('/<%pluralName%>/signin');
-        return signin({email: data.email, password: data.password})
+        return signin({ email: data.email, password: data.password })
           .then(statusEquals(200))
           .then(res => res.json())
           .then(json => {
@@ -333,11 +345,11 @@ describe('<%name%> controller', () => {
   <%/isUser%>
 
   describe('Socket connection', () => {
-    it('allows to open a web-socket connection and returns a single record', () => {
+    it('opens a web-socket connection and returns a single record', () => {
       return single<%name%>Creator()
         .then(body => {
           return new Promise(resolve => {
-            const io = IO(url+'/<%pluralName%>', {query: 'id='+body.id, forceNew: true});
+            const io = IO(`${url}/<%pluralName%>`, { query: `id=${body.id}`, forceNew: true });
             io.on('record', data => {
               resolve(data.new_val);
               io.disconnect();
@@ -347,11 +359,11 @@ describe('<%name%> controller', () => {
         });
     });
 
-    it('allows to openin a websocket connection to <%pluralName%> should return all of them', () => {
+    it('opens a websocket connection to <%pluralName%> should return all of them', () => {
       return <%name%>Creator(2)
-        .then(body => {
+        .then(() => {
           return new Promise(resolve => {
-            const io = IO(url+'/<%pluralName%>', {forceNew: true});
+            const io = IO(`${url}/<%pluralName%>`, { forceNew: true });
             let count = 0;
             io.on('record', () => {
               count++;
@@ -365,32 +377,33 @@ describe('<%name%> controller', () => {
         });
     });
 
-    it('allows to open a websocket connection to <%pluralName%> and returns changed documents', () => {
+    it('opens a websocket connection to <%pluralName%> and returns changed documents',
+    () => {
       return single<%name%>Creator()
         .then(data => {
           <%^isUser%>
-          const update = Object.assign({}, data, {name: 'ohai'});
+          const update = Object.assign({}, data, { name: 'ohai' });
           <%/isUser%>
           <%#isUser%>
-          const update = Object.assign({}, _.omit(data, 'password'), {name: 'ohai'});
+          const update = Object.assign({}, _.omit(data, 'password'), { name: 'ohai' });
           <%/isUser%>
           return new Promise(resolve => {
-            const io = IO(url+'/<%pluralName%>', {forceNew: true});
-            io.on('state', data => {
-              if (data.state === 'ready') {
-                io.on('record', data => {
+            const io = IO(`${url}/<%pluralName%>`, { forceNew: true });
+            io.on('state', state => {
+              if (state.state === 'ready') {
+                io.on('record', record => {
                   <%^isUser%>
-                  const result = data.new_val;
+                  const result = record.new_val;
                   <%/isUser%>
                   <%#isUser%>
-                  const result = _.omit(data.new_val, 'password');
+                  const result = _.omit(record.new_val, 'password');
                   <%/isUser%>
                   result.must.eql(update);
                   io.disconnect();
                   resolve();
                 });
-                putter('/<%pluralName%>/'+data.id)(update);
-              };
+                putter(`/<%pluralName%>/${data.id}`)(update);
+              }
             });
           });
         });
@@ -406,12 +419,12 @@ describe('<%name%> controller', () => {
               r[k] = target[k];
               return r;
             }, {});
-            const io = IO(url+'/<%pluralName%>', {query: query, forceNew: true});
+            const io = IO(`${url}/<%pluralName%>`, { query, forceNew: true });
             io.on('record', data => {
               data.new_val.must.eql(target);
             });
             io.on('state', data => {
-              if (data.state != 'ready') return;
+              if (data.state !== 'ready') return;
               io.disconnect();
               resolve();
             });
@@ -423,13 +436,11 @@ describe('<%name%> controller', () => {
       return <%name%>Creator(2)
         .then(() => {
           return new Promise(resolve => {
-            const io = IO(url+'/<%pluralName%>', {query: {limit: 1}, forceNew: true});
+            const io = IO(`${url}/<%pluralName%>`, { query: { limit: 1 }, forceNew: true });
             let count = 0;
-            io.on('record', data => {
-              count++;
-            });
+            io.on('record', () => count++);
             io.on('state', data => {
-              if (data.state != 'ready') return;
+              if (data.state !== 'ready') return;
               count.must.eql(1);
               io.disconnect();
               resolve();
@@ -442,14 +453,14 @@ describe('<%name%> controller', () => {
       return <%name%>Creator(5)
         .then(() => {
           return new Promise(resolve => {
-            const io = IO(url+'/<%pluralName%>', {query: {limit: 1}, forceNew: true});
+            const io = IO(`${url}/<%pluralName%>`, { query: { limit: 1 }, forceNew: true });
             let first;
-            io.on('record', data => {
-              first = data;
+            io.on('record', record => {
+              first = record;
               io.disconnect();
-              const io2 = IO(url+'/<%pluralName%>', {query: {skip: 1}, forceNew: true});
-              io2.on('record', data => {
-                data.must.not.eql(first);
+              const io2 = IO(`${url}/<%pluralName%>`, { query: { skip: 1 }, forceNew: true });
+              io2.on('record', record2 => {
+                record2.must.not.eql(first);
                 io2.disconnect();
                 return resolve();
               });
