@@ -13,7 +13,7 @@ const schema = fs.readdirSync('./schemas').reduce((s, file) => {
 
 const getIndexes = tableName => {
   return r.table(tableName).indexList().run()
-    .then(indexes => [tableName, indexes.concat("id")]);
+    .then(indexes => [tableName, indexes.concat('id')]);
 };
 
 // Note: This only adds the .indexed property to the schema's top level
@@ -39,7 +39,7 @@ exports.setIndexes = () => {
   .then(tables => _.reject(tables, t => t === '_migrations'))
   .then(tables => Promise.all(tables.map(getIndexes)))
   .then(_.zipObject)
-  .then(result => indexes = result);
+  .then(result => { indexes = result; });
 };
 
 exports.getSchema = () => transformSchema(indexes, schema);

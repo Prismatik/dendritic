@@ -17,32 +17,32 @@ const barf = (msg) => {
 
 if (!command) {
   barf('usage: npm run migrate [DIRECTION] [BACKSTOP]');
-};
+}
 
 if (commands.indexOf(command) < 0) {
-  barf('migration command must be one of: ' + commands.join(' '));
-};
+  barf(`migration command must be one of: ${commands.join(' ')}`);
+}
 
 if (command === 'up' && process.argv[3]) {
   barf('migrate up does not take an argument');
-};
+}
 
 if (command === 'release_mutex' && process.argv[3]) {
   barf('migrate release_mutex does not take an argument');
-};
+}
 
 if (command === 'release_mutex') {
-  migrate.releaseMutex();
+  migrate.releaseMutex()
   .then(() => r.getPoolMaster().drain())
   .then(() => process.exit());
-};
+}
 
 if (command === 'show_mutex') {
-  migrate.queryMutex();
+  migrate.queryMutex()
   .then(console.log)
   .then(() => r.getPoolMaster().drain())
   .then(() => process.exit());
-};
+}
 
 migrate[command](process.argv[3])
 .then(() => {

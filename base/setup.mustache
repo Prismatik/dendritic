@@ -12,7 +12,7 @@ const tables = fs.readdirSync('./tables').map(table => {
 module.exports = () => {
   return r.dbCreate(process.env.RETHINK_NAME).run()
   .catch((err) => {
-    var arr = err.message.split('\n');
+    const arr = err.message.split('\n');
     if (arr[0] === `Database ${process.env.RETHINK_NAME} already exists in:`) return;
     throw err;
   })

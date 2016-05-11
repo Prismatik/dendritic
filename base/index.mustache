@@ -10,23 +10,23 @@ app.use(bodyParser.json());
 app.use(cors());
 
 fs.readdirSync('./middleware').forEach(name => {
-  app.use(require('./middleware/' + name));
+  app.use(require(`./middleware/${name}`));
 });
 
 fs.readdirSync('./routes').forEach(name => {
-  const route = require('./routes/'+name);
+  const route = require(`./routes/${name}`);
   app.use(route.http);
   route.ws(io);
 });
 
-app.use(function (err, req, res) {
+app.use((err, req, res) => {
   if (err.name === 'UnauthorizedError') {
     res.status(401).send('Invalid token');
   }
 });
 
-process.on('unhandledRejection', function(reason, p) {
-  console.error("Unhandled Rejection at: Promise ", p, " reason: ", reason);
+process.on('unhandledRejection', (reason, p) => {
+  console.error('Unhandled Rejection at: Promise ', p, ' reason: ', reason);
 });
 
 module.exports = server;
