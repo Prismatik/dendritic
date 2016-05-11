@@ -68,7 +68,7 @@ router
   .post('/{{pluralName}}/signin', (req, res) => {
     {{name}}Controller.signin(req.body.email, req.body.password)
     .then(respond(res))
-    .catch(errHandlerFactory(res))
+    .catch(errHandlerFactory(res));
   })
   .post('/{{pluralName}}/signout', (req, res) => {
     {{name}}Controller.signout(req.body)

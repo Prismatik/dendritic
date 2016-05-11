@@ -11,7 +11,7 @@ const r = require('lib/db');
 const table = r.table('_migrations');
 
 const applyMigration = (migrations, then) => {
-  if (migrations.length === 0) return;
+  if (migrations.length === 0) return Promise.resolve();
   const m = migrations.shift();
   return m.func()
   .then(() => {
@@ -58,7 +58,7 @@ module.exports = {
   up: () => {
     const migrationFiles = getMigrationFiles();
 
-    if (migrationFiles.length < 1) return;
+    if (migrationFiles.length < 1) return Promise.resolve();
 
     return acquireMutex()
     .then(getMigrationRecords)
@@ -79,7 +79,7 @@ module.exports = {
   down: (backstop) => {
     const migrationFiles = getMigrationFiles();
 
-    if (migrationFiles.length < 1) return;
+    if (migrationFiles.length < 1) return Promise.resolve();
 
     migrationFiles.splice(0, migrationFiles.indexOf(backstop));
 

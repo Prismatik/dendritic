@@ -3,9 +3,9 @@ const fs = require('fs');
 const deref = require('json-schema-deref-sync');
 const r = require('lib/db');
 
-let indexes = {};
+let schemaIndexes = {};
 
-const schema = fs.readdirSync('./schemas').reduce((s, file) => {
+const appSchema = fs.readdirSync('./schemas').reduce((s, file) => {
   const name = file.split('.json')[0];
   s[name] = require(`./schemas/${file}`);
   return s;
@@ -39,8 +39,7 @@ exports.setIndexes = () => {
   .then(tables => _.reject(tables, t => t === '_migrations'))
   .then(tables => Promise.all(tables.map(getIndexes)))
   .then(_.zipObject)
-  .then(result => { indexes = result; });
+  .then(result => { schemaIndexes = result; });
 };
 
-exports.getSchema = () => transformSchema(indexes, schema);
-
+exports.getSchema = () => transformSchema(schemaIndexes, appSchema);

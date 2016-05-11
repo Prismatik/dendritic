@@ -88,7 +88,7 @@ module.exports = {
   create: ({{name}}) => {
     return password.create({{name}}.password, 10)
     .then(hash => {
-      const data = _.merge({{name}}, {password: hash});
+      const data = _.merge({{name}}, { password: hash });
       const valid = schema.validate(data);
       if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
       {{name}}.rev = uuid.v4();
@@ -98,9 +98,10 @@ module.exports = {
   },
   update: ({{name}}) => {
     if (!{{name}}.rev) return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
-    var getHash;
-    if ({{name}}.password) getHash = password.create({{name}}.password, 10);
-    else getHash = Promise.resolve();
+    let getHash;
+    if ({{name}}.password) {
+      getHash = password.create({{name}}.password, 10);
+    } else getHash = Promise.resolve();
 
     return getHash.then(pass => {
       if (pass) {{name}}.password = pass;
@@ -128,7 +129,7 @@ module.exports = {
   },
   signin: (email, pass) => {
     const table = r.table('{{pluralName}}');
-    const params = {email};
+    const params = { email };
     const indexes = controller.getIndexes(modelSchema, params);
     const indexBy = _.contains(indexes, 'email') ? 'email' : null;
 
