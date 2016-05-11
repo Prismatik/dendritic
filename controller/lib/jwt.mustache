@@ -1,6 +1,6 @@
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
-exports.verify = function(token, opts) {
+exports.verify = function verify(token, opts) {
   return new Promise((resolve, reject) => {
     opts = opts || {};
     jwt.verify(token, process.env.JWT_SECRET, opts, (err, decoded) => {
@@ -10,6 +10,6 @@ exports.verify = function(token, opts) {
   });
 };
 
-exports.sign = function(data, expires) {
+exports.sign = function sign(data, expires) {
   return jwt.sign(data, process.env.JWT_SECRET, expires);
 };

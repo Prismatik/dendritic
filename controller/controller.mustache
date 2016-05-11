@@ -53,7 +53,7 @@ module.exports = {
 
     var query = rethinkdb.buildQuery(table, indexBy, queryParams);
     query = rethinkdb.addTransformations(query, indexes, params);
- 
+
     if (!rethinkdb.isChangeFeedable(query)) {
       console.log(warnings.RESTRICTED_FEED);
       query = table.getAll(r.args(query.getField('id').coerceTo('array')));
@@ -101,7 +101,7 @@ module.exports = {
     var getHash;
     if ({{name}}.password) getHash = password.create({{name}}.password, 10);
     else getHash = Promise.resolve();
- 
+
     return getHash.then(pass => {
       if (pass) {{name}}.password = pass;
       const valid = schema.validate({{name}});
@@ -143,7 +143,7 @@ module.exports = {
         if (verified) return jwt.sign({ id: user.id, role: user.role });
         throw new httpError('UNAUTHORIZED');
       })
-      .then(token => { 
+      .then(token => {
         return {
           found: true,
           result: { token, user: _.omit(user, 'password') }

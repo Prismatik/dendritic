@@ -22,7 +22,7 @@ exports.addTransformations = (table, indexes, params) => {
       if (item === 'orderBy') {
         const order = params.order || 'asc';
         const isIndexed = _.contains(indexes, 'orderBy');
-        if (isIndexed) q = q[item]({index: r[order](params[item])});
+        if (isIndexed) q = q[item]({ index: r[order](params[item]) });
         else q = q[item](r[order](params[item]));
       } else {
         q = q[item](params[item]);
