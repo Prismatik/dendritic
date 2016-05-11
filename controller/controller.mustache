@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const httpError = require('standard-http-error');
+const uuid = require('uuid');
 const r = require('../lib/db');
 const controller = require('../lib/controller');
 const rethinkdb = require('../lib/rethinkdb');
@@ -64,13 +65,22 @@ module.exports = {
   create: ({{name}}) => {
     const valid = schema.validate({{name}});
     if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
+    {{name}}.rev = uuid.v4();
     return r.table('{{pluralName}}').insert({{name}}, {returnChanges: true}).run()
     .then(rethinkdb.firstChange);
   },
   update: ({{name}}) => {
+    if (!{{name}}.rev) return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
     const valid = schema.validate({{name}});
     if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
-    return r.table('{{pluralName}}').update({{name}}, {returnChanges: true}).run()
+    return r.table('{{pluralName}}')
+    .get({{name}}.id)
+    .update(
+      rethinkdb.ifRevMatches({{name}}),
+      {returnChanges: true}
+    )
+    .run()
+    .then(rethinkdb.checkRevError)
     .then(rethinkdb.firstChange);
   },
   {{/isUser}}
@@ -81,11 +91,13 @@ module.exports = {
       const data = _.merge({{name}}, {password: hash});
       const valid = schema.validate(data);
       if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
+      {{name}}.rev = uuid.v4();
       return r.table('{{pluralName}}').insert(data, {returnChanges: true}).run()
       .then(rethinkdb.firstChange);
     });
   },
   update: ({{name}}) => {
+    if (!{{name}}.rev) return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
     var getHash;
     if ({{name}}.password) getHash = password.create({{name}}.password, 10);
     else getHash = Promise.resolve();
@@ -94,7 +106,14 @@ module.exports = {
       if (pass) {{name}}.password = pass;
       const valid = schema.validate({{name}});
       if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
-      return r.table('{{pluralName}}').update({{name}}, {returnChanges: true}).run()
+      return r.table('{{pluralName}}')
+      .get({{name}}.id)
+      .update(
+        rethinkdb.ifRevMatches({{name}}),
+        {returnChanges: true}
+      )
+      .run()
+      .then(rethinkdb.checkRevError)
       .then(rethinkdb.firstChange);
     });
   },

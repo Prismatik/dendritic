@@ -239,17 +239,31 @@ describe('{{name}} controller', () => {
     it('updates {{name}} and actually persists it', () => {
       const update = {name: 'Something else'};
       return single{{name}}Creator()
-        .then(body => putter('/{{pluralName}}/'+body.id)(update))
+        .then(body => putter('/{{pluralName}}/'+body.id)(_.merge(body, update)))
         .then(unwrapJSON)
         .then(body => getJSON('/{{pluralName}}/'+body.id))
         .must.resolve.to.have.property('name', update.name);
+    });
+
+    it('rejects a {{name}} without any rev', () => {
+      const update = {name: 'Something else'};
+      return single{{name}}Creator()
+        .then(body => putter('/{{pluralName}}/'+body.id)(update))
+        .then(res => res.status.must.equal(400));
+    });
+
+    it('rejects a {{name}} with a faulty rev', () => {
+      const update = {name: 'Something else', rev: 'foo'};
+      return single{{name}}Creator()
+        .then(body => putter('/{{pluralName}}/'+body.id)(_.merge(body, update)))
+        .then(res => res.status.must.equal(400));
     });
     {{#isUser}}
 
     it('PUTing an updated password should update the password hash', () => {
       const update = {password: 'ABCD1234'};
       return single{{name}}Creator()
-      .then(body => putter('/{{pluralName}}/'+body.id)(update))
+      .then(body => putter('/{{pluralName}}/'+body.id)(_.merge(body, update)))
       .then(unwrapJSON)
       .then(body => getJSON('/{{pluralName}}/'+body.id))
       .then(json => password.verify(update.password, json.password))
