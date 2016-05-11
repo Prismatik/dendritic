@@ -1,6 +1,7 @@
 {
   "extends": "prismatik",
   "rules": {
+    "arrow-body-style": "off",
     "global-require": "off",
     "import/no-unresolved": "off"
   }
