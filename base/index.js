@@ -33,9 +33,9 @@ module.exports = (opts) => {
     { n: '.gitignore', e: '' }
   ];
 
-  scaffold({ basePath: __dirname, files: files, mustacheOpts: opts });
+  scaffold({ basePath: __dirname, files, mustacheOpts: opts });
 
-  const dirs = [
+  [
     'env',
     'middleware',
     'migrations',
