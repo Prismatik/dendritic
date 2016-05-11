@@ -83,12 +83,7 @@ module.exports = {
       )
     }, {returnChanges: true})
     .run()
-    .then(res => {
-      if (res.first_error === 'rev does not match') {
-        throw new httpError('BAD_REQUEST', res.first_error);
-      };
-      return res;
-    })
+    .then(rethinkdb.checkRevError)
     .then(rethinkdb.firstChange);
   },
   {{/isUser}}
@@ -124,12 +119,7 @@ module.exports = {
         )
       }, {returnChanges: true})
       .run()
-      .then(res => {
-        if (res.first_error === 'rev does not match') {
-          throw new httpError('BAD_REQUEST', res.first_error);
-        };
-        return res;
-      })
+      .then(rethinkdb.checkRevError)
       .then(rethinkdb.firstChange);
     });
   },

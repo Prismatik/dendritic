@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const r = require('./db');
+const httpError = require('standard-http-error');
 
 const limitRegexp = /\.limit\(([^\)]*)\)/m;
 const orderByRegexp = /\.orderBy\(([^\)]*)\)/m;
@@ -63,4 +64,11 @@ exports.isChangeFeedable = (query) => {
   if (orderBy && orderBy[1].indexOf('index') === -1) return false;
   if (filter && orderBy && filter.index > orderBy.index) return false;
   return true;
+}
+
+exports.checkRevError = res => {
+  if (res.first_error === 'rev does not match') {
+    throw new httpError('BAD_REQUEST', res.first_error);
+  };
+  return res;
 }
