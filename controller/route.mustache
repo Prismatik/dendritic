@@ -3,6 +3,22 @@ const _ = require('lodash');
 const {{name}}Controller = require('../controllers/{{name}}.js');
 const router = Router();
 
+const errHandlerFactory = res => {
+  return err => {
+    res.status(err.code || 500);
+    res.json(err);
+  };
+};
+
+const respond = (res, status) => body => {
+  if (!body.result && !body.found) {
+    res.status(404);
+    return Promise.resolve(res.json({ err: 'Not found' }));
+  }
+  res.status(status || 200);
+  return Promise.resolve(res.json(body));
+};
+
 module.exports = {
   http: router,
   ws: io => {
@@ -11,9 +27,9 @@ module.exports = {
       {{name}}Controller.watch(socket.handshake.query)
       .then(cursor => {
         cursor.each((err, data) => {
-          if (!data) return;
+          if (!data) return null;
           if (data.state) return socket.emit('state', data);
-          socket.emit('record', data);
+          return socket.emit('record', data);
         });
       });
     });
@@ -27,7 +43,7 @@ router
     .catch(errHandlerFactory(res));
   })
   .get('/{{pluralName}}/:id', (req, res) => {
-    {{name}}Controller.get(_.assign({id: req.params.id}, req.query))
+    {{name}}Controller.get(_.assign({ id: req.params.id }, req.query))
     .then(respond(res))
     .catch(errHandlerFactory(res));
   })
@@ -44,7 +60,7 @@ router
   .delete('/{{pluralName}}/:id', (req, res) => {
     {{name}}Controller.delete(req.params.id)
     .then(respond(res))
-    .catch(errHandlerFactory(res))
+    .catch(errHandlerFactory(res));
   });
 
 {{#isUser}}
@@ -52,27 +68,11 @@ router
   .post('/{{pluralName}}/signin', (req, res) => {
     {{name}}Controller.signin(req.body.email, req.body.password)
     .then(respond(res))
-    .catch( errHandlerFactory(res) )
+    .catch(errHandlerFactory(res))
   })
   .post('/{{pluralName}}/signout', (req, res) => {
     {{name}}Controller.signout(req.body)
     .then(respond(res))
-    .catch( errHandlerFactory(res) )
+    .catch(errHandlerFactory(res));
   });
 {{/isUser}}
-
-const errHandlerFactory = res => {
-  return err => {
-    res.status(err.code || 500);
-    res.json(err);
-  };
-};
-
-const respond = (res, status) => body => {
-  if (!body.result && !body.found) {
-    res.status(404);
-    return Promise.resolve(res.json({err: 'Not found'}));
-  }
-  res.status(status || 200);
-  return Promise.resolve(res.json(body));
-};
