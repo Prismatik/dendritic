@@ -75,13 +75,10 @@ module.exports = {
     if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
     return r.table('{{pluralName}}')
     .get({{name}}.id)
-    .update(doc => {
-      return r.branch(
-        doc('rev').eq({{name}}.rev),
-        {{name}},
-        r.error('rev does not match')
-      )
-    }, {returnChanges: true})
+    .update(
+      rethinkdb.ifRevMatches({{name}}),
+      {returnChanges: true}
+    )
     .run()
     .then(rethinkdb.checkRevError)
     .then(rethinkdb.firstChange);
@@ -111,13 +108,10 @@ module.exports = {
       if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
       return r.table('{{pluralName}}')
       .get({{name}}.id)
-      .update(doc => {
-        return r.branch(
-          doc('rev').eq({{name}}.rev),
-          {{name}},
-          r.error('rev does not match')
-        )
-      }, {returnChanges: true})
+      .update(
+        rethinkdb.ifRevMatches({{name}}),
+        {returnChanges: true}
+      )
       .run()
       .then(rethinkdb.checkRevError)
       .then(rethinkdb.firstChange);
