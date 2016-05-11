@@ -8,7 +8,10 @@
     "migrate": "node ./bin/migrate.js",
     "migration": "node ./bin/migration.js",
     "start": "node start",
-    "test": "mocha"
+    "test": "mocha",
+    "watch": "mocha --watch",
+    "dockertest": "docker-compose run {{name}} npm test",
+    "dockerwatch": "docker-compose run {{name}} npm run watch"
   },
   "license": "ISC",
   "dependencies": {
