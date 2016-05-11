@@ -3,14 +3,12 @@ require('dotenv').config();
 const path = require('path');
 require('app-module-path').addPath(path.resolve(__dirname, '..'));
 
-const must = require('must');
-
 const setup = require('setup');
 const app = require('index');
 const r = require('lib/db');
 
 app.listen(process.env.PORT, () => {
-  before(function() {
+  before(function before() {
     this.timeout(30000);
 
     return setup()
