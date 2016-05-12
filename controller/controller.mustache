@@ -66,8 +66,7 @@ module.exports = {
     const valid = schema.validate({{name}});
     if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
     {{name}}.rev = uuid.v4();
-    return r.table('{{pluralName}}')
-    .insert({{name}}, { returnChanges: true }).run()
+    return r.table('{{pluralName}}').insert({{name}}, { returnChanges: true }).run()
     .then(rethinkdb.firstChange);
   },
   update: ({{name}}) => {
@@ -95,8 +94,7 @@ module.exports = {
       const valid = schema.validate(data);
       if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
       {{name}}.rev = uuid.v4();
-      return r.table('{{pluralName}}')
-      .insert(data, { returnChanges: true }).run()
+      return r.table('{{pluralName}}').insert(data, { returnChanges: true }).run()
       .then(rethinkdb.firstChange);
     });
   },
@@ -126,8 +124,7 @@ module.exports = {
   },
   {{/isUser}}
   delete: (id) => {
-    return r.table('{{pluralName}}').get(id)
-    .delete({ returnChanges: true }).run()
+    return r.table('{{pluralName}}').get(id).delete({ returnChanges: true }).run()
     .then(res => {
       return res;
     })
