@@ -21,7 +21,7 @@ const respond = (res, status) => body => {
 
 module.exports = {
   http: router,
-  ws: io => {
+  socket: io => {
     const nsp = io.of('/{{pluralName}}');
     nsp.on('connection', socket => {
       {{name}}Controller.watch(socket.handshake.query)
