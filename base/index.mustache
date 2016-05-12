@@ -18,7 +18,7 @@ fs.readdirSync('./middleware').forEach(name => {
 fs.readdirSync('./routes').forEach(name => {
   const route = require(`./routes/${name}`);
   app.use(route.http);
-  route.ws(io);
+  route.socket(io);
 });
 
 app.use((err, req, res) => {

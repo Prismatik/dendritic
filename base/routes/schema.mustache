@@ -4,5 +4,5 @@ const schema = require('schema').getSchema();
 module.exports = {
   http: Router()
     .get('/schema', (req, res) => res.json(schema)),
-  ws: () => {}
+  socket: () => {}
 };
