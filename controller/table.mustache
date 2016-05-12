@@ -9,11 +9,11 @@ module.exports = () => {
     throw err;
   })
   .then(() => {
-    r.table('{{pluralName}}').wait().run()
-  })
+    r.table('{{pluralName}}').wait().run();
+  });
   //.then(() => r.table('{{pluralName}}').indexCreate('name').run())
   //.catch(err => {
-  //  if (err.message.indexOf('Index `name` already exists') > -1 )return;
+  //  if (err.message.indexOf('Index `name` already exists') > -1 ) return;
   //  throw err;
-  //})
-}
+  //});
+};
