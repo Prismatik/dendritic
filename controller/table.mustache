@@ -3,7 +3,8 @@ const r = require('../lib/db.js');
 module.exports = () => {
   return r.tableCreate('{{pluralName}}').run()
   .catch((err) => {
-    const errMsg = `Table \`${process.env.RETHINK_NAME}.{{pluralName}}\` already exists in:`;
+    let errMsg = `Table \`${process.env.RETHINK_NAME}`;
+    errMsg += `.{{pluralName}}\` already exists in:`;
     if (err.message.split('\n')[0] === errMsg) return;
     throw err;
   })
