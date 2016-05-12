@@ -5,6 +5,7 @@
     "camelcase": "off",
     "global-require": "off",
     "import/no-unresolved": "off",
+    "max-len": "off",
     "new-cap": "off",
     "no-console": "off",
     "no-param-reassign": "off",
