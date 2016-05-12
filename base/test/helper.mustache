@@ -1,16 +1,15 @@
 require('dotenv').config();
+require('must');
 
 const path = require('path');
 require('app-module-path').addPath(path.resolve(__dirname, '..'));
-
-const must = require('must');
 
 const setup = require('setup');
 const app = require('index');
 const r = require('lib/db');
 
-const server = app.listen(process.env.PORT, () => {
-  before(function() {
+app.listen(process.env.PORT, () => {
+  before(function before() {
     this.timeout(30000);
 
     return setup()
@@ -18,7 +17,7 @@ const server = app.listen(process.env.PORT, () => {
         after(() => {
           r.dbDrop('{{name}}')
             .then(() => r.getPoolMaster().drain())
-            .then(() => Promise.resolve(app.close()))
+            .then(() => Promise.resolve(app.close()));
         });
       });
   });

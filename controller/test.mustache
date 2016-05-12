@@ -1,21 +1,35 @@
-"use strict";
+{{=<% %>=}}
 const fetch = require('node-fetch');
 const querystring = require('querystring');
 const _ = require('lodash');
-const fixture = require('../../fixtures/{{name}}');
+const fixture = require('../../fixtures/<%name%>');
 const IO = require('socket.io-client');
-{{#isUser}}
+<%#isUser%>
 const password = require('simple-password');
-{{/isUser}}
-{{#relationships}}
-const {{name}}Fixture = require('../../fixtures/{{name}}');
-{{/relationships}}
+<%/isUser%>
+<%#relationships%>
+const <%name%>Fixture = require('../../fixtures/<%name%>');
+<%/relationships%>
 
-const url = 'http://localhost:'+process.env.PORT;
+const url = `http://localhost:${process.env.PORT}`;
 
+<%#isUser%>
 const statusEquals = code => res => {
   res.status.must.equal(code);
   return res;
+};
+
+<%/isUser%>
+const asc = (a, b) => {
+  if (a.id > b.id) return 1;
+  if (a.id < b.id) return -1;
+  return 0;
+};
+
+const desc = (a, b) => {
+  if (a.id < b.id) return 1;
+  if (a.id > b.id) return -1;
+  return 0;
 };
 
 const unwrapOldVal = (res) => {
@@ -29,18 +43,18 @@ const unwrapJSON = (res) => {
 };
 
 const getJSON = (path) => {
-  return fetch(url+path)
+  return fetch(url + path)
   .then(unwrapJSON);
 };
 
 const sender = method => path => data => {
-  return fetch(url+path, {
-    method: method,
+  return fetch(url + path, {
+    method,
     headers: {
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify( data )
+    body: JSON.stringify(data)
   });
 };
 
@@ -48,100 +62,103 @@ const poster = sender('post');
 const putter = sender('put');
 
 const deleter = path => () => {
-  return fetch(url+path, {
+  return fetch(url + path, {
     method: 'delete',
     headers: {
-      'Accept': 'application/json',
+      Accept: 'application/json'
     }
   });
 };
 
-const {{name}}Poster = poster('/{{pluralName}}');
+const <%name%>Poster = poster('/<%pluralName%>');
 
-const {{name}}Creator = times => {
+const <%name%>Creator = times => {
   return Promise.all(_.times(times, () => {
     const data = fixture.valid();
-    {{^isUser}}
-    return {{name}}Poster(data)
-    .then(unwrapJSON)
-    {{/isUser}}
-    {{#isUser}}
+    <%^isUser%>
+    return <%name%>Poster(data)
+    .then(unwrapJSON);
+    <%/isUser%>
+    <%#isUser%>
     return password.create(data.password, 10)
     .then(pass => {
       data.password = pass;
-      return {{name}}Poster(data)
+      return <%name%>Poster(data)
       .then(unwrapJSON);
     });
-    {{/isUser}}
+    <%/isUser%>
   }));
 };
 
 const pop = data => data[0];
 
-const single{{name}}Creator = () => {{name}}Creator(1).then(pop);
+const single<%name%>Creator = () => <%name%>Creator(1).then(pop);
 
-{{#relationships}}
-const {{name}}Poster = poster('/{{pluralName}}');
+<%#relationships%>
+const <%name%>Poster = poster('/<%pluralName%>');
 
-const {{name}}Creator = times => {
+const <%name%>Creator = times => {
   return Promise.all(_.times(times, () => {
-    const data = {{name}}Fixture.valid();
-    return {{name}}Poster(data)
+    const data = <%name%>Fixture.valid();
+    return <%name%>Poster(data)
     .then(unwrapJSON);
   }));
 };
 
-const single{{name}}Creator = () => {{name}}Creator(1).then(pop);
-{{/relationships}}
+const single<%name%>Creator = () => <%name%>Creator(1).then(pop);
+<%/relationships%>
 
-describe('{{name}} controller', () => {
-  describe('GET /{{pluralName}}', () => {
+describe('<%name%> controller', () => {
+  describe('GET /<%pluralName%>', () => {
     it('returns 200 ok', () => {
-      return single{{name}}Creator()
-        .then(() => fetch(url+'/{{pluralName}}'))
+      return single<%name%>Creator()
+        .then(() => fetch(`${url}/<%pluralName%>`))
         .must.resolve.to.have.property('status', 200);
     });
 
     it('return an object with a .result property', () => {
-      return single{{name}}Creator()
-        .then(() => fetch(url+'/{{pluralName}}'))
+      return single<%name%>Creator()
+        .then(() => fetch(`${url}/<%pluralName%>`))
         .then(res => res.json())
         .must.resolve.to.be.object();
     });
 
     it('accepts search params in the querystring', () => {
-      return {{name}}Creator(2)
+      return <%name%>Creator(2)
         .then(entries => {
-          const record   = entries[0];
-          const property = Object.keys(record).filter(k => k != 'id')[0];
-          if (!property) return; // if no properties other than id skip test
-          const queryStr = querystring.stringify({[property]: record[property]});
+          const record = entries[0];
+          const property = Object.keys(record).filter(k => k !== 'id')[0];
+          if (!property) return Promise.resolve(); // if no properties other than id skip test
+          const queryStr = querystring.stringify({ [property]: record[property] });
 
-          return getJSON('/{{pluralName}}'+'?'+queryStr)
+          return getJSON(`/<%pluralName%>?${queryStr}`)
             .then(json => json.map(entry => entry[property]))
             .must.resolve.to.eql([record[property]]);
         });
     });
 
     it('does not match non-property search params in the querystring', () => {
-      return {{name}}Creator(2)
-        .then({{pluralName}} => getJSON('/{{pluralName}}?foo='+{{pluralName}}[0].id))
+      return <%name%>Creator(2)
+        .then(<%pluralName%> => {
+          const id = <%pluralName%>[0].id;
+          return getJSON(`/<%pluralName%>?foo=${id}`);
+        })
         .then(entries => entries.length)
         .must.resolve.to.be.gt(1);
     });
 
     it('paginates data when asked', () => {
-      return {{name}}Creator(5)
-        .then(() => getJSON('/{{pluralName}}?limit=2'))
+      return <%name%>Creator(5)
+        .then(() => getJSON('/<%pluralName%>?limit=2'))
         .must.resolve.to.have.length(2);
     });
 
     it('skips records when asked', () => {
-      return {{name}}Creator(5)
-        .then(() => getJSON('/{{pluralName}}?limit=2'))
+      return <%name%>Creator(5)
+        .then(() => getJSON('/<%pluralName%>?limit=2'))
         .then(first => {
           first.must.have.length(2);
-          return getJSON('/{{pluralName}}?limit=2&skip=2')
+          return getJSON('/<%pluralName%>?limit=2&skip=2')
             .then(second => {
               second.must.have.length(2);
               second.must.not.eql(first);
@@ -150,32 +167,28 @@ describe('{{name}} controller', () => {
     });
 
     it('orders data when asked', () => {
-      return {{name}}Creator(15)
-        .then(() => getJSON('/{{pluralName}}?orderBy=id'))
+      return <%name%>Creator(15)
+        .then(() => getJSON('/<%pluralName%>?orderBy=id'))
         .then(results => {
-          const reordered = _.clone(results).sort((a, b) => {
-            return a.id > b.id ? 1 : a.id < b.id ? -1 : 0;
-          });
+          const reordered = _.clone(results).sort(asc);
 
           _.pluck(reordered, 'id').must.eql(_.pluck(results, 'id'));
         });
     });
 
     it('orders data in reverse when asked', () => {
-      return {{name}}Creator(15)
-        .then(() => getJSON('/{{pluralName}}?orderBy=id&order=desc'))
+      return <%name%>Creator(15)
+        .then(() => getJSON('/<%pluralName%>?orderBy=id&order=desc'))
         .then(results => {
-          const reordered = _.clone(results).sort((a, b) => {
-            return a.id < b.id ? 1 : a.id > b.id ? -1 : 0;
-          });
+          const reordered = _.clone(results).sort(desc);
 
           _.pluck(reordered, 'id').must.eql(_.pluck(results, 'id'));
         });
     });
 
     it('returns n matching docs with a count of all matching docs', () => {
-      return {{name}}Creator(10)
-        .then(() => fetch(url+'/{{pluralName}}?count=true&limit=5'))
+      return <%name%>Creator(10)
+        .then(() => fetch(`${url}/<%pluralName%>?count=true&limit=5`))
         .then(res => res.json())
         .then(json => {
           json.result.must.have.length(5);
@@ -184,8 +197,8 @@ describe('{{name}} controller', () => {
     });
 
     it('returns n matching docs without a count of all matching docs ', () => {
-      return {{name}}Creator(10)
-        .then(() => fetch(url+'/{{pluralName}}?limit=5'))
+      return <%name%>Creator(10)
+        .then(() => fetch(`${url}/<%pluralName%>?limit=5`))
         .then(res => res.json())
         .then(json => {
           json.result.must.have.length(5);
@@ -194,8 +207,8 @@ describe('{{name}} controller', () => {
     });
 
     it('returns only a count with no matching docs', () => {
-      return {{name}}Creator(10)
-        .then(() => fetch(url+'/{{pluralName}}?count=true&result=false'))
+      return <%name%>Creator(10)
+        .then(() => fetch(`${url}/<%pluralName%>?count=true&result=false`))
         .then(res => res.json())
         .then(json => {
           json.must.not.have.property('result');
@@ -204,95 +217,95 @@ describe('{{name}} controller', () => {
     });
   });
 
-  describe('GET /{{pluralName}}/:id', () => {
+  describe('GET /<%pluralName%>/:id', () => {
     it('returns 200 with the record data', () => {
-      return single{{name}}Creator()
-        .then(record => fetch(url+'/{{pluralName}}/'+record.id))
+      return single<%name%>Creator()
+        .then(record => fetch(`${url}/<%pluralName%>/${record.id}`))
         .must.resolve.to.have.property('status', 200);
     });
   });
 
-  describe('POST /{{pluralName}}', () => {
+  describe('POST /<%pluralName%>', () => {
     it('returns 201 for valid data', () => {
-      return {{name}}Poster(fixture.valid())
+      return <%name%>Poster(fixture.valid())
         .must.resolve.to.have.property('status', 201);
     });
 
     it('actually persists the data', () => {
-      return single{{name}}Creator()
+      return single<%name%>Creator()
         .then(record => {
-          return getJSON('/{{pluralName}}/'+record.id)
+          return getJSON(`/<%pluralName%>/${record.id}`)
             .must.resolve.to.have.property('id', record.id);
         });
     });
+    <%#relationships%>
 
-    {{#relationships}}
     it('saves related entity (can GET using :id)', () => {
-      return single{{name}}Creator()
-        .then(body => fetch(url+'/{{pluralName}}/'+body.id))
+      return single<%name%>Creator()
+        .then(body => fetch(`${url}/<%pluralName%>/${body.id}`))
         .must.resolve.to.have.property('status', 200);
     });
-    {{/relationships}}
+    <%/relationships%>
   });
 
-  describe('PUT /{{pluralName}}/:id', () => {
-    it('updates {{name}} and actually persists it', () => {
-      const update = {name: 'Something else'};
-      return single{{name}}Creator()
-        .then(body => putter('/{{pluralName}}/'+body.id)(_.merge(body, update)))
+  describe('PUT /<%pluralName%>/:id', () => {
+    it('updates <%name%> and actually persists it', () => {
+      const update = { name: 'Something else' };
+      return single<%name%>Creator()
+        .then(body => putter(`/<%pluralName%>/${body.id}`)(_.merge(body, update)))
         .then(unwrapJSON)
-        .then(body => getJSON('/{{pluralName}}/'+body.id))
+        .then(body => getJSON(`/<%pluralName%>/${body.id}`))
         .must.resolve.to.have.property('name', update.name);
     });
 
-    it('rejects a {{name}} without any rev', () => {
-      const update = {name: 'Something else'};
-      return single{{name}}Creator()
-        .then(body => putter('/{{pluralName}}/'+body.id)(update))
+    it('rejects a <%name%> without any rev', () => {
+      const update = { name: 'Something else' };
+      return single<%name%>Creator()
+        .then(body => putter(`/<%pluralName%>/${body.id}`)(update))
         .then(res => res.status.must.equal(400));
     });
 
-    it('rejects a {{name}} with a faulty rev', () => {
-      const update = {name: 'Something else', rev: 'foo'};
-      return single{{name}}Creator()
-        .then(body => putter('/{{pluralName}}/'+body.id)(_.merge(body, update)))
+    it('rejects a <%name%> with a faulty rev', () => {
+      const update = { name: 'Something else', rev: 'foo' };
+      return single<%name%>Creator()
+        .then(body => putter(`/<%pluralName%>/${body.id}`)(_.merge(body, update)))
         .then(res => res.status.must.equal(400));
     });
-    {{#isUser}}
+    <%#isUser%>
 
     it('PUTing an updated password should update the password hash', () => {
-      const update = {password: 'ABCD1234'};
-      return single{{name}}Creator()
-      .then(body => putter('/{{pluralName}}/'+body.id)(_.merge(body, update)))
+      const update = { password: 'ABCD1234' };
+      return single<%name%>Creator()
+      .then(body => putter(`/<%pluralName%>/${body.id}`)(_.merge(body, update)))
       .then(unwrapJSON)
-      .then(body => getJSON('/{{pluralName}}/'+body.id))
+      .then(body => getJSON(`/<%pluralName%>/${body.id}`))
       .then(json => password.verify(update.password, json.password))
       .must.resolve.to.equal(true);
     });
-    {{/isUser}}
+    <%/isUser%>
   });
 
-  describe('DELETE /{{pluralName}}/:id', () => {
+  describe('DELETE /<%pluralName%>/:id', () => {
     it('returns 200 ok response', () => {
-      return single{{name}}Creator()
-        .then(body => deleter('/{{pluralName}}/'+body.id)())
+      return single<%name%>Creator()
+        .then(body => deleter(`/<%pluralName%>/${body.id}`)())
         .must.resolve.to.have.property('status', 200);
     });
 
     it('actually deletes the record', () => {
-      return single{{name}}Creator()
-        .then(body => deleter('/{{pluralName}}/'+body.id)())
+      return single<%name%>Creator()
+        .then(body => deleter(`/<%pluralName%>/${body.id}`)())
         .then(unwrapOldVal)
-        .then(body => fetch(url+'/{{pluralName}}/'+body.id))
+        .then(body => fetch(`${url}/<%pluralName%>/${body.id}`))
         .must.resolve.to.have.property('status', 404);
     });
   });
 
-  {{#isUser}}
-  describe('POST /{{pluralName}}/signin', () => {
+  <%#isUser%>
+  describe('POST /<%pluralName%>/signin', () => {
     it('returns 401 response with invalid email', () => {
-      const signin = poster('/{{pluralName}}/signin');
-      return signin({email: "notexist@example.com", password: "ABCD1234"})
+      const signin = poster('/<%pluralName%>/signin');
+      return signin({ email: 'notexist@example.com', password: 'ABCD1234' })
         .then(statusEquals(401))
         .then(res => res.json())
         .must.resolve.to.have.property('message', 'Unauthorized');
@@ -300,24 +313,25 @@ describe('{{name}} controller', () => {
 
     it('returns 401 response with incorrect password', () => {
       const data = fixture.valid();
-      return {{name}}Poster(data)
+      return <%name%>Poster(data)
       .then(unwrapJSON)
-      .then((user) => {
-        const signin = poster('/{{pluralName}}/signin');
-        return signin({email: data.email, password: "ABCD1234"})
+      .then(() => {
+        const signin = poster('/<%pluralName%>/signin');
+        return signin({ email: data.email, password: 'ABCD1234' })
           .then(statusEquals(401))
           .then(res => res.json())
           .must.resolve.to.have.property('message', 'Unauthorized');
       });
     });
 
-    it('POST /{{pluralName}}/signin with correct credentials should return a valid jwt', () => {
+    it('POST /<%pluralName%>/signin with correct credentials should return a valid jwt',
+    () => {
       const data = fixture.valid();
-      return {{name}}Poster(data)
+      return <%name%>Poster(data)
       .then(unwrapJSON)
       .then((user) => {
-        const signin = poster('/{{pluralName}}/signin');
-        return signin({email: data.email, password: data.password})
+        const signin = poster('/<%pluralName%>/signin');
+        return signin({ email: data.email, password: data.password })
           .then(statusEquals(200))
           .then(res => res.json())
           .then(json => {
@@ -328,14 +342,15 @@ describe('{{name}} controller', () => {
       });
     });
   });
-  {{/isUser}}
+  <%/isUser%>
 
   describe('Socket connection', () => {
-    it('allows to open a web-socket connection and returns a single record', () => {
-      return single{{name}}Creator()
+    it('opens a web-socket connection and returns a single record', () => {
+      return single<%name%>Creator()
         .then(body => {
           return new Promise(resolve => {
-            const io = IO(url+'/{{pluralName}}', {query: 'id='+body.id, forceNew: true});
+            const opts = { query: `id=${body.id}`, forceNew: true };
+            const io = IO(`${url}/<%pluralName%>`, opts);
             io.on('record', data => {
               resolve(data.new_val);
               io.disconnect();
@@ -345,11 +360,12 @@ describe('{{name}} controller', () => {
         });
     });
 
-    it('allows to openin a websocket connection to {{pluralName}} should return all of them', () => {
-      return {{name}}Creator(2)
-        .then(body => {
+    it('opens a websocket connection to <%pluralName%> should return all of them', () => {
+      return <%name%>Creator(2)
+        .then(() => {
           return new Promise(resolve => {
-            const io = IO(url+'/{{pluralName}}', {forceNew: true});
+            const opts = { forceNew: true };
+            const io = IO(`${url}/<%pluralName%>`, opts);
             let count = 0;
             io.on('record', () => {
               count++;
@@ -363,53 +379,56 @@ describe('{{name}} controller', () => {
         });
     });
 
-    it('allows to open a websocket connection to {{pluralName}} and returns changed documents', () => {
-      return single{{name}}Creator()
+    it('opens a websocket connection to <%pluralName%> and returns changed documents',
+    () => {
+      return single<%name%>Creator()
         .then(data => {
-          {{^isUser}}
-          const update = Object.assign({}, data, {name: 'ohai'});
-          {{/isUser}}
-          {{#isUser}}
-          const update = Object.assign({}, _.omit(data, 'password'), {name: 'ohai'});
-          {{/isUser}}
+          <%^isUser%>
+          const update = Object.assign({}, data, { name: 'ohai' });
+          <%/isUser%>
+          <%#isUser%>
+          const update = Object.assign({}, _.omit(data, 'password'), { name: 'ohai' });
+          <%/isUser%>
           return new Promise(resolve => {
-            const io = IO(url+'/{{pluralName}}', {forceNew: true});
-            io.on('state', data => {
-              if (data.state === 'ready') {
-                io.on('record', data => {
-                  {{^isUser}}
-                  const result = data.new_val;
-                  {{/isUser}}
-                  {{#isUser}}
-                  const result = _.omit(data.new_val, 'password');
-                  {{/isUser}}
+            const opts = { forceNew: true };
+            const io = IO(`${url}/<%pluralName%>`, opts);
+            io.on('state', state => {
+              if (state.state === 'ready') {
+                io.on('record', record => {
+                  <%^isUser%>
+                  const result = record.new_val;
+                  <%/isUser%>
+                  <%#isUser%>
+                  const result = _.omit(record.new_val, 'password');
+                  <%/isUser%>
                   result.must.eql(update);
                   io.disconnect();
                   resolve();
                 });
-                putter('/{{pluralName}}/'+data.id)(update);
-              };
+                putter(`/<%pluralName%>/${data.id}`)(update);
+              }
             });
           });
         });
     });
 
     it('accepts the same filter params as GET requests', () => {
-      return {{name}}Creator(2)
-        .then({{pluralName}} => {
-          const target = {{pluralName}}[0];
+      return <%name%>Creator(2)
+        .then(<%pluralName%> => {
+          const target = <%pluralName%>[0];
           const targetKey = Object.keys(target).filter(k => k !== 'id')[0];
           return new Promise(resolve => {
             const query = [targetKey].reduce((r, k) => {
               r[k] = target[k];
               return r;
             }, {});
-            const io = IO(url+'/{{pluralName}}', {query: query, forceNew: true});
+            const opts = { query, forceNew: true };
+            const io = IO(`${url}/<%pluralName%>`, opts);
             io.on('record', data => {
               data.new_val.must.eql(target);
             });
             io.on('state', data => {
-              if (data.state != 'ready') return;
+              if (data.state !== 'ready') return;
               io.disconnect();
               resolve();
             });
@@ -418,16 +437,15 @@ describe('{{name}} controller', () => {
     });
 
     it('accepts the same limit param as GET requests', () => {
-      return {{name}}Creator(2)
+      return <%name%>Creator(2)
         .then(() => {
           return new Promise(resolve => {
-            const io = IO(url+'/{{pluralName}}', {query: {limit: 1}, forceNew: true});
+            const opts = { query: { limit: 1 }, forceNew: true };
+            const io = IO(`${url}/<%pluralName%>`, opts);
             let count = 0;
-            io.on('record', data => {
-              count++;
-            });
+            io.on('record', () => count++);
             io.on('state', data => {
-              if (data.state != 'ready') return;
+              if (data.state !== 'ready') return;
               count.must.eql(1);
               io.disconnect();
               resolve();
@@ -437,17 +455,19 @@ describe('{{name}} controller', () => {
     });
 
     it('skips records if asked', () => {
-      return {{name}}Creator(5)
+      return <%name%>Creator(5)
         .then(() => {
           return new Promise(resolve => {
-            const io = IO(url+'/{{pluralName}}', {query: {limit: 1}, forceNew: true});
+            const opts = { query: { limit: 1 }, forceNew: true };
+            const io = IO(`${url}/<%pluralName%>`, opts);
             let first;
-            io.on('record', data => {
-              first = data;
+            io.on('record', record => {
+              first = record;
               io.disconnect();
-              const io2 = IO(url+'/{{pluralName}}', {query: {skip: 1}, forceNew: true});
-              io2.on('record', data => {
-                data.must.not.eql(first);
+              const opts2 = { query: { skip: 1 }, forceNew: true };
+              const io2 = IO(`${url}/<%pluralName%>`, opts2);
+              io2.on('record', record2 => {
+                record2.must.not.eql(first);
                 io2.disconnect();
                 return resolve();
               });

@@ -14,15 +14,15 @@ exports.firstChange = res => {
     result: change.new_val || change,
     old_val: change.old_val
   };
-}
+};
 
 exports.addTransformations = (table, indexes, params) => {
   return ['orderBy', 'skip', 'limit'].reduce((q, item) => {
     if (params[item]) {
       if (item === 'orderBy') {
-        const order = params.order || 'asc'
-        const isIndexed = _.contains(indexes, "orderBy")
-        if (isIndexed) q = q[item]({index: r[order](params[item])});
+        const order = params.order || 'asc';
+        const isIndexed = _.contains(indexes, 'orderBy');
+        if (isIndexed) q = q[item]({ index: r[order](params[item]) });
         else q = q[item](r[order](params[item]));
       } else {
         q = q[item](params[item]);
@@ -30,33 +30,33 @@ exports.addTransformations = (table, indexes, params) => {
     }
     return q;
   }, table);
-}
+};
 
 exports.buildQuery = (table, indexBy, params) => {
-  //if only id passed, run query using .get(x)
+  // if only id passed, run query using .get(x)
   if (params.id && Object.keys(params).length === 1) return table.get(params.id);
 
   if (indexBy != null) {
-    table = table.getAll(params[indexBy], {index: indexBy})
-    delete params[indexBy]
+    table = table.getAll(params[indexBy], { index: indexBy });
+    delete params[indexBy];
   }
-  
+
   if (!_.isEmpty(params)) table = table.filter(params);
   return table;
-}
+};
 
-// refer changefeed limitations here:- 
+// refer changefeed limitations here:-
 // https://rethinkdb.com/docs/changefeeds/javascript/
 // this prevents "RqlRuntimeError: Cannot call `changes` on an eager stream in"
 exports.isChangeFeedable = (query) => {
   query = query.toString();
 
-  const orderBy = orderByRegexp.exec(query)
-  const limit = limitRegexp.test(query)
-  const skip = skipRegexp.test(query)
-  const filter = filterRegexp.exec(query)
+  const orderBy = orderByRegexp.exec(query);
+  const limit = limitRegexp.test(query);
+  const skip = skipRegexp.test(query);
+  const filter = filterRegexp.exec(query);
 
-  //if filter is used, index must also be used (getAll)
+  // if filter is used, index must also be used (getAll)
   if (orderBy && !limit) return false;
   if (limit && !orderBy) return false;
   // this issue is not documented but causes the same problem as limit without orderBy
@@ -64,14 +64,14 @@ exports.isChangeFeedable = (query) => {
   if (orderBy && orderBy[1].indexOf('index') === -1) return false;
   if (filter && orderBy && filter.index > orderBy.index) return false;
   return true;
-}
+};
 
 exports.checkRevError = res => {
   if (res.first_error === 'rev does not match') {
     throw new httpError('BAD_REQUEST', res.first_error);
-  };
+  }
   return res;
-}
+};
 
 exports.ifRevMatches = update => {
   return doc => {
@@ -79,6 +79,6 @@ exports.ifRevMatches = update => {
       doc('rev').eq(update.rev),
       update,
       r.error('rev does not match')
-    )
-  }
-}
+    );
+  };
+};

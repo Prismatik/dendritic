@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const fs = require('fs');
 require('required_env')(fs.readdirSync('./env').reduce((r, file) => {
-  return r.concat(require('./env/'+file));
+  return r.concat(require(`./env/${file}`));
 }, []));
 
 const setup = require('./setup');

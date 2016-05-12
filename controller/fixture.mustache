@@ -3,7 +3,5 @@ const appSchema = require('../schema.js').getSchema();
 const schema = appSchema.{{name}};
 
 module.exports = {
-  valid: () => {
-    return generate(schema);
-  }
+  valid: () => generate(schema)
 };

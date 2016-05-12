@@ -13,6 +13,7 @@
     "redbeard": "./index.js"
   },
   "scripts": {
+    "lint": "./node_modules/.bin/eslint .",
     "test": "node test",
     "testredbeard": "mocha",
     "watch": "chokidar '.' -c 'npm test' -i '/node_modules|redbeard_tests/' -d 2000",
@@ -33,6 +34,8 @@
     "chokidar-cli": "^1.2.0",
     "cors": "^2.7.1",
     "dotenv": "^2.0.0",
+    "eslint": "^2.9.0",
+    "eslint-config-prismatik": "git://github.com/Prismatik/eslint-config-prismatik.git#master",
     "express": "^4.13.4",
     "express-jwt": "^3.4.0",
     "istanbul": "^0.4.1",

@@ -3,15 +3,16 @@ const r = require('../lib/db.js');
 module.exports = () => {
   return r.tableCreate('{{pluralName}}').run()
   .catch((err) => {
-    if (err.message.split('\n')[0] === 'Table `'+process.env.RETHINK_NAME+'.{{pluralName}}` already exists in:') return;
+    const errMsg = `Table \`${process.env.RETHINK_NAME}.{{pluralName}}\` already exists in:`;
+    if (err.message.split('\n')[0] === errMsg) return;
     throw err;
   })
   .then(() => {
-    r.table('{{pluralName}}').wait().run()
-  })
+    r.table('{{pluralName}}').wait().run();
+  });
   //.then(() => r.table('{{pluralName}}').indexCreate('name').run())
   //.catch(err => {
-  //  if (err.message.indexOf('Index `name` already exists') > -1 )return;
+  //  if (err.message.indexOf('Index `name` already exists') > -1 ) return;
   //  throw err;
-  //})
-}
+  //});
+};

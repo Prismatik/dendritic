@@ -8,7 +8,7 @@ const os = require('os');
 
 const randomstring = () => bandname().replace(' ', '_').replace(/-/g, '_');
 
-var dir;
+let dir;
 if (process.env.SLOW_TEST) {
   dir = path.join(os.tmpdir(), 'redbeard_tests', randomstring());
 } else {
@@ -17,13 +17,13 @@ if (process.env.SLOW_TEST) {
 
 mkdirp.sync(dir);
 
-const opts = {cwd: dir, stdio: 'inherit'};
+const opts = { cwd: dir, stdio: 'inherit' };
 const index = path.join(__dirname, 'index.js');
 
-const appName = 'redbeard_tests'+randomstring();
+const appName = `redbeard_tests${randomstring()}`;
 const controllerName1 = randomstring();
 const controllerName2 = randomstring();
-const userName = randomstring()+'_user';
+const userName = `${randomstring()}_user`;
 
 exec(['node', index, 'base', appName].join(' '), opts);
 exec(['node', index, 'controller', controllerName1].join(' '), opts);
@@ -33,5 +33,7 @@ if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
 exec(['cp', 'example.env', '.env'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
 exec(['npm', 'run', 'testredbeard'].join(' '), _.omit(opts, 'cwd'));
+exec(['./node_modules/.bin/eslint', './redbeard_tests/'].join(' '), _.omit(opts, 'cwd'));
+exec(['npm', 'run', 'lint'].join(' '), _.omit(opts, 'cwd'));
 
 rimraf.sync(dir);

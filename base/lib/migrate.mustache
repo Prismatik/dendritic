@@ -11,7 +11,7 @@ const r = require('lib/db');
 const table = r.table('_migrations');
 
 const applyMigration = (migrations, then) => {
-  if (migrations.length === 0) return;
+  if (migrations.length === 0) return Promise.resolve();
   const m = migrations.shift();
   return m.func()
   .then(() => {
@@ -58,22 +58,20 @@ module.exports = {
   up: () => {
     const migrationFiles = getMigrationFiles();
 
-    if (migrationFiles.length < 1) return;
+    if (migrationFiles.length < 1) return Promise.resolve();
 
     return acquireMutex()
     .then(getMigrationRecords)
     .then(existingMigrations => _.difference(migrationFiles, existingMigrations))
     .then(missingMigrations => {
-      const toBeApplied = missingMigrations.map(file => {
-        return {
-          func: require('migrations/'+file).up,
-          name: file
-        }
-      });
+      const toBeApplied = missingMigrations.map(file => ({
+        func: require(`migrations/${file}`).up,
+        name: file
+      }));
 
       return applyMigration(toBeApplied, (name) => {
         console.log('migrated up', name);
-        return table.insert({name: name}).run();
+        return table.insert({ name }).run();
       });
     })
     .then(releaseMutex);
@@ -81,7 +79,7 @@ module.exports = {
   down: (backstop) => {
     const migrationFiles = getMigrationFiles();
 
-    if (migrationFiles.length < 1) return;
+    if (migrationFiles.length < 1) return Promise.resolve();
 
     migrationFiles.splice(0, migrationFiles.indexOf(backstop));
 
@@ -89,21 +87,18 @@ module.exports = {
     .then(existingMigrations => _.intersection(migrationFiles, existingMigrations))
     .then(migrationsToDown => {
       const toBeDowned = migrationsToDown.reverse()
-      .map(file => {
-        return {
-          func: require('migrations/'+file).down,
-          name: file
-        }
-      });
+      .map(file => ({
+        func: require(`migrations/${file}`).down,
+        name: file
+      }));
 
       return applyMigration(toBeDowned, (name) => {
         console.log('migrated down', name);
         return table.get(name).delete().run();
       });
-
     })
     .then(releaseMutex);
   },
-  releaseMutex: releaseMutex,
-  queryMutex: queryMutex
+  releaseMutex,
+  queryMutex
 };

@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 
@@ -13,13 +12,11 @@ const tables = fs.readdirSync('./tables').map(table => {
 module.exports = () => {
   return r.dbCreate(process.env.RETHINK_NAME).run()
   .catch((err) => {
-    var arr = err.message.split('\n');
-    if (arr[0] === 'Database `'+process.env.RETHINK_NAME+'` already exists in:') return;
+    const arr = err.message.split('\n');
+    if (arr[0] === `Database ${process.env.RETHINK_NAME} already exists in:`) return;
     throw err;
   })
-  .then(() => {
-    return Promise.all(tables.map(table => table()))
-  })
+  .then(() => Promise.all(tables.map(table => table())))
   .then(() => {
     if (process.env.AUTOMIGRATE === 'true') return migrate.up();
     return null;
