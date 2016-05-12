@@ -71,7 +71,9 @@ module.exports = {
     .then(rethinkdb.firstChange);
   },
   update: ({{name}}) => {
-    if (!{{name}}.rev) return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
+    if (!{{name}}.rev) {
+      return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
+    }
     const valid = schema.validate({{name}});
     if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
     return r.table('{{pluralName}}')
@@ -99,7 +101,9 @@ module.exports = {
     });
   },
   update: ({{name}}) => {
-    if (!{{name}}.rev) return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
+    if (!{{name}}.rev) {
+      return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
+    }
     let getHash;
     if ({{name}}.password) {
       getHash = password.create({{name}}.password, 10);

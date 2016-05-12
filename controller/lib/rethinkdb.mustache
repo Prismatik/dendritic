@@ -69,7 +69,7 @@ exports.isChangeFeedable = (query) => {
 exports.checkRevError = res => {
   if (res.first_error === 'rev does not match') {
     throw new httpError('BAD_REQUEST', res.first_error);
-  };
+  }
   return res;
 };
 
@@ -80,5 +80,5 @@ exports.ifRevMatches = update => {
       update,
       r.error('rev does not match')
     );
-  }
+  };
 };

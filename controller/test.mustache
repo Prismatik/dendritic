@@ -261,14 +261,14 @@ describe('<%name%> controller', () => {
     it('rejects a <%name%> without any rev', () => {
       const update = { name: 'Something else' };
       return single<%name%>Creator()
-        .then(body => putter('/<%pluralName%>/'+body.id)(update))
+        .then(body => putter(`/<%pluralName%>/${body.id}`)(update))
         .then(res => res.status.must.equal(400));
     });
 
     it('rejects a <%name%> with a faulty rev', () => {
       const update = { name: 'Something else', rev: 'foo' };
       return single<%name%>Creator()
-        .then(body => putter('/<%pluralName%>/'+body.id)(_.merge(body, update)))
+        .then(body => putter(`/<%pluralName%>/${body.id}`)(_.merge(body, update)))
         .then(res => res.status.must.equal(400));
     });
     <%#isUser%>
