@@ -34,5 +34,6 @@ exec(['cp', 'example.env', '.env'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
 exec(['npm', 'run', 'testredbeard'].join(' '), _.omit(opts, 'cwd'));
 exec(['./node_modules/.bin/eslint', './redbeard_tests/'].join(' '), _.omit(opts, 'cwd'));
+exec(['npm', 'run', 'lint'].join(' '), _.omit(opts, 'cwd'));
 
 rimraf.sync(dir);
