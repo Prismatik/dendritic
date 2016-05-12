@@ -7,6 +7,7 @@
     "import/no-unresolved": "off",
     "new-cap": "off",
     "no-console": "off",
-    "no-param-reassign": "off"
+    "no-param-reassign": "off",
+    "spaced-comment": "off"
   }
 }
