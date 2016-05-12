@@ -35,7 +35,7 @@
     "cors": "^2.7.1",
     "dotenv": "^2.0.0",
     "eslint": "^2.9.0",
-    "eslint-config-prismatik": "git+ssh://git@github.com/Prismatik/eslint-config-prismatik.git",
+    "eslint-config-prismatik": "git://github.com/Prismatik/eslint-config-prismatik.git#master",
     "express": "^4.13.4",
     "express-jwt": "^3.4.0",
     "istanbul": "^0.4.1",
