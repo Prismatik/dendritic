@@ -10,7 +10,9 @@ app.use(bodyParser.json());
 app.use(cors());
 
 fs.readdirSync('./middleware').forEach(name => {
-  app.use(require(`./middleware/${name}`));
+  const middleware = require(`./middleware/${name}`);
+  if (middleware.http) app.use(middleware.http);
+  if (middleware.socket) io.use(middleware.socket);
 });
 
 fs.readdirSync('./routes').forEach(name => {
