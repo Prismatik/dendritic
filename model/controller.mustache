@@ -1,13 +1,27 @@
 const model = require('../models/{{name}}.js');
 
 module.exports = {
-  get: model.get,
-  create: model.create,
-  update: model.update,
-  delete: model.delete,
+  get: query => {
+    return model.get(query);
+  },
+  create: body => {
+    return model.create(body);
+  },
+  update: body => {
+    return model.update(body);
+  },
+  delete: id => {
+    return model.delete(id);
+  },
 {{#isUser}}
-  signin: model.signin,
-  signout: model.signout,
+  signin: (email, password) => {
+    return model.signin(email, password);
+  },
+  signout: body => {
+    return model.signout(body);
+  },
 {{/isUser}}
-  watch: model.watch
+  watch: query => {
+    return model.watch(query);
+  }
 };
