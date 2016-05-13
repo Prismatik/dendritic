@@ -15,7 +15,7 @@ app.listen(process.env.PORT, () => {
     return setup()
       .then(() => {
         after(() => {
-          r.dbDrop('{{name}}')
+          return r.dbDrop('{{name}}')
             .then(() => r.getPoolMaster().drain())
             .then(() => Promise.resolve(app.close()));
         });
