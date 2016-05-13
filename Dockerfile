@@ -1,4 +1,4 @@
-FROM node:4
+FROM node:6
 
 MAINTAINER Prismatik Pty. Ltd. <david@prismatik.com.au>
 

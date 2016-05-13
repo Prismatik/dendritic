@@ -108,7 +108,7 @@ const <%name%>Creator = times => {
 const single<%name%>Creator = () => <%name%>Creator(1).then(pop);
 <%/relationships%>
 
-describe('<%name%> controller', () => {
+describe('<%name%> model', () => {
   describe('GET /<%pluralName%>', () => {
     it('returns 200 ok', () => {
       return single<%name%>Creator()
