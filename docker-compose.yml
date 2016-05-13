@@ -7,7 +7,7 @@ services:
       SHELL: /bin/sh
     volumes:
       - ./base:/opt/app/base
-      - ./controller:/opt/app/controller
+      - ./model:/opt/app/model
       - ./lib:/opt/app/lib
       - ./test:/opt/app/test
       - ./index.js:/opt/app/index.js
