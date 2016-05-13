@@ -166,7 +166,8 @@ describe('<%name%> model', () => {
         });
     });
 
-    it('orders data when asked', () => {
+    it('orders data when asked', function callback() {
+      this.timeout(10000); // Required for user tests because bcrypt takes time
       return <%name%>Creator(15)
         .then(() => getJSON('/<%pluralName%>?orderBy=id'))
         .then(results => {
@@ -176,7 +177,8 @@ describe('<%name%> model', () => {
         });
     });
 
-    it('orders data in reverse when asked', () => {
+    it('orders data in reverse when asked', function callback() {
+      this.timeout(10000); // Required for user tests because bcrypt takes time
       return <%name%>Creator(15)
         .then(() => getJSON('/<%pluralName%>?orderBy=id&order=desc'))
         .then(results => {
