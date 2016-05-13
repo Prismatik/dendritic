@@ -4,16 +4,16 @@ const path = require('path');
 const r = require('lib/db');
 const migrate = require('lib/migrate');
 const schema = require('schema');
+const DB_NAME = `${process.env.RETHINK_NAME}${process.env.NODE_ENV === 'test' ? '_test' : ''}`;
 
 const tables = fs.readdirSync('./tables').map(table => {
   return require(path.resolve('./tables', path.parse(table).name));
 });
 
 module.exports = () => {
-  return r.dbCreate(process.env.RETHINK_NAME).run()
+  return r.dbCreate(DB_NAME).run()
   .catch((err) => {
     const arr = err.message.split('\n');
-    if (arr[0] === `Database ${process.env.RETHINK_NAME} already exists in:`) return;
     throw err;
   })
   .then(() => Promise.all(tables.map(table => table())))
