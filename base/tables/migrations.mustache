@@ -1,6 +1,7 @@
-const r = require('../lib/db.js');
+const r = require('lib/db.js');
+const db = require('lib/db_helper.js');
 
-const DB_NAME = `${process.env.RETHINK_NAME}${process.env.NODE_ENV === 'test' ? '_test' : ''}`;
+const DB_NAME = db.getName();
 
 module.exports = () => {
   return r.tableCreate('_migrations', { primaryKey: 'name' }).run()

@@ -7,7 +7,8 @@ require('app-module-path').addPath(path.resolve(__dirname, '..'));
 const setup = require('setup');
 const app = require('index');
 const r = require('lib/db');
-const DB_NAME = `${process.env.RETHINK_NAME}${process.env.NODE_ENV === 'test' ? '_test' : ''}`;
+const db = require('lib/db_helper');
+const DB_NAME = db.getName();
 
 app.listen(process.env.PORT, () => {
   before(function before() {

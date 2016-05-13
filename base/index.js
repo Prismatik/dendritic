@@ -17,6 +17,7 @@ module.exports = (opts) => {
     { p: 'env', n: 'db' },
     { n: 'dotenv', t: 'example.env', e: '' },
     { p: 'lib', n: 'db' },
+    { p: 'lib', n: 'db_helper' },
     { p: 'lib', n: 'migrate' },
     { n: 'index' },
     { n: 'package', e: 'json' },

@@ -1,10 +1,11 @@
 const fs = require('fs');
 const path = require('path');
+const db = require('lib/db_helper');
 
 const r = require('lib/db');
 const migrate = require('lib/migrate');
 const schema = require('schema');
-const DB_NAME = `${process.env.RETHINK_NAME}${process.env.NODE_ENV === 'test' ? '_test' : ''}`;
+const DB_NAME = db.getName();
 
 const tables = fs.readdirSync('./tables').map(table => {
   return require(path.resolve('./tables', path.parse(table).name));
