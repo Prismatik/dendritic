@@ -1,14 +1,13 @@
 const model = require('../models/{{name}}.js');
-const _ = require('lodash');
 
 module.exports = {
   get: model.get,
   create: model.create,
   update: model.update,
   delete: model.delete,
-  watch: model.watch,
 {{#isUser}}
   signin: model.signin,
-  signout: model.signout
+  signout: model.signout,
 {{/isUser}}
+  watch: model.watch
 };

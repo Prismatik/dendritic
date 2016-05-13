@@ -9,19 +9,19 @@ module.exports = (opts) => {
   // p: source path, n: filename
   // d: destination path, t: target filename, e: target extension
   const files = [
-    {p: 'constants', n: 'warnings'},
-    {p: 'lib', n: 'model'},
-    {p: 'lib', n: 'rethinkdb'},
-    {p: 'lib', n: 'schema'},
-    {p: 'test/lib', n: 'model'},
-    {p: 'test/lib', n: 'rethinkdb'},
-    {n: 'model', d: 'models', t: opts.name},
-    {n: 'controller', d: 'controllers', t: opts.name},
-    {n: 'test', d: 'test/models', t: opts.name+'_test'},
-    {n: 'route', d: 'routes', t: opts.name},
-    {n: 'table', d: 'tables', t: opts.name},
-    {n: 'fixture', d: 'fixtures', t: opts.name},
-    {n: 'schema', d: 'schemas', t: opts.name, e: 'json'},
+    { p: 'constants', n: 'warnings' },
+    { p: 'lib', n: 'model' },
+    { p: 'lib', n: 'rethinkdb' },
+    { p: 'lib', n: 'schema' },
+    { p: 'test/lib', n: 'model' },
+    { p: 'test/lib', n: 'rethinkdb' },
+    { n: 'model', d: 'models', t: opts.name },
+    { n: 'controller', d: 'controllers', t: opts.name },
+    { n: 'test', d: 'test/models', t: `${opts.name}_test` },
+    { n: 'route', d: 'routes', t: opts.name },
+    { n: 'table', d: 'tables', t: opts.name },
+    { n: 'fixture', d: 'fixtures', t: opts.name },
+    { n: 'schema', d: 'schemas', t: opts.name, e: 'json' }
   ];
 
   if (opts.isUser) {
