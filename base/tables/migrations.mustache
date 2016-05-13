@@ -6,7 +6,7 @@ module.exports = () => {
   return r.tableCreate('_migrations', { primaryKey: 'name' }).run()
   .catch((err) => {
     if (err.message.split('\n')[0] ===
-      `Table '${process.env.RETHINK_NAME} ._migrations' already exists in:`) return;
+      `Table \`${DB_NAME}._migrations\` already exists in:`) return;
     throw err;
   })
   .then(() => {

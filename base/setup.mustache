@@ -14,6 +14,7 @@ module.exports = () => {
   return r.dbCreate(DB_NAME).run()
   .catch((err) => {
     const arr = err.message.split('\n');
+    if (arr[0] === `Database \`${DB_NAME}\` already exists in:`) return;
     throw err;
   })
   .then(() => Promise.all(tables.map(table => table())))
