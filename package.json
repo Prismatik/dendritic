@@ -17,7 +17,8 @@
     "test": "node test",
     "testredbeard": "mocha",
     "watch": "chokidar '.' -c 'npm test' -i '/node_modules|redbeard_tests/' -d 2000",
-    "dockertest": "docker-compose run redbeard npm run watch"
+    "dockertest": "docker-compose run redbeard npm test",
+    "dockerwatch": "docker-compose run redbeard npm run watch"
   },
   "dependencies": {
     "lodash": "^3.10.1",
