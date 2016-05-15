@@ -7,6 +7,8 @@ require('app-module-path').addPath(path.resolve(__dirname, '..'));
 const setup = require('setup');
 const app = require('index');
 const r = require('lib/db');
+const db = require('lib/db_helper');
+const DB_NAME = db.getName();
 
 app.listen(process.env.PORT, () => {
   before(function before() {
@@ -15,7 +17,7 @@ app.listen(process.env.PORT, () => {
     return setup()
       .then(() => {
         after(() => {
-          return r.dbDrop('{{name}}')
+          return r.dbDrop(DB_NAME)
             .then(() => r.getPoolMaster().drain())
             .then(() => Promise.resolve(app.close()));
         });

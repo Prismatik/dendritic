@@ -1,10 +1,13 @@
-const r = require('../lib/db.js');
+const r = require('lib/db.js');
+const db = require('lib/db_helper.js');
+
+const DB_NAME = db.getName();
 
 module.exports = () => {
   return r.tableCreate('_migrations', { primaryKey: 'name' }).run()
   .catch((err) => {
     if (err.message.split('\n')[0] ===
-      `Table '${process.env.RETHINK_NAME} ._migrations' already exists in:`) return;
+      `Table \`${DB_NAME}._migrations\` already exists in:`) return;
     throw err;
   })
   .then(() => {
