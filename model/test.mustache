@@ -271,7 +271,7 @@ describe('<%name%> model', () => {
       const update = { name: 'Something else', rev: 'foo' };
       return single<%name%>Creator()
         .then(body => putter(`/<%pluralName%>/${body.id}`)(_.merge(body, update)))
-        .then(res => res.status.must.equal(400));
+        .then(res => res.status.must.equal(422));
     });
     <%#isUser%>
 
