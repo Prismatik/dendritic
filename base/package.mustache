@@ -1,5 +1,5 @@
 {
-  "name": "{{name}}",
+  "name": "{{projectName}}",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,8 +10,8 @@
     "start": "node start",
     "test": "mocha",
     "watch": "mocha --watch",
-    "dockertest": "docker-compose run {{name}} npm test",
-    "dockerwatch": "docker-compose run {{name}} npm run watch"
+    "dockertest": "docker-compose run {{projectName}} npm test",
+    "dockerwatch": "docker-compose run {{projectName}} npm run watch"
   },
   "license": "ISC",
   "dependencies": {
