@@ -3,14 +3,14 @@ const fetch = require('node-fetch');
 const querystring = require('querystring');
 const _ = require('lodash');
 const uuid = require('uuid');
-const fixture = require('../../fixtures/<%name%>');
+const fixture = require('../../fixtures/<%fileName%>');
 const IO = require('socket.io-client');
 <%#isUser%>
 const password = require('simple-password');
 const errors = require('../../constants/errors');
 <%/isUser%>
 <%#relationships%>
-const <%name%>Fixture = require('../../fixtures/<%name%>');
+const <%name%>Fixture = require('../../fixtures/<%fileName%>');
 <%/relationships%>
 
 const url = `http://localhost:${process.env.PORT}`;

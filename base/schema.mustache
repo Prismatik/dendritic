@@ -6,7 +6,8 @@ const r = require('lib/db');
 let schemaIndexes = {};
 
 const appSchema = fs.readdirSync('./schemas').reduce((s, file) => {
-  const name = file.split('.json')[0];
+  const fileName = file.split('.json')[0];
+  const name = _.camelCase(fileName);
   s[name] = require(`./schemas/${file}`);
   return s;
 }, {});

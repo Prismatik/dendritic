@@ -20,7 +20,7 @@ mkdirp.sync(dir);
 const opts = { cwd: dir, stdio: 'inherit' };
 const index = path.join(__dirname, 'index.js');
 
-const appName = `redbeard_tests${randomstring()}`;
+const appName = `redbeard_tests_${randomstring()}`;
 const modelName1 = randomstring();
 const modelName2 = randomstring();
 const userName = `${randomstring()}_user`;
