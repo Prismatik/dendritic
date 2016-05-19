@@ -21,7 +21,7 @@ module.exports = {
     params = _.assign({ result: true }, model.normaliseParams(params));
     const queryParams = schema.filter('{{name}}', params);
 
-    const table = r.table('{{pluralName}}');
+    const table = r.table('{{tableName}}');
     const indexes = model.getIndexes(modelSchema, queryParams);
     const indexBy = _.contains(indexes, 'id') ? 'id' : indexes[0];
 
@@ -49,7 +49,7 @@ module.exports = {
     const queryParams = schema.filter('{{name}}', params);
 
     const changes = { includeInitial: true, includeStates: true };
-    const table = r.table('{{pluralName}}');
+    const table = r.table('{{tableName}}');
     const indexes = model.getIndexes(modelSchema, queryParams);
     const indexBy = _.contains(indexes, 'id') ? 'id' : indexes[0];
 
@@ -68,7 +68,7 @@ module.exports = {
     const valid = validate({{name}});
     if (!valid) return Promise.reject(new httpError('UNPROCESSABLE_ENTITY'));
     {{name}}.rev = uuid.v4();
-    return r.table('{{pluralName}}').insert({{name}}, { returnChanges: true }).run()
+    return r.table('{{tableName}}').insert({{name}}, { returnChanges: true }).run()
     .then(rethinkdb.firstChange);
   },
   update: ({{name}}) => {
@@ -79,7 +79,7 @@ module.exports = {
     const valid = validate({{name}});
     if (!valid) return Promise.reject(new httpError('UNPROCESSABLE_ENTITY'));
 
-    return r.table('{{pluralName}}')
+    return r.table('{{tableName}}')
     .get({{name}}.id)
     .update(rethinkdb.ifRevMatches({{name}}), { returnChanges: true })
     .run()
@@ -96,7 +96,7 @@ module.exports = {
       const valid = validate({{name}});
       if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
       {{name}}.rev = uuid.v4();
-      return r.table('{{pluralName}}').insert(data, { returnChanges: true }).run()
+      return r.table('{{tableName}}').insert(data, { returnChanges: true }).run()
       .then(rethinkdb.firstChange);
     });
   },
@@ -111,13 +111,13 @@ module.exports = {
     return getHash.then(pass => {
       if (pass) {{name}}.password = pass;
 
-      return r.table('{{pluralName}}').get({{name}}.id).run()
+      return r.table('{{tableName}}').get({{name}}.id).run()
       .then(current => {
         const updated = Object.assign({}, current, {{name}});
         const valid = validate(updated);
         if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
 
-        return r.table('{{pluralName}}')
+        return r.table('{{tableName}}')
         .get({{name}}.id)
         .update(
           rethinkdb.ifRevMatches({{name}}),
@@ -131,7 +131,7 @@ module.exports = {
   },
   {{/isUser}}
   delete: (id) => {
-    return r.table('{{pluralName}}').get(id).delete({ returnChanges: true }).run()
+    return r.table('{{tableName}}').get(id).delete({ returnChanges: true }).run()
     .then(res => {
       return res;
     })
@@ -139,7 +139,7 @@ module.exports = {
   {{#isUser}}
   },
   signin: (email, pass) => {
-    const table = r.table('{{pluralName}}');
+    const table = r.table('{{tableName}}');
     const params = { email };
     const indexes = model.getIndexes(modelSchema, params);
     const indexBy = _.contains(indexes, 'email') ? 'email' : null;
