@@ -72,7 +72,7 @@ const deleter = path => () => {
   });
 };
 
-const <%camelCase%>Poster = poster('/<%snakeCasePlural%>');
+const <%camelCase%>Poster = poster('/<%kebabCasePlural%>');
 
 const <%camelCase%>Creator = times => {
   return Promise.all(_.times(times, () => {
@@ -98,7 +98,7 @@ const single<%pascalCase%>Creator = () => <%camelCase%>Creator(1).then(pop);
 
 <%#relationships%>
 // <%camelCase%> relationship helpers
-const <%camelCase%>Poster = poster('/<%snakeCasePlural%>');
+const <%camelCase%>Poster = poster('/<%kebabCasePlural%>');
 
 const <%camelCase%>Creator = times => {
   return Promise.all(_.times(times, () => {
@@ -112,16 +112,16 @@ const single<%pascalCase%>Creator = () => <%camelCase%>Creator(1).then(pop);
 <%/relationships%>
 
 describe('<%camelCase%> model', () => {
-  describe('GET /<%snakeCasePlural%>', () => {
+  describe('GET /<%kebabCasePlural%>', () => {
     it('returns 200 ok', () => {
       return single<%pascalCase%>Creator()
-        .then(() => fetch(`${url}/<%snakeCasePlural%>`))
+        .then(() => fetch(`${url}/<%kebabCasePlural%>`))
         .must.resolve.to.have.property('status', 200);
     });
 
     it('return an object with a .result property', () => {
       return single<%pascalCase%>Creator()
-        .then(() => fetch(`${url}/<%snakeCasePlural%>`))
+        .then(() => fetch(`${url}/<%kebabCasePlural%>`))
         .then(res => res.json())
         .must.resolve.to.be.object();
     });
@@ -134,7 +134,7 @@ describe('<%camelCase%> model', () => {
           if (!property) return Promise.resolve(); // if no properties other than id skip test
           const queryStr = querystring.stringify({ [property]: record[property] });
 
-          return getJSON(`/<%snakeCasePlural%>?${queryStr}`)
+          return getJSON(`/<%kebabCasePlural%>?${queryStr}`)
             .then(json => json.map(entry => entry[property]))
             .must.resolve.to.eql([record[property]]);
         });
@@ -144,7 +144,7 @@ describe('<%camelCase%> model', () => {
       return <%camelCase%>Creator(2)
         .then(<%camelCasePlural%> => {
           const id = <%camelCasePlural%>[0].id;
-          return getJSON(`/<%snakeCasePlural%>?foo=${id}`);
+          return getJSON(`/<%kebabCasePlural%>?foo=${id}`);
         })
         .then(entries => entries.length)
         .must.resolve.to.be.gt(1);
@@ -152,16 +152,16 @@ describe('<%camelCase%> model', () => {
 
     it('paginates data when asked', () => {
       return <%camelCase%>Creator(5)
-        .then(() => getJSON('/<%snakeCasePlural%>?limit=2'))
+        .then(() => getJSON('/<%kebabCasePlural%>?limit=2'))
         .must.resolve.to.have.length(2);
     });
 
     it('skips records when asked', () => {
       return <%camelCase%>Creator(5)
-        .then(() => getJSON('/<%snakeCasePlural%>?limit=2'))
+        .then(() => getJSON('/<%kebabCasePlural%>?limit=2'))
         .then(first => {
           first.must.have.length(2);
-          return getJSON('/<%snakeCasePlural%>?limit=2&skip=2')
+          return getJSON('/<%kebabCasePlural%>?limit=2&skip=2')
             .then(second => {
               second.must.have.length(2);
               second.must.not.eql(first);
@@ -172,7 +172,7 @@ describe('<%camelCase%> model', () => {
     it('orders data when asked', function callback() {
       this.timeout(10000); // Required for user tests because bcrypt takes time
       return <%camelCase%>Creator(15)
-        .then(() => getJSON('/<%snakeCasePlural%>?orderBy=id'))
+        .then(() => getJSON('/<%kebabCasePlural%>?orderBy=id'))
         .then(results => {
           const reordered = _.clone(results).sort(asc);
 
@@ -183,7 +183,7 @@ describe('<%camelCase%> model', () => {
     it('orders data in reverse when asked', function callback() {
       this.timeout(10000); // Required for user tests because bcrypt takes time
       return <%camelCase%>Creator(15)
-        .then(() => getJSON('/<%snakeCasePlural%>?orderBy=id&order=desc'))
+        .then(() => getJSON('/<%kebabCasePlural%>?orderBy=id&order=desc'))
         .then(results => {
           const reordered = _.clone(results).sort(desc);
 
@@ -193,7 +193,7 @@ describe('<%camelCase%> model', () => {
 
     it('returns n matching docs with a count of all matching docs', () => {
       return <%camelCase%>Creator(10)
-        .then(() => fetch(`${url}/<%snakeCasePlural%>?count=true&limit=5`))
+        .then(() => fetch(`${url}/<%kebabCasePlural%>?count=true&limit=5`))
         .then(res => res.json())
         .then(json => {
           json.result.must.have.length(5);
@@ -203,7 +203,7 @@ describe('<%camelCase%> model', () => {
 
     it('returns n matching docs without a count of all matching docs ', () => {
       return <%camelCase%>Creator(10)
-        .then(() => fetch(`${url}/<%snakeCasePlural%>?limit=5`))
+        .then(() => fetch(`${url}/<%kebabCasePlural%>?limit=5`))
         .then(res => res.json())
         .then(json => {
           json.result.must.have.length(5);
@@ -213,7 +213,7 @@ describe('<%camelCase%> model', () => {
 
     it('returns only a count with no matching docs', () => {
       return <%camelCase%>Creator(10)
-        .then(() => fetch(`${url}/<%snakeCasePlural%>?count=true&result=false`))
+        .then(() => fetch(`${url}/<%kebabCasePlural%>?count=true&result=false`))
         .then(res => res.json())
         .then(json => {
           json.must.not.have.property('result');
@@ -222,15 +222,15 @@ describe('<%camelCase%> model', () => {
     });
   });
 
-  describe('GET /<%snakeCasePlural%>/:id', () => {
+  describe('GET /<%kebabCasePlural%>/:id', () => {
     it('returns 200 with the record data', () => {
       return single<%pascalCase%>Creator()
-        .then(record => fetch(`${url}/<%snakeCasePlural%>/${record.id}`))
+        .then(record => fetch(`${url}/<%kebabCasePlural%>/${record.id}`))
         .must.resolve.to.have.property('status', 200);
     });
   });
 
-  describe('POST /<%snakeCasePlural%>', () => {
+  describe('POST /<%kebabCasePlural%>', () => {
     it('returns 201 for valid data', () => {
       return <%camelCase%>Poster(fixture.valid())
         .must.resolve.to.have.property('status', 201);
@@ -246,7 +246,7 @@ describe('<%camelCase%> model', () => {
     it('actually persists the data', () => {
       return single<%pascalCase%>Creator()
         .then(record => {
-          return getJSON(`/<%snakeCasePlural%>/${record.id}`)
+          return getJSON(`/<%kebabCasePlural%>/${record.id}`)
             .must.resolve.to.have.property('id', record.id);
         });
     });
@@ -270,33 +270,33 @@ describe('<%camelCase%> model', () => {
 
     it('saves related entity (can GET using :id)', () => {
       return single<%pascalCase%>Creator()
-        .then(body => fetch(`${url}/<%snakeCasePlural%>/${body.id}`))
+        .then(body => fetch(`${url}/<%kebabCasePlural%>/${body.id}`))
         .must.resolve.to.have.property('status', 200);
     });
     <%/relationships%>
   });
 
-  describe('PUT /<%snakeCasePlural%>/:id', () => {
+  describe('PUT /<%kebabCasePlural%>/:id', () => {
     it('updates <%camelCase%> and actually persists it', () => {
       const update = { name: 'Something else' };
       return single<%pascalCase%>Creator()
-        .then(body => putter(`/<%snakeCasePlural%>/${body.id}`)(_.merge(body, update)))
+        .then(body => putter(`/<%kebabCasePlural%>/${body.id}`)(_.merge(body, update)))
         .then(unwrapJSON)
-        .then(body => getJSON(`/<%snakeCasePlural%>/${body.id}`))
+        .then(body => getJSON(`/<%kebabCasePlural%>/${body.id}`))
         .must.resolve.to.have.property('name', update.name);
     });
 
     it('rejects a <%camelCase%> without any rev', () => {
       const update = { name: 'Something else' };
       return single<%pascalCase%>Creator()
-        .then(body => putter(`/<%snakeCasePlural%>/${body.id}`)(update))
+        .then(body => putter(`/<%kebabCasePlural%>/${body.id}`)(update))
         .then(res => res.status.must.equal(400));
     });
 
     it('rejects a <%camelCase%> with a faulty rev', () => {
       const update = { name: 'Something else', rev: uuid.v4() };
       return single<%pascalCase%>Creator()
-        .then(body => putter(`/<%snakeCasePlural%>/${body.id}`)(_.merge(body, update)))
+        .then(body => putter(`/<%kebabCasePlural%>/${body.id}`)(_.merge(body, update)))
         .then(res => res.status.must.equal(400));
     });
     <%#isUser%>
@@ -304,35 +304,35 @@ describe('<%camelCase%> model', () => {
     it('PUTing an updated password should update the password hash', () => {
       const update = { password: 'ABCD1234' };
       return single<%pascalCase%>Creator()
-      .then(body => putter(`/<%snakeCasePlural%>/${body.id}`)(_.merge(body, update)))
+      .then(body => putter(`/<%kebabCasePlural%>/${body.id}`)(_.merge(body, update)))
       .then(unwrapJSON)
-      .then(body => getJSON(`/<%snakeCasePlural%>/${body.id}`))
+      .then(body => getJSON(`/<%kebabCasePlural%>/${body.id}`))
       .then(json => password.verify(update.password, json.password))
       .must.resolve.to.equal(true);
     });
     <%/isUser%>
   });
 
-  describe('DELETE /<%snakeCasePlural%>/:id', () => {
+  describe('DELETE /<%kebabCasePlural%>/:id', () => {
     it('returns 200 ok response', () => {
       return single<%pascalCase%>Creator()
-        .then(body => deleter(`/<%snakeCasePlural%>/${body.id}`)())
+        .then(body => deleter(`/<%kebabCasePlural%>/${body.id}`)())
         .must.resolve.to.have.property('status', 200);
     });
 
     it('actually deletes the record', () => {
       return single<%pascalCase%>Creator()
-        .then(body => deleter(`/<%snakeCasePlural%>/${body.id}`)())
+        .then(body => deleter(`/<%kebabCasePlural%>/${body.id}`)())
         .then(unwrapOldVal)
-        .then(body => fetch(`${url}/<%snakeCasePlural%>/${body.id}`))
+        .then(body => fetch(`${url}/<%kebabCasePlural%>/${body.id}`))
         .must.resolve.to.have.property('status', 404);
     });
   });
 
   <%#isUser%>
-  describe('POST /<%snakeCasePlural%>/signin', () => {
+  describe('POST /<%kebabCasePlural%>/signin', () => {
     it('returns 401 response with invalid email', () => {
-      const signin = poster('/<%snakeCasePlural%>/signin');
+      const signin = poster('/<%kebabCasePlural%>/signin');
       return signin({ email: 'notexist@example.com', password: 'ABCD1234' })
         .then(statusEquals(401))
         .then(res => res.json())
@@ -344,7 +344,7 @@ describe('<%camelCase%> model', () => {
       return <%camelCase%>Poster(data)
       .then(unwrapJSON)
       .then(() => {
-        const signin = poster('/<%snakeCasePlural%>/signin');
+        const signin = poster('/<%kebabCasePlural%>/signin');
         return signin({ email: data.email, password: 'ABCD1234' })
           .then(statusEquals(401))
           .then(res => res.json())
@@ -352,13 +352,13 @@ describe('<%camelCase%> model', () => {
       });
     });
 
-    it('POST /<%snakeCasePlural%>/signin with correct credentials should return a valid jwt',
+    it('POST /<%kebabCasePlural%>/signin with correct credentials should return a valid jwt',
     () => {
       const data = fixture.valid();
       return <%camelCase%>Poster(data)
       .then(unwrapJSON)
       .then((user) => {
-        const signin = poster('/<%snakeCasePlural%>/signin');
+        const signin = poster('/<%kebabCasePlural%>/signin');
         return signin({ email: data.email, password: data.password })
           .then(statusEquals(200))
           .then(res => res.json())
@@ -378,7 +378,7 @@ describe('<%camelCase%> model', () => {
         .then(body => {
           return new Promise(resolve => {
             const opts = { query: `id=${body.id}`, forceNew: true };
-            const io = IO(`${url}/<%snakeCasePlural%>`, opts);
+            const io = IO(`${url}/<%kebabCasePlural%>`, opts);
             io.on('record', data => {
               resolve(data.new_val);
               io.disconnect();
@@ -393,7 +393,7 @@ describe('<%camelCase%> model', () => {
         .then(() => {
           return new Promise(resolve => {
             const opts = { forceNew: true };
-            const io = IO(`${url}/<%snakeCasePlural%>`, opts);
+            const io = IO(`${url}/<%kebabCasePlural%>`, opts);
             let count = 0;
             io.on('record', () => {
               count++;
@@ -419,7 +419,7 @@ describe('<%camelCase%> model', () => {
           <%/isUser%>
           return new Promise(resolve => {
             const opts = { forceNew: true };
-            const io = IO(`${url}/<%snakeCasePlural%>`, opts);
+            const io = IO(`${url}/<%kebabCasePlural%>`, opts);
             io.on('state', state => {
               if (state.state === 'ready') {
                 io.on('record', record => {
@@ -433,7 +433,7 @@ describe('<%camelCase%> model', () => {
                   io.disconnect();
                   resolve();
                 });
-                putter(`/<%snakeCasePlural%>/${data.id}`)(update);
+                putter(`/<%kebabCasePlural%>/${data.id}`)(update);
               }
             });
           });
@@ -451,7 +451,7 @@ describe('<%camelCase%> model', () => {
               return r;
             }, {});
             const opts = { query, forceNew: true };
-            const io = IO(`${url}/<%snakeCasePlural%>`, opts);
+            const io = IO(`${url}/<%kebabCasePlural%>`, opts);
             io.on('record', data => {
               data.new_val.must.eql(target);
             });
@@ -469,7 +469,7 @@ describe('<%camelCase%> model', () => {
         .then(() => {
           return new Promise(resolve => {
             const opts = { query: { limit: 1 }, forceNew: true };
-            const io = IO(`${url}/<%snakeCasePlural%>`, opts);
+            const io = IO(`${url}/<%kebabCasePlural%>`, opts);
             let count = 0;
             io.on('record', () => count++);
             io.on('state', data => {
@@ -487,13 +487,13 @@ describe('<%camelCase%> model', () => {
         .then(() => {
           return new Promise(resolve => {
             const opts = { query: { limit: 1 }, forceNew: true };
-            const io = IO(`${url}/<%snakeCasePlural%>`, opts);
+            const io = IO(`${url}/<%kebabCasePlural%>`, opts);
             let first;
             io.on('record', record => {
               first = record;
               io.disconnect();
               const opts2 = { query: { skip: 1 }, forceNew: true };
-              const io2 = IO(`${url}/<%snakeCasePlural%>`, opts2);
+              const io2 = IO(`${url}/<%kebabCasePlural%>`, opts2);
               io2.on('record', record2 => {
                 record2.must.not.eql(first);
                 io2.disconnect();
