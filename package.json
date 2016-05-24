@@ -26,6 +26,7 @@
     "mustache": "^2.2.0",
     "pluralize": "^1.2.1",
     "rimraf": "^2.4.4",
+    "to-pascal-case": "^1.0.0",
     "yargs": "^4.3.2"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 const Router = require('express').Router;
 const _ = require('lodash');
-const controller = require('../controllers/{{fileName}}.js');
+const controller = require('../controllers/{{snakeCase}}.js');
 
 const router = Router();
 
@@ -23,7 +23,7 @@ const respond = (res, status) => body => {
 module.exports = {
   http: router,
   socket: io => {
-    const nsp = io.of('/{{routeName}}');
+    const nsp = io.of('/{{snakeCasePlural}}');
     nsp.on('connection', socket => {
       controller.watch(socket.handshake.query)
       .then(cursor => {
@@ -38,27 +38,27 @@ module.exports = {
 };
 
 router
-  .get('/{{routeName}}', (req, res) => {
+  .get('/{{snakeCasePlural}}', (req, res) => {
     controller.get(req.query)
     .then(respond(res))
     .catch(errHandlerFactory(res));
   })
-  .get('/{{routeName}}/:id', (req, res) => {
+  .get('/{{snakeCasePlural}}/:id', (req, res) => {
     controller.get(_.assign({ id: req.params.id }, req.query))
     .then(respond(res))
     .catch(errHandlerFactory(res));
   })
-  .post('/{{routeName}}', (req, res) => {
+  .post('/{{snakeCasePlural}}', (req, res) => {
     controller.create(req.body)
     .then(respond(res, 201))
     .catch(errHandlerFactory(res));
   })
-  .put('/{{routeName}}/:id', (req, res) => {
+  .put('/{{snakeCasePlural}}/:id', (req, res) => {
     controller.update(req.body)
     .then(respond(res))
     .catch(errHandlerFactory(res));
   })
-  .delete('/{{routeName}}/:id', (req, res) => {
+  .delete('/{{snakeCasePlural}}/:id', (req, res) => {
     controller.delete(req.params.id)
     .then(respond(res))
     .catch(errHandlerFactory(res));
@@ -66,12 +66,12 @@ router
 
 {{#isUser}}
 router
-  .post('/{{routeName}}/signin', (req, res) => {
+  .post('/{{snakeCasePlural}}/signin', (req, res) => {
     controller.signin(req.body.email, req.body.password)
     .then(respond(res))
     .catch(errHandlerFactory(res));
   })
-  .post('/{{routeName}}/signout', (req, res) => {
+  .post('/{{snakeCasePlural}}/signout', (req, res) => {
     controller.signout(req.body)
     .then(respond(res))
     .catch(errHandlerFactory(res));

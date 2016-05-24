@@ -1,12 +1,12 @@
 version: '2'
 services:
-  {{projectName}}:
+  {{snakeCasePlural}}:
     build: .
     environment:
       JWT_SECRET: foo
       RETHINK_HOST: rethinkdb
       RETHINK_PORT: 28015
-      RETHINK_NAME: {{dbName}}
+      RETHINK_NAME: {{snakeCasePlural}}
       PORT: 3005
     volumes:
       - ./bin:/opt/app/bin

@@ -16,13 +16,13 @@ module.exports = (opts) => {
     { p: 'lib', n: 'schema' },
     { p: 'test/lib', n: 'model' },
     { p: 'test/lib', n: 'rethinkdb' },
-    { n: 'model', d: 'models', t: opts.fileName },
-    { n: 'controller', d: 'controllers', t: opts.fileName },
-    { n: 'test', d: 'test/models', t: `${opts.fileName}_test` },
-    { n: 'route', d: 'routes', t: opts.fileName },
-    { n: 'table', d: 'tables', t: opts.fileName },
-    { n: 'fixture', d: 'fixtures', t: opts.fileName },
-    { n: 'schema', d: 'schemas', t: opts.fileName, e: 'json' }
+    { n: 'model', d: 'models', t: opts.snakeCase },
+    { n: 'controller', d: 'controllers', t: opts.snakeCase },
+    { n: 'test', d: 'test/models', t: `${opts.snakeCase}_test` },
+    { n: 'route', d: 'routes', t: opts.snakeCase },
+    { n: 'table', d: 'tables', t: opts.snakeCase },
+    { n: 'fixture', d: 'fixtures', t: opts.snakeCase },
+    { n: 'schema', d: 'schemas', t: opts.snakeCase, e: 'json' }
   ];
 
   if (opts.isUser) {
