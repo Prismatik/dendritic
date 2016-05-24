@@ -94,9 +94,10 @@ const <%camelCase%>Creator = times => {
 
 const pop = data => data[0];
 
-const single<%camelCase%>Creator = () => <%camelCase%>Creator(1).then(pop);
+const single<%pascalCase%>Creator = () => <%camelCase%>Creator(1).then(pop);
 
 <%#relationships%>
+// <%camelCase%> relationship helpers
 const <%camelCase%>Poster = poster('/<%snakeCasePlural%>');
 
 const <%camelCase%>Creator = times => {
@@ -107,19 +108,19 @@ const <%camelCase%>Creator = times => {
   }));
 };
 
-const single<%camelCase%>Creator = () => <%camelCase%>Creator(1).then(pop);
+const single<%pascalCase%>Creator = () => <%camelCase%>Creator(1).then(pop);
 <%/relationships%>
 
 describe('<%camelCase%> model', () => {
   describe('GET /<%snakeCasePlural%>', () => {
     it('returns 200 ok', () => {
-      return single<%camelCase%>Creator()
+      return single<%pascalCase%>Creator()
         .then(() => fetch(`${url}/<%snakeCasePlural%>`))
         .must.resolve.to.have.property('status', 200);
     });
 
     it('return an object with a .result property', () => {
-      return single<%camelCase%>Creator()
+      return single<%pascalCase%>Creator()
         .then(() => fetch(`${url}/<%snakeCasePlural%>`))
         .then(res => res.json())
         .must.resolve.to.be.object();
@@ -223,7 +224,7 @@ describe('<%camelCase%> model', () => {
 
   describe('GET /<%snakeCasePlural%>/:id', () => {
     it('returns 200 with the record data', () => {
-      return single<%camelCase%>Creator()
+      return single<%pascalCase%>Creator()
         .then(record => fetch(`${url}/<%snakeCasePlural%>/${record.id}`))
         .must.resolve.to.have.property('status', 200);
     });
@@ -243,7 +244,7 @@ describe('<%camelCase%> model', () => {
     });
 
     it('actually persists the data', () => {
-      return single<%camelCase%>Creator()
+      return single<%pascalCase%>Creator()
         .then(record => {
           return getJSON(`/<%snakeCasePlural%>/${record.id}`)
             .must.resolve.to.have.property('id', record.id);
@@ -268,7 +269,7 @@ describe('<%camelCase%> model', () => {
     <%#relationships%>
 
     it('saves related entity (can GET using :id)', () => {
-      return single<%camelCase%>Creator()
+      return single<%pascalCase%>Creator()
         .then(body => fetch(`${url}/<%snakeCasePlural%>/${body.id}`))
         .must.resolve.to.have.property('status', 200);
     });
@@ -278,7 +279,7 @@ describe('<%camelCase%> model', () => {
   describe('PUT /<%snakeCasePlural%>/:id', () => {
     it('updates <%camelCase%> and actually persists it', () => {
       const update = { name: 'Something else' };
-      return single<%camelCase%>Creator()
+      return single<%pascalCase%>Creator()
         .then(body => putter(`/<%snakeCasePlural%>/${body.id}`)(_.merge(body, update)))
         .then(unwrapJSON)
         .then(body => getJSON(`/<%snakeCasePlural%>/${body.id}`))
@@ -287,14 +288,14 @@ describe('<%camelCase%> model', () => {
 
     it('rejects a <%camelCase%> without any rev', () => {
       const update = { name: 'Something else' };
-      return single<%camelCase%>Creator()
+      return single<%pascalCase%>Creator()
         .then(body => putter(`/<%snakeCasePlural%>/${body.id}`)(update))
         .then(res => res.status.must.equal(400));
     });
 
     it('rejects a <%camelCase%> with a faulty rev', () => {
       const update = { name: 'Something else', rev: uuid.v4() };
-      return single<%camelCase%>Creator()
+      return single<%pascalCase%>Creator()
         .then(body => putter(`/<%snakeCasePlural%>/${body.id}`)(_.merge(body, update)))
         .then(res => res.status.must.equal(400));
     });
@@ -302,7 +303,7 @@ describe('<%camelCase%> model', () => {
 
     it('PUTing an updated password should update the password hash', () => {
       const update = { password: 'ABCD1234' };
-      return single<%camelCase%>Creator()
+      return single<%pascalCase%>Creator()
       .then(body => putter(`/<%snakeCasePlural%>/${body.id}`)(_.merge(body, update)))
       .then(unwrapJSON)
       .then(body => getJSON(`/<%snakeCasePlural%>/${body.id}`))
@@ -314,13 +315,13 @@ describe('<%camelCase%> model', () => {
 
   describe('DELETE /<%snakeCasePlural%>/:id', () => {
     it('returns 200 ok response', () => {
-      return single<%camelCase%>Creator()
+      return single<%pascalCase%>Creator()
         .then(body => deleter(`/<%snakeCasePlural%>/${body.id}`)())
         .must.resolve.to.have.property('status', 200);
     });
 
     it('actually deletes the record', () => {
-      return single<%camelCase%>Creator()
+      return single<%pascalCase%>Creator()
         .then(body => deleter(`/<%snakeCasePlural%>/${body.id}`)())
         .then(unwrapOldVal)
         .then(body => fetch(`${url}/<%snakeCasePlural%>/${body.id}`))
@@ -373,7 +374,7 @@ describe('<%camelCase%> model', () => {
 
   describe('Socket connection', () => {
     it('opens a web-socket connection and returns a single record', () => {
-      return single<%camelCase%>Creator()
+      return single<%pascalCase%>Creator()
         .then(body => {
           return new Promise(resolve => {
             const opts = { query: `id=${body.id}`, forceNew: true };
@@ -408,7 +409,7 @@ describe('<%camelCase%> model', () => {
 
     it('opens a websocket connection to <%camelCasePlural%> and returns changed documents',
     () => {
-      return single<%camelCase%>Creator()
+      return single<%pascalCase%>Creator()
         .then(data => {
           <%^isUser%>
           const update = Object.assign({}, data, { name: 'ohai' });
