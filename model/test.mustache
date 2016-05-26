@@ -2,10 +2,12 @@
 const fetch = require('node-fetch');
 const querystring = require('querystring');
 const _ = require('lodash');
+const uuid = require('uuid');
 const fixture = require('../../fixtures/<%name%>');
 const IO = require('socket.io-client');
 <%#isUser%>
 const password = require('simple-password');
+const errors = require('../../constants/errors');
 <%/isUser%>
 <%#relationships%>
 const <%name%>Fixture = require('../../fixtures/<%name%>');
@@ -233,6 +235,13 @@ describe('<%name%> model', () => {
         .must.resolve.to.have.property('status', 201);
     });
 
+    it('returns 422 for invalid data', () => {
+      const invalid = fixture.valid();
+      invalid.rev = 'lol';
+      return <%name%>Poster(invalid)
+        .must.resolve.to.have.property('status', 422);
+    });
+
     it('actually persists the data', () => {
       return single<%name%>Creator()
         .then(record => {
@@ -240,6 +249,22 @@ describe('<%name%> model', () => {
             .must.resolve.to.have.property('id', record.id);
         });
     });
+    <%#isUser%>
+    it('returns 422 for creation with no password', () => {
+      const invalid = fixture.valid();
+      delete invalid.password;
+      return <%name%>Poster(invalid)
+        .must.resolve.to.have.property('status', 422);
+    });
+
+    it('returns a meaningful error message for a create with no password', () => {
+      const invalid = fixture.valid();
+      delete invalid.password;
+      return <%name%>Poster(invalid)
+        .then(res => res.json())
+        .must.resolve.to.have.property('message', errors.NO_PASSWORD);
+    });
+    <%/isUser%>
     <%#relationships%>
 
     it('saves related entity (can GET using :id)', () => {
@@ -268,7 +293,7 @@ describe('<%name%> model', () => {
     });
 
     it('rejects a <%name%> with a faulty rev', () => {
-      const update = { name: 'Something else', rev: 'foo' };
+      const update = { name: 'Something else', rev: uuid.v4() };
       return single<%name%>Creator()
         .then(body => putter(`/<%pluralName%>/${body.id}`)(_.merge(body, update)))
         .then(res => res.status.must.equal(400));

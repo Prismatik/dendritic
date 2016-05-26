@@ -7,12 +7,14 @@ const rethinkdb = require('../lib/rethinkdb');
 const schema = require('../lib/schema');
 const warnings = require('../constants/warnings');
 {{#isUser}}
+const errors = require('../constants/errors');
 const jwt = require('../lib/jwt');
 const password = require('simple-password');
 {{/isUser}}
 
 const appSchema = require('../schema').getSchema();
 const modelSchema = appSchema.{{name}};
+const validate = schema.getValidator('{{name}}');
 
 module.exports = {
   get: (params) => {
@@ -63,8 +65,8 @@ module.exports = {
   },
   {{^isUser}}
   create: ({{name}}) => {
-    const valid = schema.validate({{name}});
-    if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
+    const valid = validate({{name}});
+    if (!valid) return Promise.reject(new httpError('UNPROCESSABLE_ENTITY'));
     {{name}}.rev = uuid.v4();
     return r.table('{{pluralName}}').insert({{name}}, { returnChanges: true }).run()
     .then(rethinkdb.firstChange);
@@ -73,14 +75,13 @@ module.exports = {
     if (!{{name}}.rev) {
       return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
     }
-    const valid = schema.validate({{name}});
-    if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
+
+    const valid = validate({{name}});
+    if (!valid) return Promise.reject(new httpError('UNPROCESSABLE_ENTITY'));
+
     return r.table('{{pluralName}}')
     .get({{name}}.id)
-    .update(
-      rethinkdb.ifRevMatches({{name}}),
-      { returnChanges: true }
-    )
+    .update(rethinkdb.ifRevMatches({{name}}), { returnChanges: true })
     .run()
     .then(rethinkdb.checkRevError)
     .then(rethinkdb.firstChange);
@@ -88,10 +89,11 @@ module.exports = {
   {{/isUser}}
   {{#isUser}}
   create: ({{name}}) => {
+    if (!{{name}}.password) return Promise.reject(new httpError(422, errors.NO_PASSWORD));
     return password.create({{name}}.password, 10)
     .then(hash => {
       const data = _.merge({{name}}, { password: hash });
-      const valid = schema.validate(data);
+      const valid = validate({{name}});
       if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
       {{name}}.rev = uuid.v4();
       return r.table('{{pluralName}}').insert(data, { returnChanges: true }).run()
@@ -103,23 +105,28 @@ module.exports = {
       return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
     }
     let getHash;
-    if ({{name}}.password) {
-      getHash = password.create({{name}}.password, 10);
-    } else getHash = Promise.resolve();
+    if ({{name}}.password) getHash = password.create({{name}}.password, 10);
+    else getHash = Promise.resolve();
 
     return getHash.then(pass => {
       if (pass) {{name}}.password = pass;
-      const valid = schema.validate({{name}});
-      if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
-      return r.table('{{pluralName}}')
-      .get({{name}}.id)
-      .update(
-        rethinkdb.ifRevMatches({{name}}),
-        { returnChanges: true }
-      )
-      .run()
-      .then(rethinkdb.checkRevError)
-      .then(rethinkdb.firstChange);
+
+      return r.table('{{pluralName}}').get({{name}}.id).run()
+      .then(current => {
+        const updated = Object.assign({}, current, {{name}});
+        const valid = validate(updated);
+        if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
+
+        return r.table('{{pluralName}}')
+        .get({{name}}.id)
+        .update(
+          rethinkdb.ifRevMatches({{name}}),
+          { returnChanges: true }
+        )
+        .run()
+        .then(rethinkdb.checkRevError)
+        .then(rethinkdb.firstChange);
+      });
     });
   },
   {{/isUser}}

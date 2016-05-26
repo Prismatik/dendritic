@@ -10,6 +10,7 @@ module.exports = (opts) => {
   // d: destination path, t: target filename, e: target extension
   const files = [
     { p: 'constants', n: 'warnings' },
+    { p: 'constants', n: 'errors' },
     { p: 'lib', n: 'model' },
     { p: 'lib', n: 'rethinkdb' },
     { p: 'lib', n: 'schema' },

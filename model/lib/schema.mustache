@@ -1,10 +1,10 @@
 const _ = require('lodash');
 const jsen = require('jsen');
-const schema = require('../schema').getSchema();
+const appSchema = require('../schema').getSchema();
 
 // filter out params that do not exist as properties on the schema
 exports.filter = (name, params) => {
-  const properties = schema[name].properties;
+  const properties = appSchema[name].properties;
   return _.reduce(params, (result, value, key) => {
     const schemaProp = properties[key];
     if (schemaProp) {
@@ -17,4 +17,7 @@ exports.filter = (name, params) => {
   }, {});
 };
 
-exports.validate = jsen(schema);
+exports.getValidator = (name) => {
+  const modelSchema = appSchema[name];
+  return jsen(modelSchema);
+};
