@@ -233,6 +233,12 @@ describe('<%name%> model', () => {
         .must.resolve.to.have.property('status', 201);
     });
 
+    it('returns 422 for invalid data', () => {
+      const invalid = _.merge({ rev: 'lol' }, fixture.valid());
+      return <%name%>Poster(invalid)
+        .must.resolve.to.have.property('status', 422);
+    });
+
     it('actually persists the data', () => {
       return single<%name%>Creator()
         .then(record => {
