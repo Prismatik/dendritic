@@ -65,7 +65,7 @@ module.exports = {
   {{^isUser}}
   create: ({{name}}) => {
     const valid = validate({{name}});
-    if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
+    if (!valid) return Promise.reject(new httpError('UNPROCESSABLE_ENTITY'));
     {{name}}.rev = uuid.v4();
     return r.table('{{pluralName}}').insert({{name}}, { returnChanges: true }).run()
     .then(rethinkdb.firstChange);
@@ -76,7 +76,7 @@ module.exports = {
     }
 
     const valid = validate({{name}});
-    if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
+    if (!valid) return Promise.reject(new httpError('UNPROCESSABLE_ENTITY'));
 
     return r.table('{{pluralName}}')
     .get({{name}}.id)
