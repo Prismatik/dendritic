@@ -7,6 +7,7 @@ const rethinkdb = require('../lib/rethinkdb');
 const schema = require('../lib/schema');
 const warnings = require('../constants/warnings');
 {{#isUser}}
+const errors = require('../constants/errors');
 const jwt = require('../lib/jwt');
 const password = require('simple-password');
 {{/isUser}}
@@ -88,6 +89,7 @@ module.exports = {
   {{/isUser}}
   {{#isUser}}
   create: ({{name}}) => {
+    if (!{{name}}.password) return Promise.reject(new httpError(422, errors.NO_PASSWORD));
     return password.create({{name}}.password, 10)
     .then(hash => {
       const data = _.merge({{name}}, { password: hash });

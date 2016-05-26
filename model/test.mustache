@@ -7,6 +7,7 @@ const fixture = require('../../fixtures/<%name%>');
 const IO = require('socket.io-client');
 <%#isUser%>
 const password = require('simple-password');
+const errors = require('../../constants/errors');
 <%/isUser%>
 <%#relationships%>
 const <%name%>Fixture = require('../../fixtures/<%name%>');
@@ -248,6 +249,22 @@ describe('<%name%> model', () => {
             .must.resolve.to.have.property('id', record.id);
         });
     });
+    <%#isUser%>
+    it('returns 422 for creation with no password', () => {
+      const invalid = fixture.valid();
+      delete invalid.password;
+      return <%name%>Poster(invalid)
+        .must.resolve.to.have.property('status', 422);
+    });
+
+    it('returns a meaningful error message for a create with no password', () => {
+      const invalid = fixture.valid();
+      delete invalid.password;
+      return <%name%>Poster(invalid)
+        .then(res => res.json())
+        .must.resolve.to.have.property('message', errors.NO_PASSWORD);
+    });
+    <%/isUser%>
     <%#relationships%>
 
     it('saves related entity (can GET using :id)', () => {
