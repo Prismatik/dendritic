@@ -235,7 +235,8 @@ describe('<%name%> model', () => {
     });
 
     it('returns 422 for invalid data', () => {
-      const invalid = _.merge({ rev: 'lol' }, fixture.valid());
+      const invalid = fixture.valid();
+      invalid.rev = 'lol';
       return <%name%>Poster(invalid)
         .must.resolve.to.have.property('status', 422);
     });

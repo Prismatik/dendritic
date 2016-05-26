@@ -1,7 +1,21 @@
 const generate = require('json-schema-faker');
 const appSchema = require('../schema.js').getSchema();
 const schema = appSchema.{{name}};
+{{#isUser}}
+const bandname = require('bandname');
+{{/isUser}}
 
+{{^isUser}}
 module.exports = {
   valid: () => generate(schema)
 };
+{{/isUser}}
+{{#isUser}}
+module.exports = {
+  valid: () => {
+    const user = generate(schema);
+    user.password = bandname();
+    return user;
+  }
+};
+{{/isUser}}
