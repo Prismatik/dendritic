@@ -2,6 +2,7 @@
 const fetch = require('node-fetch');
 const querystring = require('querystring');
 const _ = require('lodash');
+const uuid = require('uuid');
 const fixture = require('../../fixtures/<%name%>');
 const IO = require('socket.io-client');
 <%#isUser%>
@@ -274,10 +275,10 @@ describe('<%name%> model', () => {
     });
 
     it('rejects a <%name%> with a faulty rev', () => {
-      const update = { name: 'Something else', rev: 'foo' };
+      const update = { name: 'Something else', rev: uuid.v4() };
       return single<%name%>Creator()
         .then(body => putter(`/<%pluralName%>/${body.id}`)(_.merge(body, update)))
-        .then(res => res.status.must.equal(422));
+        .then(res => res.status.must.equal(400));
     });
     <%#isUser%>
 
