@@ -31,7 +31,6 @@ exec(['node', index, 'controller', controllerName2, '-s', controllerName1].join(
 exec(['node', index, 'user', userName, '-m', controllerName2].join(' '), opts);
 if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
 exec(['cp', 'example.env', '.env'].join(' '), opts);
-exec(['cp', 'default.env', '.env.default'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
 exec(['npm', 'run', 'testredbeard'].join(' '), _.omit(opts, 'cwd'));
 exec(['./node_modules/.bin/eslint', './redbeard_tests/'].join(' '), _.omit(opts, 'cwd'));
