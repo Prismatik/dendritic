@@ -1,22 +1,22 @@
-const fs = require('fs');
 const cors = require('cors');
 const app = require('express')();
 const bodyParser = require('body-parser');
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
+const routes = require('./routes');
+const middleware = require('./middleware');
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
-fs.readdirSync('./middleware').forEach(name => {
-  const middleware = require(`./middleware/${name}`);
+middleware.forEach(middleware => {
   if (middleware.http) app.use(middleware.http);
   if (middleware.socket) io.use(middleware.socket);
 });
 
-fs.readdirSync('./routes').forEach(name => {
-  const route = require(`./routes/${name}`);
+routes.forEach(route => {
   app.use(route.http);
   route.socket(io);
 });

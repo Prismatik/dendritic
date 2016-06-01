@@ -2,12 +2,13 @@ const path = require('path');
 require('app-module-path').addPath(path.join(__dirname, '..'));
 require('dotenv-safe').load({ sample: './example.env' });
 
-const fs = require('fs');
 const os = require('os');
 const _ = require('lodash');
 const r = require('lib/db');
 
 const table = r.table('_migrations');
+
+const migrationFiles = require('migrations');
 
 const applyMigration = (migrations, then) => {
   if (migrations.length === 0) return Promise.resolve();
@@ -18,14 +19,6 @@ const applyMigration = (migrations, then) => {
   })
   .then(() => {
     return applyMigration(migrations, then);
-  });
-};
-
-const getMigrationFiles = () => {
-  return fs.readdirSync('./migrations').filter(file => {
-    return file.indexOf('.js') > -1;
-  }).map(file => {
-    return file;
   });
 };
 
@@ -55,8 +48,6 @@ const getMigrationRecords = () => {
 
 module.exports = {
   up: () => {
-    const migrationFiles = getMigrationFiles();
-
     if (migrationFiles.length < 1) return Promise.resolve();
 
     return acquireMutex()
@@ -76,8 +67,6 @@ module.exports = {
     .then(releaseMutex);
   },
   down: (backstop) => {
-    const migrationFiles = getMigrationFiles();
-
     if (migrationFiles.length < 1) return Promise.resolve();
 
     migrationFiles.splice(0, migrationFiles.indexOf(backstop));

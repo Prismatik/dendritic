@@ -17,6 +17,7 @@ module.exports = (opts) => {
     { p: 'lib', n: 'db' },
     { p: 'lib', n: 'db_helper' },
     { p: 'lib', n: 'migrate' },
+    { p: 'lib', n: 'util' },
     { n: 'index' },
     { n: 'package', e: 'json' },
     { n: 'schema' },
@@ -24,7 +25,11 @@ module.exports = (opts) => {
     { n: 'start' },
     { p: 'routes', n: 'jwt' },
     { p: 'routes', n: 'schema' },
+    { p: 'routes', n: 'index' },
+    { p: 'middleware', n: 'index' },
     { p: 'tables', n: 'migrations' },
+    { p: 'tables', n: 'index' },
+    { p: 'migrations', n: 'index' },
     { p: 'test', n: 'helper' },
     { p: 'test', n: 'mocha.opts', t: 'mocha', e: 'opts' },
     { p: 'test/routes', n: 'jwt_test' },
@@ -35,9 +40,7 @@ module.exports = (opts) => {
   scaffold({ basePath: __dirname, files, mustacheOpts: opts });
 
   [
-    'middleware',
-    'migrations',
-    'routes',
+    'env',
     'schemas'
   ].forEach(dir => mkdirp.sync(dir));
 
