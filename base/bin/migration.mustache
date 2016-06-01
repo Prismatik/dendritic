@@ -12,7 +12,7 @@ const migrationTestTemplate = fs.readFileSync('./bin/migration_template_test.mus
 const migrationFile = mustache.render(migrationTemplate, opts);
 const migrationTest = mustache.render(migrationTestTemplate, opts);
 
-['./migrations/', './test/migrations'].forEach(p => {
+['./migrations/', './test/migrations/'].forEach(p => {
   try {
     fs.mkdirSync(p);
   } catch (e) {
