@@ -12,12 +12,13 @@ const migrationTestTemplate = fs.readFileSync('./bin/migration_template_test.mus
 const migrationFile = mustache.render(migrationTemplate, opts);
 const migrationTest = mustache.render(migrationTestTemplate, opts);
 
-try {
-  fs.mkdirSync('./migrations/');
-  fs.mkdirSync('./test/migrations/');
-} catch (e) {
-  if (e.code !== 'EEXIST') throw e;
-}
+['./migrations/', './test/migrations'].forEach(p => {
+  try {
+    fs.mkdirSync(p);
+  } catch (e) {
+    if (e.code !== 'EEXIST') throw e;
+  }
+});
 
 fs.writeFileSync(`./migrations/${migrationName}.js`, migrationFile);
 fs.writeFileSync(`./test/migrations/${migrationName}.js`, migrationTest);
