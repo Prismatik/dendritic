@@ -1,9 +1,22 @@
 const fs = require('fs');
+const path = require('path');
+const _ = require('lodash');
 
 module.exports = {
-  slurp: path => {
-    const files = fs.readdirSync(`./${path}`);
-    const filtered = files.filter(file => file !== 'index.js');
-    return filtered.map(name => require(`${path}/${name}`));
+  slurp: (filepath, ext) => {
+    const files = fs.readdirSync(`./${filepath}`);
+    const filtered = files
+      .filter(file => file !== 'index.js')
+      .filter(file => {
+        return ext ? path.parse(file).ext === `.${ext}` : true;
+      });
+    return {
+      arr: filtered.map(filename => require(`${filepath}/${filename}`)),
+      obj: filtered.reduce((r, filename) => {
+        const name = _.camelCase(path.parse(filename).name);
+        r[name] = require(`${filepath}/${filename}`);
+        return r;
+      }, {})
+    };
   }
 };

@@ -21,6 +21,7 @@ module.exports = (opts) => {
     { n: 'index' },
     { n: 'package', e: 'json' },
     { n: 'schema' },
+    { p: 'schemas', n: 'index' },
     { n: 'setup' },
     { n: 'start' },
     { p: 'routes', n: 'jwt' },
@@ -40,8 +41,7 @@ module.exports = (opts) => {
   scaffold({ basePath: __dirname, files, mustacheOpts: opts });
 
   [
-    'env',
-    'schemas'
+    'env'
   ].forEach(dir => mkdirp.sync(dir));
 
   const modulesDir = path.join(process.cwd(), 'node_modules');
