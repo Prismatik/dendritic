@@ -13,8 +13,6 @@ module.exports = (opts) => {
     { p: 'bin', n: 'migration_template_test', e: 'mustache' },
     { n: 'Dockerfile', e: '' },
     { n: 'docker-compose', e: 'yml' },
-    { p: 'env', n: 'base' },
-    { p: 'env', n: 'db' },
     { n: 'dotenv', t: 'example.env', e: '' },
     { p: 'lib', n: 'db' },
     { p: 'lib', n: 'db_helper' },
@@ -37,7 +35,6 @@ module.exports = (opts) => {
   scaffold({ basePath: __dirname, files, mustacheOpts: opts });
 
   [
-    'env',
     'middleware',
     'migrations',
     'routes',

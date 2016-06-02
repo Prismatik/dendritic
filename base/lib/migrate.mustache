@@ -1,7 +1,6 @@
 const path = require('path');
-require('dotenv').config();
 require('app-module-path').addPath(path.join(__dirname, '..'));
-require('required_env')(require('env/db'));
+require('dotenv-safe').load({ sample: './example.env' });
 
 const fs = require('fs');
 const os = require('os');

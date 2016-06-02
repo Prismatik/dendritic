@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv-safe').load({ sample: './example.env' });
 require('must');
 
 const path = require('path');
