@@ -61,7 +61,7 @@ effectively just a special type of controller / schema i.e.
 ### Creating Users
 
 ```
-redbeard user model-name-singular
+redbeard user model_name_singular
 ```
 
 This will create a controller (as above) but with additions to cater for a
