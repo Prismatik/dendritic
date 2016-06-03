@@ -1,6 +1,8 @@
 require('dotenv-safe').load({ sample: './example.env' });
 require('app-module-path').addPath(__dirname);
 
+const bunyan = require('bunyan');
+const log = bunyan.createLogger({ name: '{{kebabCase}}', level: process.env.LOG_LEVEL });
 const setup = require('./setup');
 
 setup()
@@ -10,6 +12,6 @@ setup()
     const host = server.address().address;
     const port = server.address().port;
 
-    console.log('{{camelCase}} API listening at http://%s:%s', host, port);
+    log.info('{{camelCase}} API listening at http://%s:%s', host, port);
   });
 });

@@ -5,6 +5,7 @@ services:
     environment:
       RETHINK_HOST: rethinkdb
       SHELL: /bin/sh
+      LOG_LEVEL: fatal
     volumes:
       - ./base:/opt/app/base
       - ./model:/opt/app/model

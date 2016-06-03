@@ -484,11 +484,11 @@ describe('<%camelCase%> model', () => {
     });
 
     it('emits a warning on an unchangefeedable query', () => {
-      return <%name%>Creator(2)
+      return <%camelCase%>Creator(2)
         .then(() => {
           return new Promise(resolve => {
             const opts = { query: { limit: 1 }, forceNew: true };
-            const io = IO(`${url}/<%pluralName%>`, opts);
+            const io = IO(`${url}/<%kebabCasePlural%>`, opts);
             let warned = false;
             io.on('warning', (warn) => {
               if (warn === warnings.RESTRICTED_FEED) warned = true;

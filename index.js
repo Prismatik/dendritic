@@ -3,6 +3,6 @@ const path = require('path');
 const opts = require('./lib/yargs');
 const log = require('loglevel');
 
-log.setLevel(process.env.LOG_LEVEL || 'info');
+log.setLevel(process.env.REDBEARD_LOG_LEVEL || 'info');
 
 require(path.resolve(__dirname, opts.command))(opts);

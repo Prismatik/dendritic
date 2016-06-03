@@ -1,6 +1,8 @@
 const _ = require('lodash');
 const httpError = require('standard-http-error');
 const uuid = require('uuid');
+const bunyan = require('bunyan');
+const log = bunyan.createLogger({ name: '{{kebabCase}}', level: process.env.LOG_LEVEL });
 const r = require('../lib/db');
 const model = require('../lib/model');
 const rethinkdb = require('../lib/rethinkdb');
@@ -59,7 +61,7 @@ module.exports = {
 
     if (!rethinkdb.isChangeFeedable(query)) {
       warns.push(warnings.RESTRICTED_FEED);
-      console.log(warnings.RESTRICTED_FEED);
+      log.warn(warnings.RESTRICTED_FEED);
       query = table.getAll(r.args(query.getField('id').coerceTo('array')));
     }
 
