@@ -1,5 +1,6 @@
 const fs = require('fs');
 const rimraf = require('rimraf');
+const mkdirp = require('mkdirp');
 const captainsLog = require('../../lib/captains_log');
 
 const root = process.cwd();
@@ -9,6 +10,7 @@ const logPath = `${root}/redbeard_tests/captains_log`;
 describe.only('lib/captainsLog', () => {
   let origwd = '';
   before(() => {
+    mkdirp.sync(outputPath);
     origwd = process.cwd();
     process.chdir(outputPath);
   });
