@@ -45,6 +45,7 @@ module.exports = {
     });
   },
   watch: (params) => {
+    const warns = [];
     params = model.normaliseParams(params);
     const queryParams = schema.filter('{{camelCase}}', params);
 
@@ -57,11 +58,15 @@ module.exports = {
     query = rethinkdb.addTransformations(query, indexes, params);
 
     if (!rethinkdb.isChangeFeedable(query)) {
+      warns.push(warnings.RESTRICTED_FEED);
       console.log(warnings.RESTRICTED_FEED);
       query = table.getAll(r.args(query.getField('id').coerceTo('array')));
     }
 
-    return query.changes(changes).run();
+    return Promise.resolve({
+      warns,
+      query: query.changes(changes).run()
+    });
   },
   {{^isUser}}
   create: ({{camelCase}}) => {
