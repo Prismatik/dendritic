@@ -1,0 +1,14 @@
+const fixture = require('fixtures/{{snakeCase}}');
+const schema = require('lib/schema');
+const validate = schema.getValidator('{{camelCase}}');
+
+describe('fixtures/{{camelCase}}', () => {
+  describe('valid', () => {
+    it('should return a valid model', () => {
+      validate(fixture.valid()).must.be.true();
+    });
+    it('should omit things if asked', () => {
+      fixture.valid(['name']).must.not.have.property('name');
+    });
+  });
+});

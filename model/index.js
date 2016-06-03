@@ -19,6 +19,7 @@ module.exports = (opts) => {
     { n: 'model', d: 'models', t: opts.snakeCase },
     { n: 'controller', d: 'controllers', t: opts.snakeCase },
     { n: 'test', d: 'test/models', t: `${opts.snakeCase}_test` },
+    { n: 'test/fixture', d: 'test/fixtures', t: `${opts.snakeCase}_test` },
     { n: 'route', d: 'routes', t: opts.snakeCase },
     { n: 'table', d: 'tables', t: opts.snakeCase },
     { n: 'fixture', d: 'fixtures', t: opts.snakeCase },
