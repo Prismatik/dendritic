@@ -1,11 +1,15 @@
-const fetch = require('node-fetch');
 const schema = require('schema').getSchema();
-const url = `http://localhost:${process.env.PORT}/schema`;
+
+const app = require('../../index').app;
+const agent = require('doubleagent')(app);
+
+const url = `/schema`;
 
 describe('/schema route', () => {
   it('must GET the schema data', () => {
-    return fetch(url)
-      .then(res => res.json())
-      .must.resolve.eql(schema);
+    return agent.get(url)
+    .then(({ body }) => {
+      body.must.eql(schema);
+    });
   });
 });

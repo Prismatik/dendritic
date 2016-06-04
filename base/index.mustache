@@ -33,4 +33,7 @@ process.on('unhandledRejection', (reason, p) => {
   log.error('Unhandled Rejection at: Promise ', p, ' reason: ', reason);
 });
 
-module.exports = server;
+module.exports = {
+  server,
+  app
+};

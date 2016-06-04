@@ -1,5 +1,6 @@
 {{=<% %>=}}
-const fetch = require('node-fetch');
+const app = require('../../index').app;
+const agent = require('doubleagent')(app);
 const querystring = require('querystring');
 const _ = require('lodash');
 const uuid = require('uuid');
@@ -37,28 +38,22 @@ const desc = (a, b) => {
 };
 
 const unwrapOldVal = (res) => {
-  return res.json()
-  .then(json => json.old_val);
+  return res.body.old_val;
 };
 
 const unwrapJSON = (res) => {
-  return res.json()
-  .then(json => json.result);
+  return res.body.result;
 };
 
 const getJSON = (path) => {
-  return fetch(url + path)
+  return agent.get(path)
   .then(unwrapJSON);
 };
 
 const sender = method => path => data => {
-  return fetch(url + path, {
-    method,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
+  return agent[method](path, data, {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
   });
 };
 
@@ -66,11 +61,8 @@ const poster = sender('post');
 const putter = sender('put');
 
 const deleter = path => () => {
-  return fetch(url + path, {
-    method: 'delete',
-    headers: {
-      Accept: 'application/json'
-    }
+  return agent.delete(path, {}, {
+    Accept: 'application/json'
   });
 };
 
@@ -117,15 +109,16 @@ describe('<%camelCase%> model', () => {
   describe('GET /<%kebabCasePlural%>', () => {
     it('returns 200 ok', () => {
       return single<%pascalCase%>Creator()
-        .then(() => fetch(`${url}/<%kebabCasePlural%>`))
+        .then(() => agent.get(`/<%kebabCasePlural%>`))
         .must.resolve.to.have.property('status', 200);
     });
 
     it('return an object with a .result property', () => {
       return single<%pascalCase%>Creator()
-        .then(() => fetch(`${url}/<%kebabCasePlural%>`))
-        .then(res => res.json())
-        .must.resolve.to.be.object();
+        .then(() => agent.get(`/<%kebabCasePlural%>`))
+        .then(({ body }) => {
+          body.must.have.property('result');
+        });
     });
 
     it('accepts search params in the querystring', () => {
@@ -195,31 +188,28 @@ describe('<%camelCase%> model', () => {
 
     it('returns n matching docs with a count of all matching docs', () => {
       return <%camelCase%>Creator(10)
-        .then(() => fetch(`${url}/<%kebabCasePlural%>?count=true&limit=5`))
-        .then(res => res.json())
-        .then(json => {
-          json.result.must.have.length(5);
-          json.count.must.be.gt(5);
+        .then(() => agent.get(`/<%kebabCasePlural%>?count=true&limit=5`))
+        .then(({ body }) => {
+          body.result.must.have.length(5);
+          body.count.must.be.gt(5);
         });
     });
 
     it('returns n matching docs without a count of all matching docs ', () => {
       return <%camelCase%>Creator(10)
-        .then(() => fetch(`${url}/<%kebabCasePlural%>?limit=5`))
-        .then(res => res.json())
-        .then(json => {
-          json.result.must.have.length(5);
-          json.must.not.have.property('count');
+        .then(() => agent.get(`/<%kebabCasePlural%>?limit=5`))
+        .then(({ body }) => {
+          body.result.must.have.length(5);
+          body.must.not.have.property('count');
         });
     });
 
     it('returns only a count with no matching docs', () => {
       return <%camelCase%>Creator(10)
-        .then(() => fetch(`${url}/<%kebabCasePlural%>?count=true&result=false`))
-        .then(res => res.json())
-        .then(json => {
-          json.must.not.have.property('result');
-          json.count.must.be.gt(5);
+        .then(() => agent.get(`/<%kebabCasePlural%>?count=true&result=false`))
+        .then(({ body }) => {
+          body.must.not.have.property('result');
+          body.count.must.be.gt(5);
         });
     });
   });
@@ -227,7 +217,7 @@ describe('<%camelCase%> model', () => {
   describe('GET /<%kebabCasePlural%>/:id', () => {
     it('returns 200 with the record data', () => {
       return single<%pascalCase%>Creator()
-        .then(record => fetch(`${url}/<%kebabCasePlural%>/${record.id}`))
+        .then(record => agent.get(`/<%kebabCasePlural%>/${record.id}`))
         .must.resolve.to.have.property('status', 200);
     });
   });
@@ -264,15 +254,16 @@ describe('<%camelCase%> model', () => {
       const invalid = fixture.valid();
       delete invalid.password;
       return <%camelCase%>Poster(invalid)
-        .then(res => res.json())
-        .must.resolve.to.have.property('message', errors.NO_PASSWORD);
+        .then(({ body }) => {
+          body.must.have.property('message', errors.NO_PASSWORD);
+        });
     });
     <%/isUser%>
     <%#relationships%>
 
     it('saves related entity (can GET using :id)', () => {
       return single<%pascalCase%>Creator()
-        .then(body => fetch(`${url}/<%kebabCasePlural%>/${body.id}`))
+        .then(body => agent.get(`/<%kebabCasePlural%>/${body.id}`))
         .must.resolve.to.have.property('status', 200);
     });
     <%/relationships%>
@@ -326,8 +317,10 @@ describe('<%camelCase%> model', () => {
       return single<%pascalCase%>Creator()
         .then(body => deleter(`/<%kebabCasePlural%>/${body.id}`)())
         .then(unwrapOldVal)
-        .then(body => fetch(`${url}/<%kebabCasePlural%>/${body.id}`))
-        .must.resolve.to.have.property('status', 404);
+        .then(body => agent.get(`/<%kebabCasePlural%>/${body.id}`))
+        .then(res => {
+          res.must.have.property('status', 404);
+        });
     });
   });
 
@@ -337,8 +330,9 @@ describe('<%camelCase%> model', () => {
       const signin = poster('/<%kebabCasePlural%>/signin');
       return signin({ email: 'notexist@example.com', password: 'ABCD1234' })
         .then(statusEquals(401))
-        .then(res => res.json())
-        .must.resolve.to.have.property('message', 'Unauthorized');
+        .then(({ body }) => {
+          body.must.have.property('message', 'Unauthorized');
+        });
     });
 
     it('returns 401 response with incorrect password', () => {
@@ -349,8 +343,9 @@ describe('<%camelCase%> model', () => {
         const signin = poster('/<%kebabCasePlural%>/signin');
         return signin({ email: data.email, password: 'ABCD1234' })
           .then(statusEquals(401))
-          .then(res => res.json())
-          .must.resolve.to.have.property('message', 'Unauthorized');
+          .then(({ body }) => {
+            body.must.have.property('message', 'Unauthorized');
+          });
       });
     });
 
@@ -363,11 +358,10 @@ describe('<%camelCase%> model', () => {
         const signin = poster('/<%kebabCasePlural%>/signin');
         return signin({ email: data.email, password: data.password })
           .then(statusEquals(200))
-          .then(res => res.json())
-          .then(json => {
-            json.found.must.be.true();
-            json.result.token.must.not.be.null();
-            json.result.user.must.eql(_.omit(user, 'password'));
+          .then(({ body }) => {
+            body.found.must.be.true();
+            body.result.token.must.not.be.null();
+            body.result.user.must.eql(_.omit(user, 'password'));
           });
       });
     });
