@@ -8,6 +8,7 @@ const IO = require('socket.io-client');
 <%#isUser%>
 const password = require('simple-password');
 const errors = require('../../constants/errors');
+const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
 <%/isUser%>
 const warnings = require('../../constants/warnings');
 <%#relationships%>
@@ -83,7 +84,7 @@ const <%camelCase%>Creator = times => {
     .then(unwrapJSON);
     <%/isUser%>
     <%#isUser%>
-    return password.create(data.password, 10)
+    return password.create(data.password, HASH_ROUNDS)
     .then(pass => {
       data.password = pass;
       return <%camelCase%>Poster(data)
