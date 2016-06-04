@@ -1,9 +1,8 @@
-const db = require('lib/db_helper');
-
 const r = require('lib/db');
 const migrate = require('lib/migrate');
 const schema = require('schema');
-const DB_NAME = db.getName();
+
+const DB_NAME = process.env.RETHINK_NAME;
 
 const tables = require('./tables');
 

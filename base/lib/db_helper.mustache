@@ -1,4 +1,0 @@
-exports.getName = function getDbName() {
-  const suffix = process.env.NODE_ENV === 'test' ? '_test' : '';
-  return `${process.env.RETHINK_NAME}${suffix}`;
-};

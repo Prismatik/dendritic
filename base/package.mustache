@@ -8,7 +8,7 @@
     "migrate": "node ./bin/migrate.js",
     "migration": "node ./bin/migration.js",
     "start": "node start",
-    "test": "mocha",
+    "test": "RETHINK_NAME={{snakeCasePlural}}_test mocha",
     "watch": "mocha --watch",
     "dockertest": "docker-compose run {{snakeCasePlural}} npm test",
     "dockerwatch": "docker-compose run {{snakeCasePlural}} npm run watch"

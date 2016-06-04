@@ -15,7 +15,6 @@ module.exports = (opts) => {
     { n: 'docker-compose', e: 'yml' },
     { n: 'dotenv', t: 'example.env', e: '' },
     { p: 'lib', n: 'db' },
-    { p: 'lib', n: 'db_helper' },
     { p: 'lib', n: 'migrate' },
     { p: 'lib', n: 'util' },
     { n: 'index' },
