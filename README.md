@@ -4,6 +4,18 @@
 Redbeard is a scaffolder and _light_ framework for HTTP APIs. It will give you
 the bones of an API using JSON Schema, Express and RethinkDB.
 
+Redbeard is designed to work in the Pirate stack, hence the name: Redbeard The Pirate.
+
+If you're unfamiliar, the Pirate stack is made up of:
+
+* REST
+* RethinkDB
+* React
+* Redux
+* Realtime
+
+(Get it? RRRRR)
+
 ## Development
 
 ### Requirements
