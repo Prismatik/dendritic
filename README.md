@@ -96,7 +96,6 @@ variables leak to prod.
 
 ## TODO
 
-* Add text explaining the assertion to all of the test assertions
 * Make it optional whether to use Auth or an internal user store
 * Add generator for auth middleware(s)
 * Investigate a graphql implementation
