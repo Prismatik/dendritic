@@ -6,14 +6,15 @@ const r = require('lib/db');
 let schemaIndexes = {};
 
 const appSchema = fs.readdirSync('./schemas').reduce((s, file) => {
-  const name = file.split('.json')[0];
+  const snakeCase = file.split('.json')[0];
+  const name = _.camelCase(snakeCase);
   s[name] = require(`./schemas/${file}`);
   return s;
 }, {});
 
-const getIndexes = tableName => {
-  return r.table(tableName).indexList().run()
-    .then(indexes => [tableName, indexes.concat('id')]);
+const getIndexes = snakeCasePlural => {
+  return r.table(snakeCasePlural).indexList().run()
+    .then(indexes => [snakeCasePlural, indexes.concat('id')]);
 };
 
 // Note: This only adds the .indexed property to the schema's top level
@@ -28,7 +29,7 @@ const indexModel = (indexes, properties) => {
 
 const transformSchema = (indexes, schema) => {
   return _.mapValues(schema, (model) => {
-    const modelIndexes = indexes[model.pluralName];
+    const modelIndexes = indexes[model.camelCasePlural];
     model.properties = indexModel(modelIndexes, model.properties);
     return deref(model);
   });

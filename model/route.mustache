@@ -1,6 +1,6 @@
 const Router = require('express').Router;
 const _ = require('lodash');
-const controller = require('../controllers/{{name}}.js');
+const controller = require('../controllers/{{snakeCase}}.js');
 
 const router = Router();
 
@@ -23,7 +23,7 @@ const respond = (res, status) => body => {
 module.exports = {
   http: router,
   socket: io => {
-    const nsp = io.of('/{{pluralName}}');
+    const nsp = io.of('/{{kebabCasePlural}}');
     nsp.on('connection', socket => {
       controller.watch(socket.handshake.query)
       .then(cursor => {
@@ -38,27 +38,27 @@ module.exports = {
 };
 
 router
-  .get('/{{pluralName}}', (req, res) => {
+  .get('/{{kebabCasePlural}}', (req, res) => {
     controller.get(req.query)
     .then(respond(res))
     .catch(errHandlerFactory(res));
   })
-  .get('/{{pluralName}}/:id', (req, res) => {
+  .get('/{{kebabCasePlural}}/:id', (req, res) => {
     controller.get(_.assign({ id: req.params.id }, req.query))
     .then(respond(res))
     .catch(errHandlerFactory(res));
   })
-  .post('/{{pluralName}}', (req, res) => {
+  .post('/{{kebabCasePlural}}', (req, res) => {
     controller.create(req.body)
     .then(respond(res, 201))
     .catch(errHandlerFactory(res));
   })
-  .put('/{{pluralName}}/:id', (req, res) => {
+  .put('/{{kebabCasePlural}}/:id', (req, res) => {
     controller.update(req.body)
     .then(respond(res))
     .catch(errHandlerFactory(res));
   })
-  .delete('/{{pluralName}}/:id', (req, res) => {
+  .delete('/{{kebabCasePlural}}/:id', (req, res) => {
     controller.delete(req.params.id)
     .then(respond(res))
     .catch(errHandlerFactory(res));
@@ -66,12 +66,12 @@ router
 
 {{#isUser}}
 router
-  .post('/{{pluralName}}/signin', (req, res) => {
+  .post('/{{kebabCasePlural}}/signin', (req, res) => {
     controller.signin(req.body.email, req.body.password)
     .then(respond(res))
     .catch(errHandlerFactory(res));
   })
-  .post('/{{pluralName}}/signout', (req, res) => {
+  .post('/{{kebabCasePlural}}/signout', (req, res) => {
     controller.signout(req.body)
     .then(respond(res))
     .catch(errHandlerFactory(res));

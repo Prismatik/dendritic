@@ -13,15 +13,15 @@ const password = require('simple-password');
 {{/isUser}}
 
 const appSchema = require('../schema').getSchema();
-const modelSchema = appSchema.{{name}};
-const validate = schema.getValidator('{{name}}');
+const modelSchema = appSchema.{{camelCase}};
+const validate = schema.getValidator('{{camelCase}}');
 
 module.exports = {
   get: (params) => {
     params = _.assign({ result: true }, model.normaliseParams(params));
-    const queryParams = schema.filter('{{name}}', params);
+    const queryParams = schema.filter('{{camelCase}}', params);
 
-    const table = r.table('{{pluralName}}');
+    const table = r.table('{{snakeCasePlural}}');
     const indexes = model.getIndexes(modelSchema, queryParams);
     const indexBy = _.contains(indexes, 'id') ? 'id' : indexes[0];
 
@@ -46,10 +46,10 @@ module.exports = {
   },
   watch: (params) => {
     params = model.normaliseParams(params);
-    const queryParams = schema.filter('{{name}}', params);
+    const queryParams = schema.filter('{{camelCase}}', params);
 
     const changes = { includeInitial: true, includeStates: true };
-    const table = r.table('{{pluralName}}');
+    const table = r.table('{{snakeCasePlural}}');
     const indexes = model.getIndexes(modelSchema, queryParams);
     const indexBy = _.contains(indexes, 'id') ? 'id' : indexes[0];
 
@@ -64,63 +64,63 @@ module.exports = {
     return query.changes(changes).run();
   },
   {{^isUser}}
-  create: ({{name}}) => {
-    const valid = validate({{name}});
+  create: ({{camelCase}}) => {
+    const valid = validate({{camelCase}});
     if (!valid) return Promise.reject(new httpError('UNPROCESSABLE_ENTITY'));
-    {{name}}.rev = uuid.v4();
-    return r.table('{{pluralName}}').insert({{name}}, { returnChanges: true }).run()
+    {{camelCase}}.rev = uuid.v4();
+    return r.table('{{snakeCasePlural}}').insert({{camelCase}}, { returnChanges: true }).run()
     .then(rethinkdb.firstChange);
   },
-  update: ({{name}}) => {
-    if (!{{name}}.rev) {
+  update: ({{camelCase}}) => {
+    if (!{{camelCase}}.rev) {
       return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
     }
 
-    const valid = validate({{name}});
+    const valid = validate({{camelCase}});
     if (!valid) return Promise.reject(new httpError('UNPROCESSABLE_ENTITY'));
 
-    return r.table('{{pluralName}}')
-    .get({{name}}.id)
-    .update(rethinkdb.ifRevMatches({{name}}), { returnChanges: true })
+    return r.table('{{snakeCasePlural}}')
+    .get({{camelCase}}.id)
+    .update(rethinkdb.ifRevMatches({{camelCase}}), { returnChanges: true })
     .run()
     .then(rethinkdb.checkRevError)
     .then(rethinkdb.firstChange);
   },
   {{/isUser}}
   {{#isUser}}
-  create: ({{name}}) => {
-    if (!{{name}}.password) return Promise.reject(new httpError(422, errors.NO_PASSWORD));
-    return password.create({{name}}.password, 10)
+  create: ({{camelCase}}) => {
+    if (!{{camelCase}}.password) return Promise.reject(new httpError(422, errors.NO_PASSWORD));
+    return password.create({{camelCase}}.password, 10)
     .then(hash => {
-      const data = _.merge({{name}}, { password: hash });
-      const valid = validate({{name}});
+      const data = _.merge({{camelCase}}, { password: hash });
+      const valid = validate({{camelCase}});
       if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
-      {{name}}.rev = uuid.v4();
-      return r.table('{{pluralName}}').insert(data, { returnChanges: true }).run()
+      {{camelCase}}.rev = uuid.v4();
+      return r.table('{{snakeCasePlural}}').insert(data, { returnChanges: true }).run()
       .then(rethinkdb.firstChange);
     });
   },
-  update: ({{name}}) => {
-    if (!{{name}}.rev) {
+  update: ({{camelCase}}) => {
+    if (!{{camelCase}}.rev) {
       return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
     }
     let getHash;
-    if ({{name}}.password) getHash = password.create({{name}}.password, 10);
+    if ({{camelCase}}.password) getHash = password.create({{camelCase}}.password, 10);
     else getHash = Promise.resolve();
 
     return getHash.then(pass => {
-      if (pass) {{name}}.password = pass;
+      if (pass) {{camelCase}}.password = pass;
 
-      return r.table('{{pluralName}}').get({{name}}.id).run()
+      return r.table('{{snakeCasePlural}}').get({{camelCase}}.id).run()
       .then(current => {
-        const updated = Object.assign({}, current, {{name}});
+        const updated = Object.assign({}, current, {{camelCase}});
         const valid = validate(updated);
         if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
 
-        return r.table('{{pluralName}}')
-        .get({{name}}.id)
+        return r.table('{{snakeCasePlural}}')
+        .get({{camelCase}}.id)
         .update(
-          rethinkdb.ifRevMatches({{name}}),
+          rethinkdb.ifRevMatches({{camelCase}}),
           { returnChanges: true }
         )
         .run()
@@ -131,7 +131,7 @@ module.exports = {
   },
   {{/isUser}}
   delete: (id) => {
-    return r.table('{{pluralName}}').get(id).delete({ returnChanges: true }).run()
+    return r.table('{{snakeCasePlural}}').get(id).delete({ returnChanges: true }).run()
     .then(res => {
       return res;
     })
@@ -139,7 +139,7 @@ module.exports = {
   {{#isUser}}
   },
   signin: (email, pass) => {
-    const table = r.table('{{pluralName}}');
+    const table = r.table('{{snakeCasePlural}}');
     const params = { email };
     const indexes = model.getIndexes(modelSchema, params);
     const indexBy = _.contains(indexes, 'email') ? 'email' : null;

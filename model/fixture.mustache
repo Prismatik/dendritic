@@ -1,6 +1,6 @@
 const generate = require('json-schema-faker');
 const appSchema = require('../schema.js').getSchema();
-const schema = appSchema.{{name}};
+const schema = appSchema.{{camelCase}};
 {{#isUser}}
 const bandname = require('bandname');
 {{/isUser}}
