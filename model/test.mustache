@@ -176,7 +176,7 @@ describe('<%camelCase%> model', () => {
         .then(results => {
           const reordered = _.clone(results).sort(asc);
 
-          _.pluck(reordered, 'id').must.eql(_.pluck(results, 'id'));
+          _.map(reordered, 'id').must.eql(_.map(results, 'id'));
         });
     });
 
@@ -187,7 +187,7 @@ describe('<%camelCase%> model', () => {
         .then(results => {
           const reordered = _.clone(results).sort(desc);
 
-          _.pluck(reordered, 'id').must.eql(_.pluck(results, 'id'));
+          _.map(reordered, 'id').must.eql(_.map(results, 'id'));
         });
     });
 

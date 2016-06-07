@@ -21,7 +21,7 @@
     "dockerwatch": "docker-compose run redbeard npm run watch"
   },
   "dependencies": {
-    "lodash": "^3.10.1",
+    "lodash": "^4.13.1",
     "mkdirp": "^0.5.1",
     "mustache": "^2.2.0",
     "pluralize": "^1.2.1",

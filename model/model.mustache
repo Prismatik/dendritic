@@ -23,7 +23,7 @@ module.exports = {
 
     const table = r.table('{{snakeCasePlural}}');
     const indexes = model.getIndexes(modelSchema, queryParams);
-    const indexBy = _.contains(indexes, 'id') ? 'id' : indexes[0];
+    const indexBy = _.includes(indexes, 'id') ? 'id' : indexes[0];
 
     const query = rethinkdb.buildQuery(table, indexBy, queryParams);
     const tranformedQuery = rethinkdb.addTransformations(query, indexes, params);
@@ -51,7 +51,7 @@ module.exports = {
     const changes = { includeInitial: true, includeStates: true };
     const table = r.table('{{snakeCasePlural}}');
     const indexes = model.getIndexes(modelSchema, queryParams);
-    const indexBy = _.contains(indexes, 'id') ? 'id' : indexes[0];
+    const indexBy = _.includes(indexes, 'id') ? 'id' : indexes[0];
 
     let query = rethinkdb.buildQuery(table, indexBy, queryParams);
     query = rethinkdb.addTransformations(query, indexes, params);
@@ -142,7 +142,7 @@ module.exports = {
     const table = r.table('{{snakeCasePlural}}');
     const params = { email };
     const indexes = model.getIndexes(modelSchema, params);
-    const indexBy = _.contains(indexes, 'email') ? 'email' : null;
+    const indexBy = _.includes(indexes, 'email') ? 'email' : null;
 
     const query = rethinkdb.buildQuery(table, indexBy, params);
 
