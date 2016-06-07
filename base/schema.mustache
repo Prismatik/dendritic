@@ -28,11 +28,11 @@ const indexModel = (indexes, properties) => {
 };
 
 const transformSchema = (indexes, schema) => {
-  return _.mapValues(schema, (model) => {
+  return deref(_.mapValues(schema, (model) => {
     const modelIndexes = indexes[model.camelCasePlural];
     model.properties = indexModel(modelIndexes, model.properties);
-    return deref(model);
-  });
+    return model;
+  }));
 };
 
 exports.setIndexes = () => {
