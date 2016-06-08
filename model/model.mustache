@@ -1,6 +1,8 @@
 const _ = require('lodash');
 const httpError = require('standard-http-error');
 const uuid = require('uuid');
+const bunyan = require('bunyan');
+const log = bunyan.createLogger({ name: '{{kebabCase}}', level: process.env.LOG_LEVEL });
 const r = require('../lib/db');
 const model = require('../lib/model');
 const rethinkdb = require('../lib/rethinkdb');
@@ -45,6 +47,7 @@ module.exports = {
     });
   },
   watch: (params) => {
+    const warns = [];
     params = model.normaliseParams(params);
     const queryParams = schema.filter('{{camelCase}}', params);
 
@@ -57,11 +60,15 @@ module.exports = {
     query = rethinkdb.addTransformations(query, indexes, params);
 
     if (!rethinkdb.isChangeFeedable(query)) {
-      console.log(warnings.RESTRICTED_FEED);
+      warns.push(warnings.RESTRICTED_FEED);
+      log.warn(warnings.RESTRICTED_FEED);
       query = table.getAll(r.args(query.getField('id').coerceTo('array')));
     }
 
-    return query.changes(changes).run();
+    return Promise.resolve({
+      warns,
+      query: query.changes(changes).run()
+    });
   },
   {{^isUser}}
   create: ({{camelCase}}) => {

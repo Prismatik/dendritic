@@ -3,6 +3,8 @@ const app = require('express')();
 const bodyParser = require('body-parser');
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
+const bunyan = require('bunyan');
+const log = bunyan.createLogger({ name: '{{kebabCase}}', level: process.env.LOG_LEVEL });
 
 const routes = require('./routes');
 const middleware = require('./middleware');
@@ -28,7 +30,7 @@ app.use((err, req, res) => {
 });
 
 process.on('unhandledRejection', (reason, p) => {
-  console.error('Unhandled Rejection at: Promise ', p, ' reason: ', reason);
+  log.error('Unhandled Rejection at: Promise ', p, ' reason: ', reason);
 });
 
 module.exports = server;
