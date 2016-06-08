@@ -26,7 +26,7 @@ If you're unfamiliar, the Pirate stack is made up of:
 
 ```
 npm install -g redbeard
-mdkir my_new_project && cd my_new_project
+mkdir my_new_project && cd my_new_project
 redbeard base project_name_singular
 ```
 
