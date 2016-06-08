@@ -1,19 +1,10 @@
 const _ = require('lodash');
-const fs = require('fs');
 const deref = require('json-schema-deref-sync');
 const r = require('lib/db');
 
 let schemaIndexes = {};
-const jsonMatch = /.json$/;
 
-const appSchema = fs.readdirSync('./schemas').reduce((s, file) => {
-  if (jsonMatch.test(file)) {
-    const snakeCase = file.split('.json')[0];
-    const name = _.camelCase(snakeCase);
-    s[name] = require(`./schemas/${file}`);
-  }
-  return s;
-}, {});
+const appSchema = require('./schemas');
 
 const getIndexes = snakeCasePlural => {
   return r.table(snakeCasePlural).indexList().run()
