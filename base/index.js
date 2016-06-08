@@ -21,6 +21,7 @@ module.exports = (opts) => {
     { n: 'package', e: 'json' },
     { n: 'schema' },
     { p: 'schemas', n: 'index' },
+    { p: 'schemas', n: 'definitions', e: 'json' },
     { n: 'setup' },
     { n: 'start' },
     { p: 'routes', n: 'jwt' },
