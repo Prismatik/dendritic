@@ -2,6 +2,9 @@ const _ = require('lodash');
 const r = require('./db');
 const httpError = require('standard-http-error');
 
+const model = require('./model');
+const schema = require('./schema');
+
 const limitRegexp = /\.limit\(([^\)]*)\)/m;
 const orderByRegexp = /\.orderBy\(([^\)]*)\)/m;
 const filterRegexp = /\.filter\(([^\)]*)\)/m;
@@ -32,17 +35,35 @@ exports.addTransformations = (table, indexes, params) => {
   }, table);
 };
 
-exports.buildQuery = (table, indexBy, params) => {
+exports.queryBuilder = (tableName, modelName, params, primaryIndex = 'id') => {
+  const appSchema = require('../schema').getSchema();
+  const modelSchema = appSchema[modelName];
+
+  params = _.assign({ result: true }, model.normaliseParams(params));
+  const queryParams = schema.filter(modelName, params);
+
+  const indexes = model.getIndexes(modelSchema, queryParams);
+  const indexBy = _.includes(indexes, primaryIndex) ? primaryIndex : indexes[0];
+
+  const query = exports.buildQuery(tableName, indexBy, queryParams);
+
+  return { query, indexes, params };
+};
+
+exports.buildQuery = (tableName, indexBy, queryParams) => {
+  let query = r.table(tableName);
+
   // if only id passed, run query using .get(x)
-  if (params.id && Object.keys(params).length === 1) return table.get(params.id);
+  if (queryParams.id && Object.keys(queryParams).length === 1) return query.get(queryParams.id);
 
   if (indexBy != null) {
-    table = table.getAll(params[indexBy], { index: indexBy });
-    delete params[indexBy];
+    query = query.getAll(queryParams[indexBy], { index: indexBy });
+    delete queryParams[indexBy];
   }
 
-  if (!_.isEmpty(params)) table = table.filter(params);
-  return table;
+  if (!_.isEmpty(queryParams)) query = query.filter(queryParams);
+
+  return query;
 };
 
 // refer changefeed limitations here:-

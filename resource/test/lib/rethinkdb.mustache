@@ -6,7 +6,7 @@ describe('lib/rethinkdb', () => {
   describe('.buildQuery', () => {
     it('must return an unchanged query given no params', () => {
       const query = r.table('test');
-      const result = rethinkdb.buildQuery(query, null, {});
+      const result = rethinkdb.buildQuery('test', null, {});
 
       result.toString().must.equal(query.toString());
     });
@@ -14,7 +14,7 @@ describe('lib/rethinkdb', () => {
     it('must return a filered query given filters', () => {
       const query = r.table('test');
       const filters = { name: 'Darth Vader' };
-      const result = rethinkdb.buildQuery(query, null, filters);
+      const result = rethinkdb.buildQuery('test', null, filters);
       const expected = query.filter(filters);
 
       result.toString().must.equal(expected.toString());
@@ -23,7 +23,7 @@ describe('lib/rethinkdb', () => {
     it('must use an index when filters use an indexed property', () => {
       const query = r.table('test');
       const filters = { name: 'Darth Vader' };
-      const result = rethinkdb.buildQuery(query, 'name', filters);
+      const result = rethinkdb.buildQuery('test', 'name', filters);
       const expected = query.getAll('Darth Vader', { index: 'name' });
 
       result.toString().must.equal(expected.toString());
@@ -35,7 +35,7 @@ describe('lib/rethinkdb', () => {
         name: 'Darth Vader',
         sith: true
       };
-      const result = rethinkdb.buildQuery(query, 'name', filters);
+      const result = rethinkdb.buildQuery('test', 'name', filters);
       const expected = query.getAll('Darth Vader', { index: 'name' }).filter({ sith: true });
 
       result.toString().must.equal(expected.toString());
@@ -44,7 +44,7 @@ describe('lib/rethinkdb', () => {
     it('must use .get(x) when an id and no other params provided', () => {
       const query = r.table('test');
       const filters = { id: UUID };
-      const result = rethinkdb.buildQuery(query, null, filters);
+      const result = rethinkdb.buildQuery('test', null, filters);
       const expected = query.get(UUID);
 
       result.toString().must.equal(expected.toString());
@@ -53,7 +53,7 @@ describe('lib/rethinkdb', () => {
     it('must use .filter(x) when an id and other params provided', () => {
       const query = r.table('test');
       const filters = { id: UUID, name: 'Luke Skywalker' };
-      const result = rethinkdb.buildQuery(query, null, filters);
+      const result = rethinkdb.buildQuery('test', null, filters);
       const expected = query.filter(filters);
 
       result.toString().must.equal(expected.toString());

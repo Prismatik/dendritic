@@ -1,34 +1,24 @@
-const _ = require('lodash');
 const httpError = require('standard-http-error');
 const uuid = require('uuid');
 const bunyan = require('bunyan');
 const log = bunyan.createLogger({ name: '{{kebabCase}}', level: process.env.LOG_LEVEL });
 const r = require('../lib/db');
-const model = require('../lib/model');
 const rethinkdb = require('../lib/rethinkdb');
 const schema = require('../lib/schema');
 const warnings = require('../constants/warnings');
 {{#isUser}}
+const _ = require('lodash');
 const errors = require('../constants/errors');
 const jwt = require('../lib/jwt');
 const password = require('simple-password');
 const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
 {{/isUser}}
 
-const appSchema = require('../schema').getSchema();
-const modelSchema = appSchema.{{camelCase}};
 const validate = schema.getValidator('{{camelCase}}');
 
 module.exports = {
-  get: (params) => {
-    params = _.assign({ result: true }, model.normaliseParams(params));
-    const queryParams = schema.filter('{{camelCase}}', params);
-
-    const table = r.table('{{snakeCasePlural}}');
-    const indexes = model.getIndexes(modelSchema, queryParams);
-    const indexBy = _.includes(indexes, 'id') ? 'id' : indexes[0];
-
-    const query = rethinkdb.buildQuery(table, indexBy, queryParams);
+  get: (initialParams) => {
+    const { query, indexes, params } = rethinkdb.queryBuilder('{{snakeCasePlural}}', '{{camelCase}}', initialParams);
     const tranformedQuery = rethinkdb.addTransformations(query, indexes, params);
 
     const taggedQueries = [
@@ -47,24 +37,21 @@ module.exports = {
       }, { found: false });
     });
   },
-  watch: (params) => {
+  watch: (initialParams) => {
     const warns = [];
-    params = model.normaliseParams(params);
-    const queryParams = schema.filter('{{camelCase}}', params);
 
-    const changes = { includeInitial: true, includeStates: true };
-    const table = r.table('{{snakeCasePlural}}');
-    const indexes = model.getIndexes(modelSchema, queryParams);
-    const indexBy = _.includes(indexes, 'id') ? 'id' : indexes[0];
+    const { query: initialQuery, indexes, params } = rethinkdb.queryBuilder('{{snakeCasePlural}}', '{{camelCase}}', initialParams);
+    let query = initialQuery;
 
-    let query = rethinkdb.buildQuery(table, indexBy, queryParams);
     query = rethinkdb.addTransformations(query, indexes, params);
 
     if (!rethinkdb.isChangeFeedable(query)) {
       warns.push(warnings.RESTRICTED_FEED);
       log.warn(warnings.RESTRICTED_FEED);
-      query = table.getAll(r.args(query.getField('id').coerceTo('array')));
+      query = r.table('{{snakeCasePlural}}').getAll(r.args(query.getField('id').coerceTo('array')));
     }
+
+    const changes = { includeInitial: true, includeStates: true };
 
     return Promise.resolve({
       warns,
@@ -147,12 +134,9 @@ module.exports = {
   {{#isUser}}
   },
   signin: (email, pass) => {
-    const table = r.table('{{snakeCasePlural}}');
     const params = { email };
-    const indexes = model.getIndexes(modelSchema, params);
-    const indexBy = _.includes(indexes, 'email') ? 'email' : null;
 
-    const query = rethinkdb.buildQuery(table, indexBy, params);
+    const { query } = rethinkdb.queryBuilder('{{snakeCasePlural}}', '{{camelCase}}', params);
 
     return query.run()
     .then(users => {
