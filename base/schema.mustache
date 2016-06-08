@@ -4,11 +4,14 @@ const deref = require('json-schema-deref-sync');
 const r = require('lib/db');
 
 let schemaIndexes = {};
+const jsonMatch = /.json$/;
 
 const appSchema = fs.readdirSync('./schemas').reduce((s, file) => {
-  const snakeCase = file.split('.json')[0];
-  const name = _.camelCase(snakeCase);
-  s[name] = require(`./schemas/${file}`);
+  if (jsonMatch.test(file)) {
+    const snakeCase = file.split('.json')[0];
+    const name = _.camelCase(snakeCase);
+    s[name] = require(`./schemas/${file}`);
+  }
   return s;
 }, {});
 
