@@ -8,7 +8,7 @@ services:
       LOG_LEVEL: fatal
     volumes:
       - ./base:/opt/app/base
-      - ./model:/opt/app/model
+      - ./resource:/opt/app/resource
       - ./lib:/opt/app/lib
       - ./test:/opt/app/test
       - ./index.js:/opt/app/index.js
