@@ -6,6 +6,7 @@ services:
       RETHINK_HOST: rethinkdb
       SHELL: /bin/sh
       LOG_LEVEL: fatal
+      HASH_ROUNDS: 1
     volumes:
       - ./base:/opt/app/base
       - ./resource:/opt/app/resource

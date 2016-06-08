@@ -12,6 +12,7 @@ const warnings = require('../constants/warnings');
 const errors = require('../constants/errors');
 const jwt = require('../lib/jwt');
 const password = require('simple-password');
+const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
 {{/isUser}}
 
 const appSchema = require('../schema').getSchema();
@@ -97,7 +98,7 @@ module.exports = {
   {{#isUser}}
   create: ({{camelCase}}) => {
     if (!{{camelCase}}.password) return Promise.reject(new httpError(422, errors.NO_PASSWORD));
-    return password.create({{camelCase}}.password, 10)
+    return password.create({{camelCase}}.password, HASH_ROUNDS)
     .then(hash => {
       const data = _.merge({{camelCase}}, { password: hash });
       const valid = validate({{camelCase}});
@@ -112,7 +113,7 @@ module.exports = {
       return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
     }
     let getHash;
-    if ({{camelCase}}.password) getHash = password.create({{camelCase}}.password, 10);
+    if ({{camelCase}}.password) getHash = password.create({{camelCase}}.password, HASH_ROUNDS);
     else getHash = Promise.resolve();
 
     return getHash.then(pass => {
