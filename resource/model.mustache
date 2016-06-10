@@ -16,24 +16,11 @@ const validate = schema.getValidator('{{camelCase}}');
 module.exports = {
   get: (initialParams) => {
     const { query, indexes, params } = rethinkdb.queryBuilder('{{snakeCasePlural}}', '{{camelCase}}', initialParams);
-    const tranformedQuery = rethinkdb.addTransformations(query, indexes, params);
+    const transformedQuery = rethinkdb.addTransformations(query, indexes, params);
 
-    const taggedQueries = [
-      { tag: 'result', q: tranformedQuery },
-      { tag: 'count', q: query.count() }
-    ].filter(x => params[x.tag]);
-
-    return Promise.all(taggedQueries.map(x => x.q.run()))
-    .then(results => {
-      return results.reduce((response, result, i) => {
-        const tag = taggedQueries[i].tag;
-        response[tag] = result;
-        if (tag === 'count' && result > 0) response.found = true;
-        if (tag === 'response' && result.length > 0) response.found = true;
-        return response;
-      }, { found: false });
-    });
+    return rethinkdb.queryWithCount(query, transformedQuery, params);
   },
+
   watch: (initialParams) => {
     const { query: initialQuery, indexes, params } = rethinkdb.queryBuilder('{{snakeCasePlural}}', '{{camelCase}}', initialParams);
     let query = initialQuery;
