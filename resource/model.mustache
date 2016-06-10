@@ -1,11 +1,8 @@
 const httpError = require('standard-http-error');
 const uuid = require('uuid');
-const bunyan = require('bunyan');
-const log = bunyan.createLogger({ name: '{{kebabCase}}', level: process.env.LOG_LEVEL });
 const r = require('../lib/db');
 const rethinkdb = require('../lib/rethinkdb');
 const schema = require('../lib/schema');
-const warnings = require('../constants/warnings');
 {{#isUser}}
 const _ = require('lodash');
 const errors = require('../constants/errors');
@@ -38,24 +35,16 @@ module.exports = {
     });
   },
   watch: (initialParams) => {
-    const warns = [];
-
     const { query: initialQuery, indexes, params } = rethinkdb.queryBuilder('{{snakeCasePlural}}', '{{camelCase}}', initialParams);
     let query = initialQuery;
 
     query = rethinkdb.addTransformations(query, indexes, params);
 
-    if (!rethinkdb.isChangeFeedable(query)) {
-      warns.push(warnings.RESTRICTED_FEED);
-      log.warn(warnings.RESTRICTED_FEED);
-      query = r.table('{{snakeCasePlural}}').getAll(r.args(query.getField('id').coerceTo('array')));
-    }
-
-    const changes = { includeInitial: true, includeStates: true };
+    const ret = rethinkdb.changeFeed(query, '{{snakeCasePlural}}');
 
     return Promise.resolve({
-      warns,
-      query: query.changes(changes).run()
+      warns: ret.warns,
+      query: ret.query.run()
     });
   },
   {{^isUser}}

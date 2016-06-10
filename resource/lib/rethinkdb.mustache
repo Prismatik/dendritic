@@ -1,9 +1,12 @@
 const _ = require('lodash');
 const r = require('./db');
 const httpError = require('standard-http-error');
+const bunyan = require('bunyan');
+const log = bunyan.createLogger({ name: '{{kebabCase}}', level: process.env.LOG_LEVEL });
 
 const model = require('./model');
 const schema = require('./schema');
+const warnings = require('../constants/warnings');
 
 const limitRegexp = /\.limit\(([^\)]*)\)/m;
 const orderByRegexp = /\.orderBy\(([^\)]*)\)/m;
@@ -101,5 +104,22 @@ exports.ifRevMatches = update => {
       update,
       r.error('rev does not match')
     );
+  };
+};
+
+exports.changeFeed = (query, tableName) => {
+  const warns = [];
+
+  if (!exports.isChangeFeedable(query)) {
+    warns.push(warnings.RESTRICTED_FEED);
+    log.warn(warnings.RESTRICTED_FEED);
+    query = r.table(tableName).getAll(r.args(query.getField('id').coerceTo('array')));
+  }
+
+  const changes = { includeInitial: true, includeStates: true };
+
+  return {
+    warns,
+    query: query.changes(changes)
   };
 };
