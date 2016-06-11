@@ -3,10 +3,6 @@ const uuid = require('uuid');
 const r = require('../lib/db');
 const rethinkdb = require('../lib/rethinkdb');
 const schema = require('../lib/schema');
-{{#isUser}}
-const password = require('simple-password');
-const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
-{{/isUser}}
 
 const validate = schema.getValidator('{{camelCase}}');
 
@@ -38,7 +34,6 @@ module.exports = {
     return r.table('{{snakeCasePlural}}').insert({{camelCase}}, { returnChanges: true }).run()
     .then(rethinkdb.firstChange);
   },
-  {{^isUser}}
   update: ({{camelCase}}) => {
     if (!{{camelCase}}.rev) {
       return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
@@ -54,38 +49,6 @@ module.exports = {
     .then(rethinkdb.checkRevError)
     .then(rethinkdb.firstChange);
   },
-  {{/isUser}}
-  {{#isUser}}
-  update: ({{camelCase}}) => {
-    if (!{{camelCase}}.rev) {
-      return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
-    }
-    let getHash;
-    if ({{camelCase}}.password) getHash = password.create({{camelCase}}.password, HASH_ROUNDS);
-    else getHash = Promise.resolve();
-
-    return getHash.then(pass => {
-      if (pass) {{camelCase}}.password = pass;
-
-      return r.table('{{snakeCasePlural}}').get({{camelCase}}.id).run()
-      .then(current => {
-        const updated = Object.assign({}, current, {{camelCase}});
-        const valid = validate(updated);
-        if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
-
-        return r.table('{{snakeCasePlural}}')
-        .get({{camelCase}}.id)
-        .update(
-          rethinkdb.ifRevMatches({{camelCase}}),
-          { returnChanges: true }
-        )
-        .run()
-        .then(rethinkdb.checkRevError)
-        .then(rethinkdb.firstChange);
-      });
-    });
-  },
-  {{/isUser}}
   delete: (id) => {
     return r.table('{{snakeCasePlural}}').get(id).delete({ returnChanges: true }).run()
     .then(res => {

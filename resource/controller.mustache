@@ -16,6 +16,9 @@ module.exports = {
   create: body => {
     return model.create(body);
   },
+  update: body => {
+    return model.update(body);
+  },
   {{/isUser}}
   {{#isUser}}
   create: body => {
@@ -26,10 +29,18 @@ module.exports = {
       return model.create(data);
     });
   },
-  {{/isUser}}
   update: body => {
-    return model.update(body);
+    const getHash = body.password ?
+      password.create(body.password, HASH_ROUNDS)
+      : Promise.resolve();
+
+    return getHash.then(pass => {
+      if (pass) body.password = pass;
+      return body;
+    })
+    .then(model.update);
   },
+  {{/isUser}}
   delete: id => {
     return model.delete(id);
   },
