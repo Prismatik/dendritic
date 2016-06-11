@@ -6,7 +6,6 @@ const schema = require('../lib/schema');
 {{#isUser}}
 const _ = require('lodash');
 const errors = require('../constants/errors');
-const jwt = require('../lib/jwt');
 const password = require('simple-password');
 const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
 {{/isUser}}
@@ -107,29 +106,5 @@ module.exports = {
       return res;
     })
     .then(rethinkdb.firstChange);
-  {{#isUser}}
-  },
-  signin: (email, pass) => {
-    const params = { email };
-
-    const { query } = rethinkdb.queryBuilder('{{snakeCasePlural}}', '{{camelCase}}', params);
-
-    return query.run()
-    .then(users => {
-      if (users.length === 0) throw new httpError('UNAUTHORIZED');
-      const user = users[0];
-      return password.verify(pass, user.password)
-      .then(verified => {
-        if (verified) return jwt.sign({ id: user.id, role: user.role });
-        throw new httpError('UNAUTHORIZED');
-      })
-      .then(token => {
-        return {
-          found: true,
-          result: { token, user: _.omit(user, 'password') }
-        };
-      });
-    });
-  {{/isUser}}
   }
 };

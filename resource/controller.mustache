@@ -1,3 +1,9 @@
+{{#isUser}}
+const httpError = require('standard-http-error');
+const password = require('simple-password');
+const _ = require('lodash');
+const jwt = require('../lib/jwt');
+{{/isUser}}
 const model = require('../models/{{snakeCase}}.js');
 
 module.exports = {
@@ -14,8 +20,24 @@ module.exports = {
     return model.delete(id);
   },
 {{#isUser}}
-  signin: (email, password) => {
-    return model.signin(email, password);
+  signin: (email, pass) => {
+    return model.get({ email })
+    .then((res) => {
+      const users = res.result;
+      if (users.length === 0) throw new httpError('UNAUTHORIZED');
+      const user = users[0];
+      return password.verify(pass, user.password)
+      .then(verified => {
+        if (verified) return jwt.sign({ id: user.id, role: user.role });
+        throw new httpError('UNAUTHORIZED');
+      })
+      .then(token => {
+        return {
+          found: true,
+          result: { token, user: _.omit(user, 'password') }
+        };
+      });
+    });
   },
   signout: body => {
     return model.signout(body);
