@@ -4,8 +4,6 @@ const r = require('../lib/db');
 const rethinkdb = require('../lib/rethinkdb');
 const schema = require('../lib/schema');
 {{#isUser}}
-const _ = require('lodash');
-const errors = require('../constants/errors');
 const password = require('simple-password');
 const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
 {{/isUser}}
@@ -33,7 +31,6 @@ module.exports = {
       query: ret.query.run()
     });
   },
-  {{^isUser}}
   create: ({{camelCase}}) => {
     const valid = validate({{camelCase}});
     if (!valid) return Promise.reject(new httpError('UNPROCESSABLE_ENTITY'));
@@ -41,6 +38,7 @@ module.exports = {
     return r.table('{{snakeCasePlural}}').insert({{camelCase}}, { returnChanges: true }).run()
     .then(rethinkdb.firstChange);
   },
+  {{^isUser}}
   update: ({{camelCase}}) => {
     if (!{{camelCase}}.rev) {
       return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
@@ -58,18 +56,6 @@ module.exports = {
   },
   {{/isUser}}
   {{#isUser}}
-  create: ({{camelCase}}) => {
-    if (!{{camelCase}}.password) return Promise.reject(new httpError(422, errors.NO_PASSWORD));
-    return password.create({{camelCase}}.password, HASH_ROUNDS)
-    .then(hash => {
-      const data = _.merge({{camelCase}}, { password: hash });
-      const valid = validate({{camelCase}});
-      if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
-      {{camelCase}}.rev = uuid.v4();
-      return r.table('{{snakeCasePlural}}').insert(data, { returnChanges: true }).run()
-      .then(rethinkdb.firstChange);
-    });
-  },
   update: ({{camelCase}}) => {
     if (!{{camelCase}}.rev) {
       return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
