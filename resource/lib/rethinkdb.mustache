@@ -136,7 +136,7 @@ exports.queryWithCount = (query, transformedQuery, params) => {
       const tag = taggedQueries[i].tag;
       response[tag] = result;
       if (tag === 'count' && result > 0) response.found = true;
-      if (tag === 'response' && result.length > 0) response.found = true;
+      if (tag === 'result' && result && result.length > 0) response.found = true;
       return response;
     }, { found: false });
   });
