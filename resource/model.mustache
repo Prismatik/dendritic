@@ -7,25 +7,19 @@ const schema = require('../lib/schema');
 const validate = schema.getValidator('{{camelCase}}');
 
 module.exports = {
-  get: (initialParams) => {
-    const { query, indexes, params } = rethinkdb.queryBuilder('{{snakeCasePlural}}', '{{camelCase}}', initialParams);
-    const transformedQuery = rethinkdb.addTransformations(query, indexes, params);
-
-    return rethinkdb.queryWithCount(query, transformedQuery, params);
-  },
-
-  watch: (initialParams) => {
+  get: (initialParams, rt) => {
     const { query: initialQuery, indexes, params } = rethinkdb.queryBuilder('{{snakeCasePlural}}', '{{camelCase}}', initialParams);
     let query = initialQuery;
-
     query = rethinkdb.addTransformations(query, indexes, params);
 
-    const ret = rethinkdb.changeFeed(query, '{{snakeCasePlural}}');
+    let warns = [];
+    if (rt) {
+      const ret = rethinkdb.changeFeed(query, '{{snakeCasePlural}}');
+      warns = ret.warns;
+      query = ret.query;
+    }
 
-    return Promise.resolve({
-      warns: ret.warns,
-      query: ret.query.run()
-    });
+    return rethinkdb.queryWithCount(initialQuery, query, params, warns);
   },
   create: ({{camelCase}}) => {
     const valid = validate({{camelCase}});

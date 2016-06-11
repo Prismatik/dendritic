@@ -40,11 +40,6 @@ module.exports = {
     })
     .then(model.update);
   },
-  {{/isUser}}
-  delete: id => {
-    return model.delete(id);
-  },
-{{#isUser}}
   signin: (email, pass) => {
     return model.get({ email })
     .then((res) => {
@@ -67,8 +62,11 @@ module.exports = {
   signout: body => {
     return model.signout(body);
   },
-{{/isUser}}
+  {{/isUser}}
+  delete: id => {
+    return model.delete(id);
+  },
   watch: query => {
-    return model.watch(query);
+    return model.get(query, true);
   }
 };

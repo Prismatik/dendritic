@@ -124,7 +124,7 @@ exports.changeFeed = (query, tableName) => {
   };
 };
 
-exports.queryWithCount = (query, transformedQuery, params) => {
+exports.queryWithCount = (query, transformedQuery, params, warns) => {
   const taggedQueries = [
     { tag: 'result', q: transformedQuery },
     { tag: 'count', q: query.count() }
@@ -138,6 +138,6 @@ exports.queryWithCount = (query, transformedQuery, params) => {
       if (tag === 'count' && result > 0) response.found = true;
       if (tag === 'result' && result && result.length > 0) response.found = true;
       return response;
-    }, { found: false });
+    }, { found: false, warns });
   });
 };

@@ -26,15 +26,13 @@ module.exports = {
     const nsp = io.of('/{{kebabCasePlural}}');
     nsp.on('connection', socket => {
       controller.watch(socket.handshake.query)
-      .then(({ query, warns = [] }) => {
+      .then(({ result: cursor, warns = [] }) => {
         warns.forEach(warn => socket.emit('warning', warn));
 
-        query.then(cursor => {
-          cursor.each((err, data) => {
-            if (!data) return null;
-            if (data.state) return socket.emit('state', data);
-            return socket.emit('record', data);
-          });
+        cursor.each((err, data) => {
+          if (!data) return null;
+          if (data.state) return socket.emit('state', data);
+          return socket.emit('record', data);
         });
       });
     });
