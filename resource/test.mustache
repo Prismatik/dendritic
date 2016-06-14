@@ -51,19 +51,14 @@ const getJSON = (path) => {
 };
 
 const sender = method => path => data => {
-  return agent[method](path, data, {
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  });
+  return agent[method](path, data);
 };
 
 const poster = sender('post');
 const putter = sender('put');
 
 const deleter = path => () => {
-  return agent.delete(path, {}, {
-    Accept: 'application/json'
-  });
+  return agent.delete(path);
 };
 
 const <%camelCase%>Poster = poster('/<%kebabCasePlural%>');
