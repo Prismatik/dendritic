@@ -1,77 +1,26 @@
-const _ = require('lodash');
 const httpError = require('standard-http-error');
 const uuid = require('uuid');
-const bunyan = require('bunyan');
-const log = bunyan.createLogger({ name: '{{kebabCase}}', level: process.env.LOG_LEVEL });
 const r = require('../lib/db');
-const model = require('../lib/model');
 const rethinkdb = require('../lib/rethinkdb');
 const schema = require('../lib/schema');
-const warnings = require('../constants/warnings');
-{{#isUser}}
-const errors = require('../constants/errors');
-const jwt = require('../lib/jwt');
-const password = require('simple-password');
-const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
-{{/isUser}}
 
-const appSchema = require('../schema').getSchema();
-const modelSchema = appSchema.{{camelCase}};
 const validate = schema.getValidator('{{camelCase}}');
 
 module.exports = {
-  get: (params) => {
-    params = _.assign({ result: true }, model.normaliseParams(params));
-    const queryParams = schema.filter('{{camelCase}}', params);
-
-    const table = r.table('{{snakeCasePlural}}');
-    const indexes = model.getIndexes(modelSchema, queryParams);
-    const indexBy = _.includes(indexes, 'id') ? 'id' : indexes[0];
-
-    const query = rethinkdb.buildQuery(table, indexBy, queryParams);
-    const tranformedQuery = rethinkdb.addTransformations(query, indexes, params);
-
-    const taggedQueries = [
-      { tag: 'result', q: tranformedQuery },
-      { tag: 'count', q: query.count() }
-    ].filter(x => params[x.tag]);
-
-    return Promise.all(taggedQueries.map(x => x.q.run()))
-    .then(results => {
-      return results.reduce((response, result, i) => {
-        const tag = taggedQueries[i].tag;
-        response[tag] = result;
-        if (tag === 'count' && result > 0) response.found = true;
-        if (tag === 'response' && result.length > 0) response.found = true;
-        return response;
-      }, { found: false });
-    });
-  },
-  watch: (params) => {
-    const warns = [];
-    params = model.normaliseParams(params);
-    const queryParams = schema.filter('{{camelCase}}', params);
-
-    const changes = { includeInitial: true, includeStates: true };
-    const table = r.table('{{snakeCasePlural}}');
-    const indexes = model.getIndexes(modelSchema, queryParams);
-    const indexBy = _.includes(indexes, 'id') ? 'id' : indexes[0];
-
-    let query = rethinkdb.buildQuery(table, indexBy, queryParams);
+  get: (initialParams, rt) => {
+    const { query: initialQuery, indexes, params } = rethinkdb.queryBuilder('{{snakeCasePlural}}', '{{camelCase}}', initialParams);
+    let query = initialQuery;
     query = rethinkdb.addTransformations(query, indexes, params);
 
-    if (!rethinkdb.isChangeFeedable(query)) {
-      warns.push(warnings.RESTRICTED_FEED);
-      log.warn(warnings.RESTRICTED_FEED);
-      query = table.getAll(r.args(query.getField('id').coerceTo('array')));
+    let warns = [];
+    if (rt) {
+      const ret = rethinkdb.changeFeed(query, '{{snakeCasePlural}}');
+      warns = ret.warns;
+      query = ret.query;
     }
 
-    return Promise.resolve({
-      warns,
-      query: query.changes(changes).run()
-    });
+    return rethinkdb.queryWithCount(initialQuery, query, params, warns);
   },
-  {{^isUser}}
   create: ({{camelCase}}) => {
     const valid = validate({{camelCase}});
     if (!valid) return Promise.reject(new httpError('UNPROCESSABLE_ENTITY'));
@@ -94,82 +43,11 @@ module.exports = {
     .then(rethinkdb.checkRevError)
     .then(rethinkdb.firstChange);
   },
-  {{/isUser}}
-  {{#isUser}}
-  create: ({{camelCase}}) => {
-    if (!{{camelCase}}.password) return Promise.reject(new httpError(422, errors.NO_PASSWORD));
-    return password.create({{camelCase}}.password, HASH_ROUNDS)
-    .then(hash => {
-      const data = _.merge({{camelCase}}, { password: hash });
-      const valid = validate({{camelCase}});
-      if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
-      {{camelCase}}.rev = uuid.v4();
-      return r.table('{{snakeCasePlural}}').insert(data, { returnChanges: true }).run()
-      .then(rethinkdb.firstChange);
-    });
-  },
-  update: ({{camelCase}}) => {
-    if (!{{camelCase}}.rev) {
-      return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
-    }
-    let getHash;
-    if ({{camelCase}}.password) getHash = password.create({{camelCase}}.password, HASH_ROUNDS);
-    else getHash = Promise.resolve();
-
-    return getHash.then(pass => {
-      if (pass) {{camelCase}}.password = pass;
-
-      return r.table('{{snakeCasePlural}}').get({{camelCase}}.id).run()
-      .then(current => {
-        const updated = Object.assign({}, current, {{camelCase}});
-        const valid = validate(updated);
-        if (!valid) throw new httpError('UNPROCESSABLE_ENTITY');
-
-        return r.table('{{snakeCasePlural}}')
-        .get({{camelCase}}.id)
-        .update(
-          rethinkdb.ifRevMatches({{camelCase}}),
-          { returnChanges: true }
-        )
-        .run()
-        .then(rethinkdb.checkRevError)
-        .then(rethinkdb.firstChange);
-      });
-    });
-  },
-  {{/isUser}}
   delete: (id) => {
     return r.table('{{snakeCasePlural}}').get(id).delete({ returnChanges: true }).run()
     .then(res => {
       return res;
     })
     .then(rethinkdb.firstChange);
-  {{#isUser}}
-  },
-  signin: (email, pass) => {
-    const table = r.table('{{snakeCasePlural}}');
-    const params = { email };
-    const indexes = model.getIndexes(modelSchema, params);
-    const indexBy = _.includes(indexes, 'email') ? 'email' : null;
-
-    const query = rethinkdb.buildQuery(table, indexBy, params);
-
-    return query.run()
-    .then(users => {
-      if (users.length === 0) throw new httpError('UNAUTHORIZED');
-      const user = users[0];
-      return password.verify(pass, user.password)
-      .then(verified => {
-        if (verified) return jwt.sign({ id: user.id, role: user.role });
-        throw new httpError('UNAUTHORIZED');
-      })
-      .then(token => {
-        return {
-          found: true,
-          result: { token, user: _.omit(user, 'password') }
-        };
-      });
-    });
-  {{/isUser}}
   }
 };
