@@ -5,13 +5,10 @@
   "camelCasePlural": "<%camelCasePlural%>",
   "properties": {
     "id": {
-      "type": "string",
-      "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
-      "faker": "random.uuid"
+      "$ref": "#/definitions/uuid"
     },
     "rev": {
-      "type": "string",
-      "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+      "$ref": "#/definitions/uuid"
     },
     "name": {
       "type": "string",
@@ -19,7 +16,7 @@
     <%#isUser%>
     },
     "email": {
-      "type": "string",
+      "type": "email",
       "faker": "internet.exampleEmail"
     },
     "password": {
@@ -29,16 +26,14 @@
     <%#singularRelationships%>
     },
     "<%camelCase%>": {
-      "type": "string",
-      "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+      "$ref": "#/definitions/uuid"
     <%/singularRelationships%>
     <%#multiRelationships%>
     },
     "<%camelCasePlural%>": {
       "type": "array",
       "items": {
-        "type": "string",
-        "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+        "$ref": "#/definitions/uuid"
       }
     <%/multiRelationships%>
     }
