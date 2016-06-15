@@ -1,5 +1,5 @@
 {{=<% %>=}}
-const app = require('../../index').app;
+const app = require('../../src/app').app;
 const agent = require('doubleagent')(app);
 const querystring = require('querystring');
 const _ = require('lodash');
@@ -8,10 +8,10 @@ const fixture = require('../../fixtures/<%snakeCase%>');
 const IO = require('socket.io-client');
 <%#isUser%>
 const password = require('simple-password');
-const errors = require('../../constants/errors');
+const errors = require('../../config/errors');
 const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
 <%/isUser%>
-const warnings = require('../../constants/warnings');
+const warnings = require('../../config/warnings');
 <%#relationships%>
 const <%camelCase%>Fixture = require('../../fixtures/<%snakeCase%>');
 <%/relationships%>

@@ -8,16 +8,13 @@ services:
       PORT: 3005
     volumes:
       - ./bin:/opt/app/bin
-      - ./constants:/opt/app/constants
-      - ./controllers:/opt/app/controllers
+      - ./config:/opt/app/config
+      - ./src:/opt/app/src
       - ./env:/opt/app/env
       - ./fixtures:/opt/app/fixtures
-      - ./index.js:/opt/app/index.js
       - ./lib:/opt/app/lib
-      - ./middleware:/opt/app/middleware
       - ./migrations:/opt/app/migrations
       - ./package.json:/opt/app/package.json
-      - ./routes:/opt/app/routes
       - ./schema.js:/opt/app/schema.js
       - ./schemas:/opt/app/schemas
       - ./setup.js:/opt/app/setup.js

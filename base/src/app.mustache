@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
-const log = require('./lib/logger');
+const log = require('../lib/logger');
 const routes = require('./routes');
 const middleware = require('./middleware');
 
