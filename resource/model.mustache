@@ -1,4 +1,4 @@
-const httpError = require('standard-http-error');
+const HttpError = require('standard-http-error');
 const uuid = require('uuid');
 const r = require('../lib/db');
 const rethinkdb = require('../lib/rethinkdb');
@@ -23,18 +23,18 @@ module.exports = {
   },
   create: ({{camelCase}}) => {
     const valid = validate({{camelCase}});
-    if (!valid) return Promise.reject(new httpError('UNPROCESSABLE_ENTITY'));
+    if (!valid) return Promise.reject(new HttpError('UNPROCESSABLE_ENTITY'));
     {{camelCase}}.rev = uuid.v4();
     return r.table('{{snakeCasePlural}}').insert({{camelCase}}, { returnChanges: true }).run()
     .then(rethinkdb.firstChange);
   },
   update: ({{camelCase}}) => {
     if (!{{camelCase}}.rev) {
-      return Promise.reject(new httpError('BAD_REQUEST', 'No rev provided'));
+      return Promise.reject(new HttpError('BAD_REQUEST', 'No rev provided'));
     }
 
     const valid = validate({{camelCase}});
-    if (!valid) return Promise.reject(new httpError('UNPROCESSABLE_ENTITY'));
+    if (!valid) return Promise.reject(new HttpError('UNPROCESSABLE_ENTITY'));
 
     return r.table('{{snakeCasePlural}}')
     .get({{camelCase}}.id)
