@@ -1,8 +1,7 @@
 require('dotenv-safe').load({ sample: './example.env' });
 require('app-module-path').addPath(__dirname);
 
-const bunyan = require('bunyan');
-const log = bunyan.createLogger({ name: '{{kebabCase}}', level: process.env.LOG_LEVEL });
+const log = require('./lib/logger');
 const setup = require('./setup');
 
 setup()

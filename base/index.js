@@ -17,6 +17,7 @@ module.exports = (opts) => {
     { p: 'lib', n: 'db' },
     { p: 'lib', n: 'migrate' },
     { p: 'lib', n: 'util' },
+    { p: 'lib', n: 'logger' },
     { n: 'index' },
     { n: 'package', e: 'json' },
     { n: 'schema' },

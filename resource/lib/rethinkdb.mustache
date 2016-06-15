@@ -1,8 +1,7 @@
 const _ = require('lodash');
 const r = require('./db');
 const httpError = require('standard-http-error');
-const bunyan = require('bunyan');
-const log = bunyan.createLogger({ name: '{{kebabCase}}', level: process.env.LOG_LEVEL });
+const log = require('./logger');
 
 const model = require('./model');
 const schema = require('./schema');
