@@ -42,10 +42,6 @@ module.exports = (opts) => {
 
   scaffold({ basePath: __dirname, files, mustacheOpts: opts });
 
-  [
-    'env'
-  ].forEach(dir => mkdirp.sync(dir));
-
   const modulesDir = path.join(process.cwd(), 'node_modules');
   if (!fs.existsSync(modulesDir)) mkdirp.sync(modulesDir);
 };
