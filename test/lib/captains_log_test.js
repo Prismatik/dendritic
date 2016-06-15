@@ -7,7 +7,7 @@ const root = process.cwd();
 const outputPath = `${root}/redbeard_tests/`;
 const logPath = `${root}/redbeard_tests/captains_log`;
 
-describe.only('lib/captainsLog', () => {
+describe('lib/captainsLog', () => {
   let origwd = '';
   before(() => {
     mkdirp.sync(outputPath);
