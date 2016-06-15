@@ -2,9 +2,9 @@
 const HttpError = require('standard-http-error');
 const password = require('simple-password');
 const _ = require('lodash');
-const jwt = require('../lib/jwt');
+const jwt = require('../../lib/jwt');
 const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
-const errors = require('../constants/errors');
+const errors = require('../../config/errors');
 {{/isUser}}
 const model = require('../models/{{snakeCase}}.js');
 

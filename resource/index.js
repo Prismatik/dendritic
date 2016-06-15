@@ -9,18 +9,18 @@ module.exports = (opts) => {
   // p: source path, n: filename
   // d: destination path, t: target filename, e: target extension
   const files = [
-    { p: 'constants', n: 'warnings' },
-    { p: 'constants', n: 'errors' },
+    { p: 'config', n: 'warnings' },
+    { p: 'config', n: 'errors' },
     { p: 'lib', n: 'model' },
     { p: 'lib', n: 'rethinkdb' },
     { p: 'lib', n: 'schema' },
     { p: 'test/lib', n: 'model' },
     { p: 'test/lib', n: 'rethinkdb' },
-    { n: 'model', d: 'models', t: opts.snakeCase },
-    { n: 'controller', d: 'controllers', t: opts.snakeCase },
+    { n: 'model', d: 'src/models', t: opts.snakeCase },
+    { n: 'controller', d: 'src/controllers', t: opts.snakeCase },
     { n: 'test', d: 'test/models', t: `${opts.snakeCase}_test` },
     { n: 'test/fixture', d: 'test/fixtures', t: `${opts.snakeCase}_test` },
-    { n: 'route', d: 'routes', t: opts.snakeCase },
+    { n: 'route', d: 'src/routes', t: opts.snakeCase },
     { n: 'table', d: 'tables', t: opts.snakeCase },
     { n: 'fixture', d: 'fixtures', t: opts.snakeCase },
     { n: 'schema', d: 'schemas', t: opts.snakeCase, e: 'json' }

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const app = require('../../index').app;
+const app = require('../../src/app').app;
 const agent = require('doubleagent')(app);
 
 const token = jwt.sign({ hello: 'world' }, process.env.JWT_SECRET);

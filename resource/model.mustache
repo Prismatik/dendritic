@@ -1,8 +1,8 @@
 const HttpError = require('standard-http-error');
 const uuid = require('uuid');
-const r = require('../lib/db');
-const rethinkdb = require('../lib/rethinkdb');
-const schema = require('../lib/schema');
+const r = require('../../lib/db');
+const rethinkdb = require('../../lib/rethinkdb');
+const schema = require('../../lib/schema');
 
 const validate = schema.getValidator('{{camelCase}}');
 

@@ -1,12 +1,11 @@
 const _ = require('lodash');
 const r = require('./db');
 const HttpError = require('standard-http-error');
-const bunyan = require('bunyan');
 const log = require('./logger');
 
 const model = require('./model');
 const schema = require('./schema');
-const warnings = require('../constants/warnings');
+const warnings = require('../config/warnings');
 
 const limitRegexp = /\.limit\(([^\)]*)\)/m;
 const orderByRegexp = /\.orderBy\(([^\)]*)\)/m;
