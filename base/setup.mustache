@@ -2,7 +2,7 @@ const r = require('lib/db');
 const migrate = require('lib/migrate');
 const schema = require('schema');
 
-const DB_NAME = process.env.RETHINK_NAME;
+const DB_NAME = r._poolMaster._options.db;
 
 const tables = require('./tables');
 

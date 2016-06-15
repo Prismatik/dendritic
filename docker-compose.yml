@@ -3,7 +3,7 @@ services:
   redbeard:
     build: .
     environment:
-      RETHINK_HOST: rethinkdb
+      RETHINKDB_URL: rethinkdb://rethinkdb:28015/redbeard
       SHELL: /bin/sh
       LOG_LEVEL: fatal
       HASH_ROUNDS: 1

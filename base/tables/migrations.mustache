@@ -1,6 +1,6 @@
 const r = require('lib/db.js');
 
-const DB_NAME = process.env.RETHINK_NAME;
+const DB_NAME = r._poolMaster._options.db;
 
 module.exports = () => {
   return r.tableCreate('_migrations', { primaryKey: 'name' }).run()
