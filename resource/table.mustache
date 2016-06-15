@@ -3,7 +3,7 @@ const r = require('../lib/db.js');
 module.exports = () => {
   return r.tableCreate('{{snakeCasePlural}}').run()
   .catch((err) => {
-    const errMsg = `Table \`${process.env.RETHINK_NAME}.{{snakeCasePlural}}\` already exists in:`;
+    const errMsg = `Table \`${r._poolMaster._options.db}.{{snakeCasePlural}}\` already exists in:`;
     if (err.message.split('\n')[0] === errMsg) return;
     throw err;
   })

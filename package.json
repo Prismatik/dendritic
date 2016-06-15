@@ -15,7 +15,6 @@
   "scripts": {
     "lint": "./node_modules/.bin/eslint .",
     "test": "REDBEARD_LOG_LEVEL=silent node test",
-
     "testredbeard": "mocha",
     "watch": "chokidar '.' -c 'npm test' -i '/node_modules|redbeard_tests/' -d 2000",
     "dockertest": "docker-compose run redbeard npm test",
@@ -56,6 +55,7 @@
     "socket.io": "^1.3.7",
     "socket.io-client": "^1.3.7",
     "standard-http-error": "^2.0.0",
+    "thinky": "^2.3.2",
     "uuid": "^2.0.2"
   },
   "engines": {

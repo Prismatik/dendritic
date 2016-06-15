@@ -8,7 +8,7 @@ const setup = require('setup');
 const app = require('index').server;
 const r = require('lib/db');
 
-const DB_NAME = process.env.RETHINK_NAME;
+const DB_NAME = r._poolMaster._options.db;
 
 app.listen(process.env.PORT, () => {
   before(function before() {

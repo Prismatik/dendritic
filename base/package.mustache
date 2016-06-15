@@ -8,7 +8,7 @@
     "migrate": "node ./bin/migrate.js",
     "migration": "node ./bin/migration.js",
     "start": "node start",
-    "test": "RETHINK_NAME={{snakeCasePlural}}_test mocha",
+    "test": "NODE_ENV=test mocha",
     "watch": "mocha --watch",
     "dockertest": "docker-compose run {{snakeCasePlural}} npm test",
     "dockerwatch": "docker-compose run {{snakeCasePlural}} npm run watch"
@@ -29,6 +29,7 @@
     "rethinkdbdash": "^2.2.8",
     "socket.io": "^1.3.7",
     "standard-http-error": "^2.0.0",
+    "thinky": "^2.3.2",
     "uuid": "^2.0.2"
   },
   "devDependencies": {
