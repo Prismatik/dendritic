@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const r = require('./db');
-const httpError = require('standard-http-error');
+const HttpError = require('standard-http-error');
+const bunyan = require('bunyan');
 const log = require('./logger');
 
 const model = require('./model');
@@ -91,7 +92,7 @@ exports.isChangeFeedable = (query) => {
 
 exports.checkRevError = res => {
   if (res.first_error === 'rev does not match') {
-    throw new httpError('BAD_REQUEST', res.first_error);
+    throw new HttpError('BAD_REQUEST', res.first_error);
   }
   return res;
 };

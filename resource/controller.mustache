@@ -1,5 +1,5 @@
 {{#isUser}}
-const httpError = require('standard-http-error');
+const HttpError = require('standard-http-error');
 const password = require('simple-password');
 const _ = require('lodash');
 const jwt = require('../lib/jwt');
@@ -22,7 +22,7 @@ module.exports = {
   {{/isUser}}
   {{#isUser}}
   create: body => {
-    if (!body.password) return Promise.reject(new httpError(422, errors.NO_PASSWORD));
+    if (!body.password) return Promise.reject(new HttpError(422, errors.NO_PASSWORD));
     return password.create(body.password, HASH_ROUNDS)
     .then(hash => {
       const data = _.merge(body, { password: hash });
@@ -44,12 +44,12 @@ module.exports = {
     return model.get({ email })
     .then((res) => {
       const users = res.result;
-      if (users.length === 0) throw new httpError('UNAUTHORIZED');
+      if (users.length === 0) throw new HttpError('UNAUTHORIZED');
       const user = users[0];
       return password.verify(pass, user.password)
       .then(verified => {
         if (verified) return jwt.sign({ id: user.id, role: user.role });
-        throw new httpError('UNAUTHORIZED');
+        throw new HttpError('UNAUTHORIZED');
       })
       .then(token => {
         return {
