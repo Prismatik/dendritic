@@ -7,7 +7,7 @@ const setup = require('./setup');
 
 setup()
 .then(() => {
-  const app = require('./index');
+  const app = require('./index').server;
   const server = app.listen(process.env.PORT, () => {
     const host = server.address().address;
     const port = server.address().port;

@@ -1,37 +1,30 @@
-const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
+const app = require('../../index').app;
+const agent = require('doubleagent')(app);
 
 const token = jwt.sign({ hello: 'world' }, process.env.JWT_SECRET);
-const url = `http://localhost:${process.env.PORT}/jwt/verify`;
+const url = `/jwt/verify`;
 
 describe('JWT authentication handling', () => {
   it('must accept a valid bearer token in a header', () => {
-    return fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+    return agent.get(url, {}, {
+      Authorization: `Bearer ${token}`
     }).must.resolve.have.property('status', 200);
   });
 
   it('must throw 401 for an invalid JWT bearer', () => {
-    return fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: 'Bearer hackhackhack'
-      }
+    return agent.get(url, {}, {
+      Authorization: 'Bearer hackhackhack'
     }).must.resolve.have.property('status', 401);
   });
 
   it('must accept a valid JWT in a query string param', () => {
-    return fetch(`${url}?token=${token}`, {
-      method: 'GET'
-    }).must.resolve.have.property('status', 200);
+    return agent.get(url, { token })
+    .must.resolve.have.property('status', 200);
   });
 
   it('must reject invalid JWT in the query string params', () => {
-    return fetch(`${url}?token=hack`, {
-      method: 'GET'
-    }).must.resolve.with.property('status', 401);
+    return agent.get(url, { token: 'hack' })
+    .must.resolve.with.property('status', 401);
   });
 });

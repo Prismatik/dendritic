@@ -5,7 +5,7 @@ const path = require('path');
 require('app-module-path').addPath(path.resolve(__dirname, '..'));
 
 const setup = require('setup');
-const app = require('index');
+const app = require('index').server;
 const r = require('lib/db');
 
 const DB_NAME = process.env.RETHINK_NAME;
