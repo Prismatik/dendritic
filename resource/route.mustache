@@ -28,29 +28,33 @@ module.exports = {
 router
   .get('/{{kebabCasePlural}}', function * (req, res) {
     const {{snakeCasePlural}} = yield controller.get(req.query);
-    res.json({{snakeCasePlural}});
+    res.json({{snakeCasePlural}}.result || []);
   })
   .get('/{{kebabCasePlural}}/:id', function * (req, res) {
-    const {{snakeCase}} = yield controller.get(_.assign({ id: req.params.id }, req.query))
-    res.json({{snakeCase}});
+    const {{snakeCase}} = yield controller.get(_.assign({ id: req.params.id }, req.query));
+    if ({{snakeCase}}.result) {
+      res.json({{snakeCase}}.result);
+    } else {
+      res.status(404).json({ error: 'Not found' });
+    }
   })
   .post('/{{kebabCasePlural}}', function * (req, res) {
     const {{snakeCase}} = yield controller.create(req.body);
-    res.status(201).json({{snakeCase}});
+    res.status(201).json({{snakeCase}}.result);
   })
   .put('/{{kebabCasePlural}}/:id', function * (req, res) {
     const {{snakeCase}} = yield controller.update(req.body);
-    res.json({{snakeCase}});
+    res.json({{snakeCase}}.result);
   })
   .delete('/{{kebabCasePlural}}/:id', function * (req, res) {
-    yield controller.delete(req.params.id)
-    res.json({ok: true});
+    yield controller.delete(req.params.id);
+    res.json({ ok: true });
   });
 
 {{#isUser}}
 router
   .post('/{{kebabCasePlural}}/signin', function * (req, res) {
-    const result = yield controller.signin(req.body.email, req.body.password)
+    const result = yield controller.signin(req.body.email, req.body.password);
     res.json(result);
   })
   .post('/{{kebabCasePlural}}/signout', function * (req, res) {

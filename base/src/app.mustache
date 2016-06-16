@@ -2,6 +2,7 @@ require('express-yields');
 const cors = require('cors');
 const app = require('express')();
 const bodyParser = require('body-parser');
+const HttpError = require('standard-http-error');
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
@@ -23,10 +24,14 @@ routes.forEach(route => {
   route.socket(io);
 });
 
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   if (err.name === 'UnauthorizedError') {
     res.status(401).send('Invalid token');
+  } else if (err instanceof HttpError) {
+    res.status(err.code).json({ error: err.message });
   }
+
+  next(err);
 });
 
 process.on('unhandledRejection', (reason, p) => {
