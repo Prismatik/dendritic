@@ -55,7 +55,8 @@ describe('lib/model', () => {
         },
         email: {
           type: 'string',
-          format: 'email'
+          format: 'email',
+          indexed: true
         },
         password: {
           type: 'string'
