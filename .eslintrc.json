@@ -10,6 +10,7 @@
     "no-console": "off",
     "no-param-reassign": "off",
     "spaced-comment": "off",
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "func-names": "off"
   }
 }

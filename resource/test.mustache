@@ -37,12 +37,8 @@ const desc = (a, b) => {
   return 0;
 };
 
-const unwrapOldVal = (res) => {
-  return res.body.old_val;
-};
-
 const unwrapJSON = (res) => {
-  return res.body.result;
+  return res.body;
 };
 
 const getJSON = (path) => {
@@ -108,11 +104,11 @@ describe('<%camelCase%> model', () => {
         .must.resolve.to.have.property('status', 200);
     });
 
-    it('return an object with a .result property', () => {
+    it('return an list of entries', () => {
       return single<%pascalCase%>Creator()
         .then(() => agent.get(`/<%kebabCasePlural%>`))
         .then(({ body }) => {
-          body.must.have.property('result');
+          body.must.be.an(Array);
         });
     });
 
@@ -185,8 +181,7 @@ describe('<%camelCase%> model', () => {
       return <%camelCase%>Creator(10)
         .then(() => agent.get(`/<%kebabCasePlural%>?count=true&limit=5`))
         .then(({ body }) => {
-          body.result.must.have.length(5);
-          body.count.must.be.gt(5);
+          body.must.have.length(5);
         });
     });
 
@@ -194,8 +189,7 @@ describe('<%camelCase%> model', () => {
       return <%camelCase%>Creator(10)
         .then(() => agent.get(`/<%kebabCasePlural%>?limit=5`))
         .then(({ body }) => {
-          body.result.must.have.length(5);
-          body.must.not.have.property('count');
+          body.must.have.length(5);
         });
     });
 
@@ -203,8 +197,7 @@ describe('<%camelCase%> model', () => {
       return <%camelCase%>Creator(10)
         .then(() => agent.get(`/<%kebabCasePlural%>?count=true&result=false`))
         .then(({ body }) => {
-          body.must.not.have.property('result');
-          body.count.must.be.gt(5);
+          body.must.eql([]);
         });
     });
   });
@@ -250,7 +243,7 @@ describe('<%camelCase%> model', () => {
       delete invalid.password;
       return <%camelCase%>Poster(invalid)
         .then(({ body }) => {
-          body.must.have.property('message', errors.NO_PASSWORD);
+          body.must.have.property('error', errors.NO_PASSWORD);
         });
     });
     <%/isUser%>
@@ -310,12 +303,11 @@ describe('<%camelCase%> model', () => {
 
     it('actually deletes the record', () => {
       return single<%pascalCase%>Creator()
-        .then(body => deleter(`/<%kebabCasePlural%>/${body.id}`)())
-        .then(unwrapOldVal)
-        .then(body => agent.get(`/<%kebabCasePlural%>/${body.id}`))
-        .then(res => {
-          res.must.have.property('status', 404);
-        });
+        .then(body => (
+          deleter(`/<%kebabCasePlural%>/${body.id}`)()
+          .then(() => agent.get(`/<%kebabCasePlural%>/${body.id}`))
+          .then(res => res.must.have.property('status', 404))
+        ));
     });
   });
 
@@ -326,7 +318,7 @@ describe('<%camelCase%> model', () => {
       return signin({ email: 'notexist@example.com', password: 'ABCD1234' })
         .then(statusEquals(401))
         .then(({ body }) => {
-          body.must.have.property('message', 'Unauthorized');
+          body.must.have.property('error', 'Unauthorized');
         });
     });
 
@@ -339,7 +331,7 @@ describe('<%camelCase%> model', () => {
         return signin({ email: data.email, password: 'ABCD1234' })
           .then(statusEquals(401))
           .then(({ body }) => {
-            body.must.have.property('message', 'Unauthorized');
+            body.must.have.property('error', 'Unauthorized');
           });
       });
     });
@@ -355,8 +347,8 @@ describe('<%camelCase%> model', () => {
           .then(statusEquals(200))
           .then(({ body }) => {
             body.found.must.be.true();
-            body.result.token.must.not.be.null();
-            body.result.user.must.eql(_.omit(user, 'password'));
+            body.token.must.not.be.null();
+            body.user.must.eql(_.omit(user, 'password'));
           });
       });
     });

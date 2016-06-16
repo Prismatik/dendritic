@@ -21,22 +21,22 @@ module.exports = {
   },
   {{/isUser}}
   {{#isUser}}
-  create: function * (body) {
+  *create(body) {
     if (!body.password) throw new HttpError(422, errors.NO_PASSWORD);
 
     const hash = yield password.create(body.password, HASH_ROUNDS);
     const data = _.merge(body, { password: hash });
     return yield model.create(data);
   },
-  update: function * (body) {
+  *update(body) {
     if (body.password) {
       body.password = yield password.create(body.password, HASH_ROUNDS);
     }
 
     return model.update(body);
   },
-  signin: function * (email, pass) {
-    const {result: [ user ]} = yield model.get({ email });
+  *signin(email, pass) {
+    const { result: [user] } = yield model.get({ email });
 
     if (!user) throw new HttpError('UNAUTHORIZED');
 
