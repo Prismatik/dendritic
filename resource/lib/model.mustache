@@ -19,58 +19,63 @@ exports.getIndexes = (schema, params) => {
 };
 
 const Ajv = require('ajv');
-const ajv = new Ajv({ allErrors: true });
 const { thinky, schemas } = require('../config');
 
 exports.create = (modelName) => {
   const schema = schemas[modelName];
+  const validator = exports.thinkyValidatorFor(schema);
+  const model = thinky.createModel(
+    schema.camelCasePlural,
+    exports.toThinkySchema(schema.properties),
+    { validator, enforce_extra: 'strict' }
+  );
+
+  return model;
+};
+
+exports.thinkyValidatorFor = (schema) => {
+  const ajv = new Ajv({ allErrors: true });
   const validate = ajv.compile(schema);
-  const validator = document => {
+  return document => {
     if (!validate(document)) {
       throw new thinky.Errors.ValidationError(
         validate.errors.map(e => e.message).join(', ')
       );
     }
   };
-
-  return thinky.createModel(
-    schema.camelCasePlural,
-    exports.toThinkySchema(schema.properties),
-    { validator, enforce_extra: 'strict' }
-  );
 };
 
 exports.toThinkySchema = (properties) => {
   const schema = {};
-  const typesToTypes = {
-    string: String,
-    email: thinky.type.string().email(),
-    number: Number,
-    integer: thinky.type.number().integer(),
-    date: Date,
-    boolean: Boolean,
-    array: [],
-    object: {}
-  };
 
   Object.keys(properties).forEach(name => {
-    const type = properties[name].type;
-    const Type = typesToTypes[type];
-
-    if (!Type) throw new Error(`can't compute property type: ${type} for property: ${name}`);
-
-    if (type === 'array') {
-      schema[name] = [typesToTypes[properties[name].items.type]];
-    } else if (type === 'object') {
-      schema[name] = exports.toThinkySchema(properties[name].properties);
-    } else if (type === 'string' && properties[name].enum) {
-      schema[name] = thinky.type.string().enum(properties[name].enum);
-    } else if (type === 'string' && properties[name].format === 'email') {
-      schema[name] = typesToTypes.email;
-    } else {
-      schema[name] = Type;
-    }
+    schema[name] = exports.toThinkyType(properties[name]);
   });
 
   return schema;
+};
+
+const typesToTypes = {
+  string: String,
+  number: Number,
+  integer: thinky.type.number().integer(),
+  date: Date,
+  boolean: Boolean,
+  array: [],
+  object: {}
+};
+
+exports.toThinkyType = (property) => {
+  const type = property.type;
+  const Type = typesToTypes[type];
+
+  if (!Type) throw new Error(`can't compute property type: ${type} for property: ${name}`);
+
+  switch (type) {
+    case 'array': return [typesToTypes[property.items.type]];
+    case 'object': return exports.toThinkySchema(property.properties);
+    case 'string': return property.enum ? thinky.type.string().enum(property.enum) : Type;
+    default:
+      return Type;
+  }
 };
