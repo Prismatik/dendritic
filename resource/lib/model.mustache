@@ -17,3 +17,54 @@ exports.getIndexes = (schema, params) => {
 
   return fields.filter(f => props[f] && props[f].indexed).sort();
 };
+
+const jsen = require('jsen');
+const { thinky } = require('../config');
+
+exports.create = (modelName) => {
+  const appSchema = require('../schema').getSchema();
+  console.log(JSON.stringify(appSchema, null, 2));
+  const modelSchema = appSchema[modelName];
+  console.log(JSON.stringify(modelSchema, null, 2));
+
+  const validator = jsen(modelSchema);
+
+  return thinky.createModel(
+    '{{snakeCasePlural}}',
+    exports.toThinkySchema(modelSchema.properties),
+    { validator }
+  );
+};
+
+exports.toThinkySchema = (properties) => {
+  const schema = {};
+  const typesToTypes = {
+    string: String,
+    email: thinky.type.string().email(),
+    number: Number,
+    integer: thinky.type.number().integer(),
+    date: Date,
+    boolean: Boolean,
+    array: [],
+    object: {}
+  };
+
+  Object.keys(properties).forEach(name => {
+    const type = properties[name].type;
+    const Type = typesToTypes[type];
+
+    if (!Type) throw new Error(`can't compute property type: ${type} for property: ${name}`);
+
+    if (type === 'array') {
+      schema[name] = [typesToTypes[properties[name].items.type]];
+    } else if (type === 'object') {
+      schema[name] = exports.toThinkySchema(properties[name].properties);
+    } else if (type === 'string' && properties[name].enum) {
+      schema[name] = thinky.type.string().enum(properties[name].enum);
+    } else {
+      schema[name] = Type;
+    }
+  });
+
+  return schema;
+};
