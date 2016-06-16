@@ -30,7 +30,16 @@ exports.create = (modelName) => {
     { validator, enforce_extra: 'strict' }
   );
 
+  exports.findIndexes(schema).forEach(name => {
+    model.ensureIndex(name);
+  });
+
   return model;
+};
+
+exports.findIndexes = (schema) => {
+  return Object.keys(schema.properties)
+    .filter(p => schema.properties[p].indexed);
 };
 
 exports.thinkyValidatorFor = (schema) => {
