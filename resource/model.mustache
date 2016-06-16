@@ -45,9 +45,6 @@ module.exports = {
   },
   delete: (id) => {
     return r.table('{{snakeCasePlural}}').get(id).delete({ returnChanges: true }).run()
-    .then(res => {
-      return res;
-    })
     .then(rethinkdb.firstChange);
   }
 };
