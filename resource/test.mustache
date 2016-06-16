@@ -473,6 +473,22 @@ describe('<%camelCase%> model', () => {
         });
     });
 
+    it('accepts the same count param as GET requests', () => {
+      return <%camelCase%>Creator(2)
+        .then(() => {
+          return new Promise(resolve => {
+            const opts = { query: { count: true, limit: 1 }, forceNew: true };
+            const io = IO(`${url}/<%kebabCasePlural%>`, opts);
+            io.on('metadata', data => {
+              data.count.must.be.a.number();
+              data.count.must.be.gt(1);
+              io.disconnect();
+              resolve();
+            });
+          });
+        });
+    });
+
     it('emits a warning on an unchangefeedable query', () => {
       return <%camelCase%>Creator(2)
         .then(() => {
