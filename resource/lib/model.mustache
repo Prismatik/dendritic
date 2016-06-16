@@ -19,20 +19,26 @@ exports.getIndexes = (schema, params) => {
 };
 
 const jsen = require('jsen');
-const { thinky } = require('../config');
+const { thinky, schemas } = require('../config');
 
 exports.create = (modelName) => {
-  const appSchema = require('../schema').getSchema();
-  console.log(JSON.stringify(appSchema, null, 2));
-  const modelSchema = appSchema[modelName];
-  console.log(JSON.stringify(modelSchema, null, 2));
+  const schema = schemas[modelName];
 
-  const validator = jsen(modelSchema);
+  const validator = document => {
+    console.log(document);
+    const validator = jsen(schema);
+    if (validator(document)) {
+      return true;
+    } else {
+      console.log(validator.errors);
+      return validator.errors
+    }
+  }
 
   return thinky.createModel(
-    '{{snakeCasePlural}}',
-    exports.toThinkySchema(modelSchema.properties),
-    { validator }
+    schema.camelCasePlural,
+    exports.toThinkySchema(schema.properties),
+    { validator, enforce_extra: "strict" }
   );
 };
 

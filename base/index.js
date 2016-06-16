@@ -13,6 +13,7 @@ module.exports = (opts) => {
     { p: 'bin', n: 'migration_template_test', e: 'mustache' },
     { p: 'config', n: 'index' },
     { p: 'config', n: 'thinky' },
+    { p: 'config', n: 'schema' },
     { n: 'Dockerfile', e: '' },
     { n: 'docker-compose', e: 'yml' },
     { n: 'dotenv', t: 'example.env', e: '' },
