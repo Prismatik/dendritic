@@ -43,7 +43,7 @@ describe('lib/model', () => {
     });
   });
 
-  describe.only('.toThinkySchema(jsonSchemaProperties)', () => {
+  describe('.toThinkySchema(jsonSchemaProperties)', () => {
     const JSON_SCHEMA_PROPS = {
       id: {
         type: 'string',
@@ -111,7 +111,42 @@ describe('lib/model', () => {
     });
   });
 
-  describe('.create(modelName)', () => {
+  describe.only('.create(modelName)', () => {
+    const TEST_JSON_SCHEMA = {
+      type: 'object',
+      name: 'thing',
+      camelCasePlural: 'things',
+      properties: {
+        id: {
+          type: 'string',
+          pattern: '^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$'
+        },
+        email: {
+          type: 'email'
+        },
+        password: {
+          type: 'string'
+        }
+      },
+      required: [
+        'email',
+        'password'
+      ]
+    };
+    let Model;
 
+    before(() => {
+      const { schemas } = require('../../config');
+      schemas['thing'] = TEST_JSON_SCHEMA;
+      Model = model.create('thing');
+    });
+
+    it('should build a thinky class', () => {
+      Model.must.equal(thinky.models.things);
+    });
+
+    it('should pick up validations correctly', () => {
+      return new Model({}).save();
+    });
   });
 });
