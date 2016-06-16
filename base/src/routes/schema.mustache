@@ -1,8 +1,8 @@
-const Router = require('express').Router;
+const { Router } = require('express');
 const schema = require('schema').getSchema();
 
 module.exports = {
-  http: Router()
+  http: new Router()
     .get('/schema', (req, res) => res.json(schema)),
   socket: () => {}
 };
