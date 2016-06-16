@@ -57,7 +57,8 @@ describe('lib/model', () => {
         type: 'string'
       },
       email: {
-        type: 'email'
+        type: 'string',
+        format: 'email'
       },
       password: {
         type: 'string'
@@ -122,7 +123,8 @@ describe('lib/model', () => {
           pattern: '^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$'
         },
         email: {
-          type: 'email'
+          type: 'string',
+          format: 'email'
         },
         password: {
           type: 'string'
@@ -137,7 +139,7 @@ describe('lib/model', () => {
 
     before(() => {
       const { schemas } = require('../../config');
-      schemas['thing'] = TEST_JSON_SCHEMA;
+      schemas.thing = TEST_JSON_SCHEMA;
       Model = model.create('thing');
     });
 
@@ -146,7 +148,18 @@ describe('lib/model', () => {
     });
 
     it('should pick up validations correctly', () => {
-      return new Model({}).save();
+      return new Model({}).save().must.reject.with.error(
+        thinky.Errors.ValidationError,
+        "should have required property 'email', should have required property 'password'"
+      );
+    });
+
+    it('should handle malformed data as well', () => {
+      const params = { email: 'blah!', password: 'blah!' };
+      return new Model(params).save().must.reject.with.error(
+        thinky.Errors.ValidationError,
+        'should match format "email"'
+      );
     });
   });
 });
