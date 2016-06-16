@@ -1,4 +1,4 @@
-const Router = require('express').Router;
+const { Router } = require('express');
 const jwt = require('express-jwt');
 
 const OPTS = {
@@ -13,10 +13,7 @@ const OPTS = {
 };
 
 module.exports = {
-  http: Router()
-    .get('/jwt/verify', jwt(OPTS), (req, res, next) => {
-      res.sendStatus(200);
-      return next();
-    }),
+  http: new Router()
+    .get('/jwt/verify', jwt(OPTS), (req, res) => res.json({ok: true}) ),
   socket: () => {}
 };

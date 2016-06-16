@@ -21,43 +21,31 @@ module.exports = {
   },
   {{/isUser}}
   {{#isUser}}
-  create: body => {
-    if (!body.password) return Promise.reject(new HttpError(422, errors.NO_PASSWORD));
-    return password.create(body.password, HASH_ROUNDS)
-    .then(hash => {
-      const data = _.merge(body, { password: hash });
-      return model.create(data);
-    });
-  },
-  update: body => {
-    const getHash = body.password ?
-      password.create(body.password, HASH_ROUNDS)
-      : Promise.resolve();
+  create: function * (body) {
+    if (!body.password) throw new HttpError(422, errors.NO_PASSWORD);
 
-    return getHash.then(pass => {
-      if (pass) body.password = pass;
-      return body;
-    })
-    .then(model.update);
+    const hash = yield password.create(body.password, HASH_ROUNDS);
+    const data = _.merge(body, { password: hash });
+    return yield model.create(data);
   },
-  signin: (email, pass) => {
-    return model.get({ email })
-    .then((res) => {
-      const users = res.result;
-      if (users.length === 0) throw new HttpError('UNAUTHORIZED');
-      const user = users[0];
-      return password.verify(pass, user.password)
-      .then(verified => {
-        if (verified) return jwt.sign({ id: user.id, role: user.role });
-        throw new HttpError('UNAUTHORIZED');
-      })
-      .then(token => {
-        return {
-          found: true,
-          result: { token, user: _.omit(user, 'password') }
-        };
-      });
-    });
+  update: function * (body) {
+    if (body.password) {
+      body.password = yield password.create(body.password, HASH_ROUNDS);
+    }
+
+    return model.update(body);
+  },
+  signin: function * (email, pass) {
+    const {result: [ user ]} = yield model.get({ email });
+
+    if (!user) throw new HttpError('UNAUTHORIZED');
+
+    const verified = yield password.verify(pass, user.password);
+    if (!verified) throw new HttpError('UNAUTHORIZED');
+
+    const token = yield jwt.sign({ id: user.id, role: user.role });
+
+    return { token, user: _.omit(user, 'password') };
   },
   signout: body => {
     return model.signout(body);
