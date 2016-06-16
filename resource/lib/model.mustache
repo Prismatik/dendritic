@@ -18,27 +18,25 @@ exports.getIndexes = (schema, params) => {
   return fields.filter(f => props[f] && props[f].indexed).sort();
 };
 
-const jsen = require('jsen');
+const Ajv = require('ajv');
+const ajv = new Ajv({ allErrors: true });
 const { thinky, schemas } = require('../config');
 
 exports.create = (modelName) => {
   const schema = schemas[modelName];
-
+  const validate = ajv.compile(schema);
   const validator = document => {
-    console.log(document);
-    const validator = jsen(schema);
-    if (validator(document)) {
-      return true;
-    } else {
-      console.log(validator.errors);
-      return validator.errors
+    if (!validate(document)) {
+      throw new thinky.Errors.ValidationError(
+        validate.errors.map(e => e.message).join(', ')
+      );
     }
-  }
+  };
 
   return thinky.createModel(
     schema.camelCasePlural,
     exports.toThinkySchema(schema.properties),
-    { validator, enforce_extra: "strict" }
+    { validator, enforce_extra: 'strict' }
   );
 };
 
@@ -67,6 +65,8 @@ exports.toThinkySchema = (properties) => {
       schema[name] = exports.toThinkySchema(properties[name].properties);
     } else if (type === 'string' && properties[name].enum) {
       schema[name] = thinky.type.string().enum(properties[name].enum);
+    } else if (type === 'string' && properties[name].format === 'email') {
+      schema[name] = typesToTypes.email;
     } else {
       schema[name] = Type;
     }
