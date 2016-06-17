@@ -1,44 +1,47 @@
-
+const uuid = require('uuid');
+const {{pascalCase}} = require('../models').{{camelCase}};
 {{#isUser}}
 const HttpError = require('standard-http-error');
 const password = require('simple-password');
-const _ = require('lodash');
 const jwt = require('../../lib/jwt');
 const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
-const errors = require('../../config/errors');
+function * hashPassword(params) {
+  return Object.assign({}, params, params.password ? {
+    password: yield password.create(params.password, HASH_ROUNDS)
+  } : {});
+}
 {{/isUser}}
-const model = require('../models/{{snakeCase}}');
-const uuid = require('uuid');
 
 module.exports = {
-  get: query => {
-    return model.get(query);
+  *all() {
+    // TODO query converter
+    return yield {{pascalCase}}.run();
+  },
+  *find(id) {
+    return yield {{pascalCase}}.get(id);
   },
   {{^isUser}}
-  create: body => {
-    return model.create(body);
+  *create(params) {
+    return yield new {{pascalCase}}(
+      Object.assign({ rev: uuid.v4() }, params)
+    ).save();
   },
-  update: body => {
-    return model.update(body);
+  *update(params) {
+    const {{snakeCase}} = yield this.find(params.id);
+    return yield {{snakeCase}}.merge(params).save();
   },
   {{/isUser}}
   {{#isUser}}
-  *create(body) {
-    if (!body.password) throw new HttpError(422, errors.NO_PASSWORD);
-
-    const hash = yield password.create(body.password, HASH_ROUNDS);
-    const data = _.merge(body, { password: hash });
-    return yield model.create(data);
+  *create(params) {
+    const data = Object.assign({ rev: uuid.v4() }, yield hashPassword(params));
+    return yield new {{pascalCase}}(data).save();
   },
-  *update(body) {
-    if (body.password) {
-      body.password = yield password.create(body.password, HASH_ROUNDS);
-    }
-
-    return model.update(body);
+  *update(params) {
+    const {{snakeCase}} = yield this.find(params.id);
+    return yield {{snakeCase}}.merge(yield hashPassword(params)).save();
   },
   *signin(email, pass) {
-    const { result: [user] } = yield model.get({ email });
+    const [user] = yield {{snakeCase}}.getAll(email, { index: 'email' });
 
     if (!user) throw new HttpError('UNAUTHORIZED');
 
@@ -47,16 +50,15 @@ module.exports = {
 
     const token = yield jwt.sign({ id: user.id, role: user.role });
 
-    return { token, user: _.omit(user, 'password') };
-  },
-  signout: body => {
-    return model.signout(body);
+    return { token, user: Object.assign({}, user, { password: undefined }) };
   },
   {{/isUser}}
-  delete: id => {
-    return model.delete(id);
+  *delete(id) {
+    const {{snakeCase}} = yield this.find(id);
+    return yield {{snakeCase}}.delete();
   },
   watch: query => {
-    return model.get(query, true);
+    // TODO figure this
+    return query;
   }
 };

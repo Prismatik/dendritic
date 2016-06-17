@@ -1,0 +1,71 @@
+const {{pascalCase}} = require('../../src/models/{{snakeCase}}');
+const {{camelCasePlural}} = require('../../src/controllers/{{snakeCasePlural}}');
+const { thinky: { Errors: { DocumentNotFound, ValidationError } } } = require('../../config');
+const {{camelCase}}Fixture = require('../../fixtures/{{snakeCase}}');
+const UUID_RE = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/;
+
+describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
+  let validData;
+
+  beforeEach(() => {
+    validData = {{camelCase}}Fixture.valid();
+  });
+
+  const pureData = data => Object.assign({}, data, { id: null, rev: null{{#isUser}}, password: null{{/isUser}} });
+
+  describe('.create(data)', () => {
+    it('saves valid data and returns a model instance', function * () {
+      const record = yield {{camelCasePlural}}.create(validData);
+      record.constructor.must.equal({{pascalCase}});
+
+      record.id.must.match(UUID_RE);
+
+      pureData(record).must.eql(pureData(validData));
+    });
+
+    it('automatically adds a `rev` property onto new records', function * () {
+      delete(validData.rev);
+      const record = yield {{camelCasePlural}}.create(validData);
+      record.rev.must.match(UUID_RE);
+    });
+
+    it('throws validation errors when data is missing', function * () {
+      try {
+        yield {{camelCasePlural}}.create({});
+        throw new Error('should fail');
+      } catch (e) {
+        e.must.be.instanceOf(ValidationError);
+        e.message.must.contain('should have required property');
+      }
+    });
+
+    {{#isUser}}
+    it('must require `email` and `password`', function * () {
+      try {
+        yield {{camelCasePlural}}.create(Object.assign(validData, { email: undefined, password: undefined }));
+        throw 'should fail';
+      } catch (e) {
+        e.must.be.instanceOf(ValidationError);
+        e.message.must.contain("should have required property 'email'");
+        e.message.must.contain("should have required property 'password'");
+      }
+    });
+
+    it('must validate `email` format', function * () {
+      try {
+        yield {{camelCasePlural}}.create(Object.assign(validData, { email: 'hack!' }));
+        throw 'should fail';
+      } catch (e) {
+        e.must.be.instanceOf(ValidationError);
+        e.message.must.contain('should match format "email"');
+      }
+    });
+
+    it('must encrypt passwords', function * () {
+      const data = Object.assign(validData, { password: '84(0/\\/' });
+      const record = yield {{camelCasePlural}}.create(data);
+      record.password.must.not.eql(data.password);
+    });
+    {{/isUser}}
+  });
+});
