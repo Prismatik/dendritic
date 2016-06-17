@@ -12,6 +12,7 @@
     "spaced-comment": "off",
     "no-underscore-dangle": "off",
     "func-names": "off",
-    "no-shadow": "off"
+    "no-shadow": "off",
+    "prefer-template": "off"
   }
 }
