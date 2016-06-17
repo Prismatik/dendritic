@@ -1,23 +1,3 @@
-exports.normaliseParams = params => {
-  return Object.keys(params).reduce((p, k) => {
-    const param = params[k];
-
-    p[k] = param;
-    if (!isNaN(Number(param))) p[k] = Number(param);
-    if (param === 'true') p[k] = true;
-    if (param === 'false') p[k] = false;
-
-    return p;
-  }, {});
-};
-
-exports.getIndexes = (schema, params) => {
-  const props = schema.properties;
-  const fields = Object.keys(params);
-
-  return fields.filter(f => props[f] && props[f].indexed).sort();
-};
-
 const Ajv = require('ajv');
 const { thinky, schemas } = require('../config');
 
