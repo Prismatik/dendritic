@@ -6,12 +6,41 @@ const UUID_RE = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a
 
 describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
   let validData;
+  let record;
 
-  beforeEach(() => {
+  beforeEach(function * () {
     validData = {{camelCase}}Fixture.valid();
+    record = yield new {{pascalCase}}({{camelCase}}Fixture.valid()).save();
   });
 
   const pureData = data => Object.assign({}, data, { id: null, rev: null{{#isUser}}, password: null{{/isUser}} });
+
+  describe('.all(query)', () => {
+    it('returns all the records by default', function * () {
+      const result = yield {{camelCasePlural}}.all();
+      result.must.be.an(Array);
+      result.map(i => Object.assign({}, i)).must.eql(
+        [Object.assign({}, record)]
+      );
+    });
+  });
+
+  describe('.find(id)', () => {
+    it('returns the record when it exists', function * () {
+      const result = yield {{camelCasePlural}}.find(record.id);
+
+      Object.assign({}, result).must.eql(Object.assign({}, record));
+    });
+
+    it('throws DocumentNotFound if the record does not exist', function * () {
+      try {
+        yield {{camelCasePlural}}.find('hack!');
+        throw new Error('must fail here!');
+      } catch (e) {
+        e.must.be.instanceOf(DocumentNotFound);
+      }
+    });
+  });
 
   describe('.create(data)', () => {
     it('saves valid data and returns a model instance', function * () {
@@ -38,12 +67,11 @@ describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
         e.message.must.contain('should have required property');
       }
     });
-
     {{#isUser}}
     it('must require `email` and `password`', function * () {
       try {
         yield {{camelCasePlural}}.create(Object.assign(validData, { email: undefined, password: undefined }));
-        throw 'should fail';
+        throw new Error('must fail here');
       } catch (e) {
         e.must.be.instanceOf(ValidationError);
         e.message.must.contain("should have required property 'email'");
@@ -54,7 +82,7 @@ describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
     it('must validate `email` format', function * () {
       try {
         yield {{camelCasePlural}}.create(Object.assign(validData, { email: 'hack!' }));
-        throw 'should fail';
+        throw new Error('should fail');
       } catch (e) {
         e.must.be.instanceOf(ValidationError);
         e.message.must.contain('should match format "email"');
@@ -67,5 +95,71 @@ describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
       record.password.must.not.eql(data.password);
     });
     {{/isUser}}
+  });
+
+  describe('.update(params)', () => {
+    it('updates params when things are good', function * () {
+      const oldId = record.id;
+      const result = yield {{camelCasePlural}}.update(record.id, validData);
+      result.constructor.must.equal({{pascalCase}});
+      result.id.must.eql(oldId);
+
+      pureData(result).must.eql(pureData(validData));
+    });
+
+    it('explodes when data is wrong', function * () {
+      try {
+        yield {{camelCasePlural}}.update(record.id, { rev: 'hack!' });
+        throw new Error('should fail');
+      } catch (e) {
+        e.must.be.instanceOf(ValidationError);
+        e.message.must.contain('should match pattern');
+      }
+    });
+
+    it('throws DocumentNotFound when the document does not exist', function * () {
+      try {
+        yield {{camelCasePlural}}.update('hack!', validData);
+      } catch (e) {
+        e.must.be.instanceOf(DocumentNotFound);
+      }
+    });
+    {{#isUser}}
+    it('does not allow update to borked emails', function * () {
+      try {
+        yield {{camelCasePlural}}.update(record.id, { email: 'hack!' });
+        throw new Error('should fail');
+      } catch (e) {
+        e.must.be.instanceOf(ValidationError);
+        e.message.must.contain('should match format "email"');
+      }
+    });
+
+    it('re-encrypts new passwords', function * () {
+      const oldPassword = record.password;
+      const data = { password: '84(0/\\/' };
+      const result = yield {{camelCasePlural}}.update(record.id, data);
+      result.password.must.not.eql(data.password);
+      result.password.must.not.eql(oldPassword);
+    });
+    {{/isUser}}
+  });
+
+  describe('.delete(id)', () => {
+    it('deletes a record for sure when it exists', function * () {
+      yield {{camelCasePlural}}.delete(record.id);
+
+      const result = yield {{pascalCase}}.getAll(record.id);
+      result.must.eql([]);
+    });
+
+    it('throws DocumentNotFound when the document does not exist', function * () {
+      try {
+        yield {{camelCasePlural}}.delete('hack!');
+        throw new Error('must fail here');
+      } catch (e) {
+        e.must.be.instanceOf(DocumentNotFound);
+      }
+    });
   });
 });

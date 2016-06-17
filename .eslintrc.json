@@ -11,6 +11,7 @@
     "no-param-reassign": "off",
     "spaced-comment": "off",
     "no-underscore-dangle": "off",
-    "func-names": "off"
+    "func-names": "off",
+    "no-shadow": "off"
   }
 }
