@@ -122,5 +122,18 @@ exports.queryBuilder = (model, schema) => (params = {}) => {
     query = query.filter(filter);
   }
 
+  if (params.orderBy && schema.properties[params.orderBy]) {
+    const direction = params.order || 'asc';
+    query = query.orderBy(params.orderBy, direction);
+  }
+
+  if (params.skip && !isNaN(parseInt(params.skip, 10))) {
+    query = query.skip(parseInt(params.skip, 10));
+  }
+
+  if (params.limit && !isNaN(parseInt(params.limit, 10))) {
+    query = query.limit(parseInt(params.limit, 10));
+  }
+
   return query;
 };

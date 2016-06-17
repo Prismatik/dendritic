@@ -23,11 +23,9 @@ describe('{{snakeCasePlural}} controller', () => {
     let record2;
     let record3;
 
-    const sorted = records => (
-      records
-        .sort((a, b) => a.id > b.id ? -1 : 1)
-        .map(i => Object.assign({}, i))
-    );
+    const sorted = (records, param = 'id') => records
+      .sort((a, b) => (a[param] > b[param] ? 1 : -1))
+      .map(i => Object.assign({}, i));
 
     beforeEach(function * () {
       const oldRecords = yield {{pascalCase}}.run();
@@ -50,6 +48,36 @@ describe('{{snakeCasePlural}} controller', () => {
       const filter = { id: record1.id };
       const result = yield {{camelCasePlural}}.all(filter);
       sorted(result).must.eql(sorted([record1]));
+    });
+
+    it('ignores totally unsupported params', function * () {
+      const filter = { totalMonkey: 123 };
+      const result = yield {{camelCasePlural}}.all(filter);
+      sorted(result).must.eql(sorted([record1, record2, record3]));
+    });
+
+    it('allows to order things by a specific field', function * () {
+      const params = { orderBy: 'rev' };
+      const result = yield {{camelCasePlural}}.all(params);
+      result.map(i => Object.assign({}, i)).must.eql(
+        sorted([record1, record2, record3], 'rev')
+      );
+    });
+
+    it('allows to skip records', function * () {
+      const params = { orderBy: 'rev', skip: 1 };
+      const result = yield {{camelCasePlural}}.all(params);
+      result.map(i => Object.assign({}, i)).must.eql(
+        sorted([record1, record2, record3], 'rev').slice(1)
+      );
+    });
+
+    it('allows to limit records', function * () {
+      const params = { orderBy: 'rev', limit: 2 };
+      const result = yield {{camelCasePlural}}.all(params);
+      result.map(i => Object.assign({}, i)).must.eql(
+        sorted([record1, record2, record3], 'rev').slice(0, 2)
+      );
     });
   });
 
