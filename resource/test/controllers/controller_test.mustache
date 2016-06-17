@@ -7,7 +7,7 @@ const { thinky: { Errors: { DocumentNotFound, ValidationError } } } = require('.
 const {{camelCase}}Fixture = require('../../fixtures/{{snakeCase}}');
 const UUID_RE = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/;
 
-describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
+describe('{{snakeCasePlural}} controller', () => {
   let validData;
   let record;
 
@@ -18,13 +18,38 @@ describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
 
   const pureData = data => Object.assign({}, data, { id: null, rev: null{{#isUser}}, password: null{{/isUser}} });
 
-  describe('.all(query)', () => {
+  describe{{#isUser}}.only{{/isUser}}('.all(query)', () => {
+    let record1;
+    let record2;
+    let record3;
+
+    const sorted = records => (
+      records
+        .sort((a, b) => a.id > b.id ? -1 : 1)
+        .map(i => Object.assign({}, i))
+    );
+
+    beforeEach(function * () {
+      const oldRecords = yield {{pascalCase}}.run();
+      yield oldRecords.map(r => r.delete());
+
+      [record1, record2, record3] = yield [
+        {{camelCasePlural}}.create({{camelCase}}Fixture.valid()),
+        {{camelCasePlural}}.create({{camelCase}}Fixture.valid()),
+        {{camelCasePlural}}.create({{camelCase}}Fixture.valid())
+      ];
+    });
+
     it('returns all the records by default', function * () {
       const result = yield {{camelCasePlural}}.all();
       result.must.be.an(Array);
-      result.map(i => Object.assign({}, i)).must.eql(
-        [Object.assign({}, record)]
-      );
+      sorted(result).must.eql(sorted([record1, record2, record3]));
+    });
+
+    it('allows to filter the list by a specific field', function * () {
+      const filter = { id: record1.id };
+      const result = yield {{camelCasePlural}}.all(filter);
+      sorted(result).must.eql(sorted([record1]));
     });
   });
 

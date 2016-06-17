@@ -1,6 +1,12 @@
 const Ajv = require('ajv');
 const { thinky, schemas } = require('../config');
 
+/**
+ * Creates a Thiky model based on a schema definition
+ *
+ * @param {String} model name (in JSON schema)
+ * @return {Class} thinky model
+ */
 exports.create = (modelName) => {
   const schema = schemas[modelName];
   const validator = exports.thinkyValidatorFor(schema);
@@ -14,14 +20,28 @@ exports.create = (modelName) => {
     model.ensureIndex(name);
   });
 
+  model.standardQuery = exports.queryBuilder(model, schema);
+
   return model;
 };
 
+/**
+ * Finds the names of properties that are marked as indexed in the schema
+ *
+ * @param {Object} model JSON schema
+ * @return {Array} field names
+ */
 exports.findIndexes = (schema) => {
   return Object.keys(schema.properties)
     .filter(p => schema.properties[p].indexed);
 };
 
+/**
+ * Builds a Thinky compatible data validator out of the JSON Schema
+ *
+ * @param {Object} model JSON schema
+ * @return {Function} thinky compatible validator
+ */
 exports.thinkyValidatorFor = (schema) => {
   const ajv = new Ajv({ allErrors: true });
   const validate = ajv.compile(schema);
@@ -34,6 +54,12 @@ exports.thinkyValidatorFor = (schema) => {
   };
 };
 
+/**
+ * Converts a JSON schema properties into a Thinky model properties config
+ *
+ * @param {Object} model JSON schema properties
+ * @return {Object} thinky compatible properties config
+ */
 exports.toThinkySchema = (properties) => {
   const schema = {};
 
@@ -54,6 +80,12 @@ const typesToTypes = {
   object: {}
 };
 
+/**
+ * Converts a JSON schema field config into a Thinky based field type
+ *
+ * @param {Object} JSON property definition
+ * @return {Object} thinky type thing
+ */
 exports.toThinkyType = (property) => {
   const type = property.type;
   const Type = typesToTypes[type];
@@ -67,4 +99,28 @@ exports.toThinkyType = (property) => {
     default:
       return Type;
   }
+};
+
+/**
+ * A standard query builder (used in controllers)
+ *
+ * @param {Class} thinky model
+ * @param {Object} model json schema
+ * @return {Function} a query builder
+ */
+exports.queryBuilder = (model, schema) => (params = {}) => {
+  let query = model;
+  const filter = {};
+
+  Object.keys(params).forEach(key => {
+    if (schema.properties[key]) {
+      filter[key] = params[key];
+    }
+  });
+
+  if (Object.keys(filter).length > 0) {
+    query = query.filter(filter);
+  }
+
+  return query;
 };

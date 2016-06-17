@@ -1,12 +1,11 @@
 require('dotenv-safe').load({ sample: './example.env' });
 require('must');
+const path = require('path');
+require('app-module-path').addPath(path.resolve(__dirname, '..'));
 
 const mocha = require('mocha');
 const coMocha = require('co-mocha');
 coMocha(mocha);
-
-const path = require('path');
-require('app-module-path').addPath(path.resolve(__dirname, '..'));
 
 // const setup = require('setup');
 // const app = require('../src/app').server;

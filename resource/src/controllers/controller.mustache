@@ -13,9 +13,8 @@ function * hashPassword(params) {
 {{/isUser}}
 
 module.exports = {
-  *all() {
-    // TODO query converter
-    return yield {{pascalCase}}.run();
+  *all(params) {
+    return yield {{pascalCase}}.standardQuery(params).run();
   },
   *find(id) {
     return yield {{pascalCase}}.get(id);
