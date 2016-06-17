@@ -13,4 +13,9 @@ setup()
 
     log.info('{{camelCase}} API listening at http://%s:%s', host, port);
   });
+})
+.catch(e => {
+  console.log('Exiting due to error:');
+  console.log(e);
+  process.exit();
 });
