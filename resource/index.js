@@ -18,10 +18,10 @@ module.exports = (opts) => {
     { p: 'test/lib', n: 'rethinkdb' },
     { p: 'src/models', n: 'index' },
     { n: 'src/models/model', d: 'src/models', t: opts.snakeCase },
-    { n: 'controller', d: 'src/controllers', t: opts.snakeCase },
-    { n: 'test', d: 'test/models', t: `${opts.snakeCase}_test` },
+    { n: 'src/controllers/controller', d: 'src/controllers', t: opts.snakeCasePlural },
+    { n: 'test/routes/test', d: 'test/routes', t: `${opts.snakeCase}_test` },
     { n: 'test/fixture', d: 'test/fixtures', t: `${opts.snakeCase}_test` },
-    { n: 'route', d: 'src/routes', t: opts.snakeCase },
+    { n: 'src/routes/route', d: 'src/routes', t: opts.snakeCase },
     { n: 'table', d: 'tables', t: opts.snakeCase },
     { n: 'fixture', d: 'fixtures', t: opts.snakeCase },
     { n: 'schema', d: 'schemas', t: opts.snakeCase, e: 'json' }
