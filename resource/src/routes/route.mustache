@@ -1,6 +1,5 @@
 const { Router } = require('express');
-const _ = require('lodash');
-const controller = require('../controllers/{{snakeCasePlural}}.js');
+const {{camelCasePlural}} = require('../controllers/{{snakeCasePlural}}');
 
 const router = new Router();
 
@@ -9,7 +8,7 @@ module.exports = {
   socket: io => {
     const nsp = io.of('/{{kebabCasePlural}}');
     nsp.on('connection', socket => {
-      controller.watch(socket.handshake.query)
+      {{camelCasePlural}}.watch(socket.handshake.query)
       .then(({ result: cursor, warns = [], count }) => {
         warns.forEach(warn => socket.emit('warning', warn));
 
@@ -27,38 +26,37 @@ module.exports = {
 
 router
   .get('/{{kebabCasePlural}}', function * (req, res) {
-    const {{snakeCasePlural}} = yield controller.get(req.query);
-    res.json({{snakeCasePlural}} || []);
+    const list = yield {{camelCasePlural}}.all(req.query);
+    {{#isUser}}
+    list.forEach(user => delete(user.password));
+    {{/isUser}}
+    res.json(list);
   })
   .get('/{{kebabCasePlural}}/:id', function * (req, res) {
-    const {{snakeCase}} = yield controller.get(_.assign({ id: req.params.id }, req.query));
-    if ({{snakeCase}}) {
-      res.json({{snakeCase}});
-    } else {
-      res.status(404).json({ error: 'Not found' });
-    }
+    const {{camelCase}} = yield {{camelCasePlural}}.find(req.params.id);
+    res.json({{camelCase}});
   })
   .post('/{{kebabCasePlural}}', function * (req, res) {
-    const {{snakeCase}} = yield controller.create(req.body);
-    res.status(201).json({{snakeCase}});
+    const {{camelCase}} = yield {{camelCasePlural}}.create(req.body);
+    res.status(201).json({{camelCase}});
   })
   .put('/{{kebabCasePlural}}/:id', function * (req, res) {
-    const {{snakeCase}} = yield controller.update(req.body);
-    res.json({{snakeCase}});
+    const {{camelCase}} = yield {{camelCasePlural}}.update(req.params.id, req.body);
+    res.json({{camelCase}});
   })
   .delete('/{{kebabCasePlural}}/:id', function * (req, res) {
-    yield controller.delete(req.params.id);
+    yield {{camelCasePlural}}.delete(req.params.id);
     res.json({ ok: true });
   });
 
 {{#isUser}}
 router
   .post('/{{kebabCasePlural}}/signin', function * (req, res) {
-    const result = yield controller.signin(req.body.email, req.body.password);
+    const result = yield {{camelCasePlural}}.signin(req.body.email, req.body.password);
     res.json(result);
   })
   .post('/{{kebabCasePlural}}/signout', function * (req, res) {
-    const result = yield controller.signout(req.body);
+    const result = yield {{camelCasePlural}}.signout(req.body);
     res.json(result);
   });
 {{/isUser}}
