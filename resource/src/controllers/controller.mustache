@@ -1,5 +1,5 @@
 const uuid = require('uuid');
-const {{pascalCase}} = require('../models').{{camelCase}};
+const { {{pascalCase}} } = require('../models');
 {{#isUser}}
 const HttpError = require('standard-http-error');
 const password = require('simple-password');
@@ -26,9 +26,11 @@ module.exports = {
       Object.assign({ rev: uuid.v4() }, params)
     ).save();
   },
-  *update(params) {
-    const {{snakeCase}} = yield this.find(params.id);
-    return yield {{snakeCase}}.merge(params).save();
+  *update(id, params) {
+    const {{camelCase}} = yield this.find(id);
+    const data = Object.assign({}, params);
+    delete(data.id); // disallow ID replacements
+    return yield {{camelCase}}.merge(data).save();
   },
   {{/isUser}}
   {{#isUser}}
@@ -36,12 +38,14 @@ module.exports = {
     const data = Object.assign({ rev: uuid.v4() }, yield hashPassword(params));
     return yield new {{pascalCase}}(data).save();
   },
-  *update(params) {
-    const {{snakeCase}} = yield this.find(params.id);
-    return yield {{snakeCase}}.merge(yield hashPassword(params)).save();
+  *update(id, params) {
+    const {{camelCase}} = yield this.find(id);
+    const data = yield hashPassword(params);
+    delete(data.id); // disallow ID replacements
+    return yield {{camelCase}}.merge(data).save();
   },
   *signin(email, pass) {
-    const [user] = yield {{snakeCase}}.getAll(email, { index: 'email' });
+    const [user] = yield {{camelCase}}.getAll(email, { index: 'email' });
 
     if (!user) throw new HttpError('UNAUTHORIZED');
 
@@ -54,8 +58,8 @@ module.exports = {
   },
   {{/isUser}}
   *delete(id) {
-    const {{snakeCase}} = yield this.find(id);
-    return yield {{snakeCase}}.delete();
+    const {{camelCase}} = yield this.find(id);
+    return yield {{camelCase}}.delete();
   },
   watch: query => {
     // TODO figure this
