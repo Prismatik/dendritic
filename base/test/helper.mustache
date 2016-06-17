@@ -1,26 +1,38 @@
 require('dotenv-safe').load({ sample: './example.env' });
 require('must');
 
+const mocha = require('mocha');
+const coMocha = require('co-mocha');
+coMocha(mocha);
+
 const path = require('path');
 require('app-module-path').addPath(path.resolve(__dirname, '..'));
 
-const setup = require('setup');
-const app = require('../src/app').server;
-const r = require('lib/db');
+// const setup = require('setup');
+// const app = require('../src/app').server;
+// const r = require('lib/db');
+//
+// const DB_NAME = r._poolMaster._options.db;
 
-const DB_NAME = r._poolMaster._options.db;
+const { thinky } = require('../config');
 
-app.listen(process.env.PORT, () => {
-  before(function before() {
-    this.timeout(30000);
-
-    return setup()
-      .then(() => {
-        after(() => {
-          return r.dbDrop(DB_NAME)
-            .then(() => r.getPoolMaster().drain())
-            .then(() => Promise.resolve(app.close()));
-        });
-      });
+process.nextTick(function() {
+  before(function * () {
+    yield thinky.dbReady();
   });
 });
+
+// app.listen(process.env.PORT, () => {
+//   before(function before() {
+//     this.timeout(30000);
+//
+//     return setup()
+//       .then(() => {
+//         after(() => {
+//           return r.dbDrop(DB_NAME)
+//             .then(() => r.getPoolMaster().drain())
+//             .then(() => Promise.resolve(app.close()));
+//         });
+//       });
+//   });
+// });
