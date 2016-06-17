@@ -52,10 +52,14 @@ module.exports = {
 
     return { token, user };
   },
+  *signout() {
+    return { ok: true };
+  },
   {{/isUser}}
   *delete(id) {
     const {{camelCase}} = yield this.find(id);
-    return yield {{camelCase}}.delete();
+    yield {{camelCase}}.delete();
+    return {{camelCase}};
   },
   watch: query => {
     // TODO figure this
