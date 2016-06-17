@@ -7,7 +7,7 @@ const jwt = require('../../lib/jwt');
 const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
 const errors = require('../../config/errors');
 {{/isUser}}
-const model = require('../models/{{snakeCase}}.js');
+const model = require('../models/{{snakeCase}}');
 const uuid = require('uuid');
 
 module.exports = {

@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const HttpError = require('standard-http-error');
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
-const { thinky: { Errors: { DocumentNotFound, ValidationError } } } = require('../config')
+const { thinky: { Errors: { DocumentNotFound, ValidationError } } } = require('../config');
 
 const log = require('../lib/logger');
 const routes = require('./routes');
