@@ -1,27 +1,31 @@
+const uuid = require('uuid');
 const { app } = require('../helper');
 const {{camelCasePlural}} = require('../../src/controllers/{{snakeCasePlural}}');
 const {{camelCase}}Fixture = require('../../fixtures/{{snakeCase}}');
 
 describe{{#isUser}}.only{{/isUser}}('/{{kebabCasePlural}} route', () => {
-  describe('GET /', () => {
-    let {{camelCase}}1;
-    let {{camelCase}}2;
+  let {{camelCase}};
+  let {{camelCase}}1;
+  let {{camelCase}}2;
 
+  beforeEach(function * () {
+    const oldRecords = yield {{camelCasePlural}}.all();
+    yield oldRecords.map(r => r.delete());
+
+    [{{camelCase}}1, {{camelCase}}2] = yield [
+      {{camelCasePlural}}.create({{camelCase}}Fixture.valid()),
+      {{camelCasePlural}}.create({{camelCase}}Fixture.valid())
+    ];
+
+    {{camelCase}} = {{camelCase}}1;
+  });
+
+  describe('GET /', () => {
     const sorted = (records, param = 'id') => records
       .sort((a, b) => (a[param] > b[param] ? 1 : -1))
       .map(i => Object.assign({}, i)){{#isUser}}
       .map(i => { delete(i.password); return i; })
       {{/isUser}};
-
-    beforeEach(function * () {
-      const oldRecords = yield {{camelCasePlural}}.all();
-      yield oldRecords.map(r => r.delete());
-
-      [{{camelCase}}1, {{camelCase}}2] = yield [
-        {{camelCasePlural}}.create({{camelCase}}Fixture.valid()),
-        {{camelCasePlural}}.create({{camelCase}}Fixture.valid())
-      ];
-    });
 
     it('returns all records by default', function * () {
       const response = yield app.get('/{{kebabCasePlural}}');
@@ -37,325 +41,116 @@ describe{{#isUser}}.only{{/isUser}}('/{{kebabCasePlural}} route', () => {
     });
 
     it('allows to sort data by fields', function * () {
-      const response = yield app.get('/{{kebabCasePlural}}', { orderBy: 'ref' });
+      const response = yield app.get('/{{kebabCasePlural}}', { orderBy: 'rev' });
       response.status.must.eql(200);
-      sorted(response.body, 'ref').must.eql(sorted([{{camelCase}}1, {{camelCase}}2], 'ref'));
+      sorted(response.body, 'rev').must.eql(sorted([{{camelCase}}1, {{camelCase}}2], 'rev'));
+    });
+
+    it('allows `limit` data', function * () {
+      const response = yield app.get('/{{kebabCasePlural}}', { limit: 1, orderBy: 'rev' });
+      response.status.must.eql(200);
+      response.body.must.eql(sorted([{{camelCase}}1, {{camelCase}}2], 'rev').slice(0, 1));
+    });
+  });
+
+  describe('GET /:id', () => {
+    it('returns the record if exists', function * () {
+      const response = yield app.get('/{{kebabCasePlural}}/' + {{camelCase}}.id);
+      response.status.must.eql(200);
+      response.body.must.be.object();
+      {{#isUser}}
+      delete({{camelCase}}.password);
+      {{/isUser}}
+      response.body.must.eql(Object.assign({}, {{camelCase}}));
+    });
+
+    it('throws 404 when the record does not exist', function * () {
+      const response = yield app.get(`/{{kebabCasePlural}}/hack`);
+      response.status.must.eql(404);
+      response.body.must.eql({ error: 'not found' });
+    });
+  });
+
+  describe('POST /', () => {
+    it('creates new record when data is good', function * () {
+      const data = {{camelCase}}Fixture.valid(); delete(data.id);
+      const response = yield app.post('/{{kebabCasePlural}}', data);
+      response.status.must.eql(201);
+      response.body.must.be.object();
+      {{#isUser}}
+      response.body.must.not.have.property('password');
+      {{/isUser}}
+      const {{camelCase}} = response.body;
+
+      delete({{camelCase}}.id); delete({{camelCase}}.rev);
+      delete(data.rev); delete(data.password);
+
+      {{camelCase}}.must.eql(data);
+    });
+
+    it('throws 422 if the data is bad', function * () {
+      const response = yield app.post('/{{kebabCasePlural}}', {});
+      response.status.must.eql(422);
+      response.body.must.be.object();
+      response.body.must.have.property('error');
+      response.body.error.must.contain('should have required property');
+    });
+    {{#isUser}}
+    it('throws 422 if a password is mising', function * () {
+      const data = {{camelCase}}Fixture.valid(); delete(data.password);
+      const response = yield app.post('/{{kebabCasePlural}}', data);
+      response.status.must.eql(422);
+      response.body.must.eql({
+        error: "should have required property 'password'"
+      });
+    });
+    {{/isUser}}
+  });
+
+  describe('PUT /:id', () => {
+    it('updates the data and returns the updated record back', function * () {
+      const data = { rev: uuid.v4() };
+      const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
+      response.status.must.eql(200);
+
+      const expected = Object.assign({}, {{camelCase}}, data);
+      delete(expected.password);
+
+      response.body.must.eql(expected);
+    });
+
+    it('throws 404 if the record does not exist', function * () {
+      const response = yield app.put('/{{kebabCasePlural}}/hack', {});
+      response.status.must.eql(404);
+      response.body.must.eql({ error: 'not found' });
+    });
+
+    it('throws 422 if the data is malformed', function * () {
+      const data = { rev: 'hack hack hack' };
+      const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
+      response.status.must.eql(422);
+      response.body.must.eql({
+        error: 'should match pattern "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"'
+      });
+    });
+  });
+
+  describe('DELETE /:id', () => {
+    it('deletes a record if it exists', function * () {
+      const response = yield app.delete('/{{kebabCasePlural}}/' + {{camelCase}}.id);
+      response.status.must.eql(200);
+      response.body.must.eql({ ok: true });
+    });
+
+    it('throws 404 if the record does not exist', function * () {
+      const response = yield app.delete('/{{kebabCasePlural}}/hack', {});
+      response.status.must.eql(404);
+      response.body.must.eql({ error: 'not found' });
     });
   });
 });
 
 /********************************************************************************
-const app = require('../../src/app').app;
-const agent = require('doubleagent')(app);
-const querystring = require('querystring');
-const _ = require('lodash');
-const uuid = require('uuid');
-const fixture = require('../../fixtures/{{snakeCase}}');
-const IO = require('socket.io-client');
-{{#isUser}}
-const password = require('simple-password');
-const errors = require('../../config/errors');
-const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
-{{/isUser}}
-const warnings = require('../../config/warnings');
-{{#relationships}}
-const {{camelCase}}Fixture = require('../../fixtures/{{snakeCase}}');
-{{/relationships}}
-
-const url = `http://localhost:${process.env.PORT}`;
-
-{{#isUser}}
-const statusEquals = code => res => {
-  res.status.must.equal(code);
-  return res;
-};
-
-{{/isUser}}
-const asc = (a, b) => {
-  if (a.id > b.id) return 1;
-  if (a.id < b.id) return -1;
-  return 0;
-};
-
-const desc = (a, b) => {
-  if (a.id < b.id) return 1;
-  if (a.id > b.id) return -1;
-  return 0;
-};
-
-const unwrapJSON = (res) => {
-  return res.body;
-};
-
-const getJSON = (path) => {
-  return agent.get(path)
-  .then(unwrapJSON);
-};
-
-const sender = method => path => data => {
-  return agent[method](path, data);
-};
-
-const poster = sender('post');
-const putter = sender('put');
-
-const deleter = path => () => {
-  return agent.delete(path);
-};
-
-const {{camelCase}}Poster = poster('/{{kebabCasePlural}}');
-
-const {{camelCase}}Creator = times => {
-  return Promise.all(_.times(times, () => {
-    const data = fixture.valid();
-    {{^isUser}}
-    return {{camelCase}}Poster(data)
-    .then(unwrapJSON);
-    {{/isUser}}
-    {{#isUser}}
-    return password.create(data.password, HASH_ROUNDS)
-    .then(pass => {
-      data.password = pass;
-      return {{camelCase}}Poster(data)
-      .then(unwrapJSON);
-    });
-    {{/isUser}}
-  }));
-};
-
-const pop = data => data[0];
-
-const single{{pascalCase}}Creator = () => {{camelCase}}Creator(1).then(pop);
-
-{{#relationships}}
-// {{camelCase}} relationship helpers
-const {{camelCase}}Poster = poster('/{{kebabCasePlural}}');
-
-const {{camelCase}}Creator = times => {
-  return Promise.all(_.times(times, () => {
-    const data = {{camelCase}}Fixture.valid();
-    return {{camelCase}}Poster(data)
-    .then(unwrapJSON);
-  }));
-};
-
-const single{{pascalCase}}Creator = () => {{camelCase}}Creator(1).then(pop);
-{{/relationships}}
-
-describe('{{camelCase}} model', () => {
-  describe('GET /{{kebabCasePlural}}', () => {
-    it('returns 200 ok', () => {
-      return single{{pascalCase}}Creator()
-        .then(() => agent.get(`/{{kebabCasePlural}}`))
-        .must.resolve.to.have.property('status', 200);
-    });
-
-    it('return an list of entries', () => {
-      return single{{pascalCase}}Creator()
-        .then(() => agent.get(`/{{kebabCasePlural}}`))
-        .then(({ body }) => {
-          body.must.be.an(Array);
-        });
-    });
-
-    it('accepts search params in the querystring', () => {
-      return {{camelCase}}Creator(2)
-        .then(entries => {
-          const record = entries[0];
-          const property = Object.keys(record).filter(k => k !== 'id')[0];
-          if (!property) return Promise.resolve(); // if no properties other than id skip test
-          const queryStr = querystring.stringify({ [property]: record[property] });
-
-          return getJSON(`/{{kebabCasePlural}}?${queryStr}`)
-            .then(json => json.map(entry => entry[property]))
-            .must.resolve.to.eql([record[property]]);
-        });
-    });
-
-    it('does not match non-property search params in the querystring', () => {
-      return {{camelCase}}Creator(2)
-        .then({{camelCasePlural}} => {
-          const id = {{camelCasePlural}}[0].id;
-          return getJSON(`/{{kebabCasePlural}}?foo=${id}`);
-        })
-        .then(entries => entries.length)
-        .must.resolve.to.be.gt(1);
-    });
-
-    it('paginates data when asked', () => {
-      return {{camelCase}}Creator(5)
-        .then(() => getJSON('/{{kebabCasePlural}}?limit=2'))
-        .must.resolve.to.have.length(2);
-    });
-
-    it('skips records when asked', () => {
-      return {{camelCase}}Creator(5)
-        .then(() => getJSON('/{{kebabCasePlural}}?limit=2'))
-        .then(first => {
-          first.must.have.length(2);
-          return getJSON('/{{kebabCasePlural}}?limit=2&skip=2')
-            .then(second => {
-              second.must.have.length(2);
-              second.must.not.eql(first);
-            });
-        });
-    });
-
-    it('orders data when asked', function callback() {
-      this.timeout(10000); // Required for user tests because bcrypt takes time
-      return {{camelCase}}Creator(15)
-        .then(() => getJSON('/{{kebabCasePlural}}?orderBy=id'))
-        .then(results => {
-          const reordered = _.clone(results).sort(asc);
-
-          _.map(reordered, 'id').must.eql(_.map(results, 'id'));
-        });
-    });
-
-    it('orders data in reverse when asked', function callback() {
-      this.timeout(10000); // Required for user tests because bcrypt takes time
-      return {{camelCase}}Creator(15)
-        .then(() => getJSON('/{{kebabCasePlural}}?orderBy=id&order=desc'))
-        .then(results => {
-          const reordered = _.clone(results).sort(desc);
-
-          _.map(reordered, 'id').must.eql(_.map(results, 'id'));
-        });
-    });
-
-    it('returns n matching docs with a count of all matching docs', () => {
-      return {{camelCase}}Creator(10)
-        .then(() => agent.get(`/{{kebabCasePlural}}?count=true&limit=5`))
-        .then(({ body }) => {
-          body.must.have.length(5);
-        });
-    });
-
-    it('returns n matching docs without a count of all matching docs ', () => {
-      return {{camelCase}}Creator(10)
-        .then(() => agent.get(`/{{kebabCasePlural}}?limit=5`))
-        .then(({ body }) => {
-          body.must.have.length(5);
-        });
-    });
-
-    it('returns only a count with no matching docs', () => {
-      return {{camelCase}}Creator(10)
-        .then(() => agent.get(`/{{kebabCasePlural}}?count=true&result=false`))
-        .then(({ body }) => {
-          body.must.eql([]);
-        });
-    });
-  });
-
-  describe('GET /{{kebabCasePlural}}/:id', () => {
-    it('returns 200 with the record data', () => {
-      return single{{pascalCase}}Creator()
-        .then(record => agent.get(`/{{kebabCasePlural}}/${record.id}`))
-        .must.resolve.to.have.property('status', 200);
-    });
-  });
-
-  describe('POST /{{kebabCasePlural}}', () => {
-    it('returns 201 for valid data', () => {
-      return {{camelCase}}Poster(fixture.valid())
-        .must.resolve.to.have.property('status', 201);
-    });
-
-    it('returns 422 for invalid data', () => {
-      const invalid = fixture.valid();
-      invalid.rev = 'lol';
-      return {{camelCase}}Poster(invalid)
-        .must.resolve.to.have.property('status', 422);
-    });
-
-    it('actually persists the data', () => {
-      return single{{pascalCase}}Creator()
-        .then(record => {
-          return getJSON(`/{{kebabCasePlural}}/${record.id}`)
-            .must.resolve.to.have.property('id', record.id);
-        });
-    });
-    {{#isUser}}
-    it('returns 422 for creation with no password', () => {
-      const invalid = fixture.valid();
-      delete invalid.password;
-      return {{camelCase}}Poster(invalid)
-        .must.resolve.to.have.property('status', 422);
-    });
-
-    it('returns a meaningful error message for a create with no password', () => {
-      const invalid = fixture.valid();
-      delete invalid.password;
-      return {{camelCase}}Poster(invalid)
-        .then(({ body }) => {
-          body.must.have.property('error', errors.NO_PASSWORD);
-        });
-    });
-    {{/isUser}}
-    {{#relationships}}
-
-    it('saves related entity (can GET using :id)', () => {
-      return single{{pascalCase}}Creator()
-        .then(body => agent.get(`/{{kebabCasePlural}}/${body.id}`))
-        .must.resolve.to.have.property('status', 200);
-    });
-    {{/relationships}}
-  });
-
-  describe('PUT /{{kebabCasePlural}}/:id', () => {
-    it('updates {{camelCase}} and actually persists it', () => {
-      const update = { name: 'Something else' };
-      return single{{pascalCase}}Creator()
-        .then(body => putter(`/{{kebabCasePlural}}/${body.id}`)(_.merge(body, update)))
-        .then(unwrapJSON)
-        .then(body => getJSON(`/{{kebabCasePlural}}/${body.id}`))
-        .must.resolve.to.have.property('name', update.name);
-    });
-
-    it('rejects a {{camelCase}} without any rev', () => {
-      const update = { name: 'Something else' };
-      return single{{pascalCase}}Creator()
-        .then(body => putter(`/{{kebabCasePlural}}/${body.id}`)(update))
-        .then(res => res.status.must.equal(400));
-    });
-
-    it('rejects a {{camelCase}} with a faulty rev', () => {
-      const update = { name: 'Something else', rev: uuid.v4() };
-      return single{{pascalCase}}Creator()
-        .then(body => putter(`/{{kebabCasePlural}}/${body.id}`)(_.merge(body, update)))
-        .then(res => res.status.must.equal(400));
-    });
-    {{#isUser}}
-
-    it('PUTing an updated password should update the password hash', () => {
-      const update = { password: 'ABCD1234' };
-      return single{{pascalCase}}Creator()
-      .then(body => putter(`/{{kebabCasePlural}}/${body.id}`)(_.merge(body, update)))
-      .then(unwrapJSON)
-      .then(body => getJSON(`/{{kebabCasePlural}}/${body.id}`))
-      .then(json => password.verify(update.password, json.password))
-      .must.resolve.to.equal(true);
-    });
-    {{/isUser}}
-  });
-
-  describe('DELETE /{{kebabCasePlural}}/:id', () => {
-    it('returns 200 ok response', () => {
-      return single{{pascalCase}}Creator()
-        .then(body => deleter(`/{{kebabCasePlural}}/${body.id}`)())
-        .must.resolve.to.have.property('status', 200);
-    });
-
-    it('actually deletes the record', () => {
-      return single{{pascalCase}}Creator()
-        .then(body => (
-          deleter(`/{{kebabCasePlural}}/${body.id}`)()
-          .then(() => agent.get(`/{{kebabCasePlural}}/${body.id}`))
-          .then(res => res.must.have.property('status', 404))
-        ));
-    });
-  });
 
   {{#isUser}}
   describe('POST /{{kebabCasePlural}}/signin', () => {
