@@ -28,9 +28,7 @@ module.exports = {
   },
   *update(id, params) {
     const {{camelCase}} = yield this.find(id);
-    const data = Object.assign({}, params);
-    delete(data.id); // disallow ID replacements
-    return yield {{camelCase}}.merge(data).save();
+    return yield {{camelCase}}.merge(params).save();
   },
   {{/isUser}}
   {{#isUser}}
@@ -40,21 +38,20 @@ module.exports = {
   },
   *update(id, params) {
     const {{camelCase}} = yield this.find(id);
-    const data = yield hashPassword(params);
-    delete(data.id); // disallow ID replacements
-    return yield {{camelCase}}.merge(data).save();
+    return yield {{camelCase}}.merge(yield hashPassword(params)).save();
   },
   *signin(email, pass) {
-    const [user] = yield {{camelCase}}.getAll(email, { index: 'email' });
+    const [user] = yield {{pascalCase}}.filter({ email }).run();
 
     if (!user) throw new HttpError('UNAUTHORIZED');
 
     const verified = yield password.verify(pass, user.password);
     if (!verified) throw new HttpError('UNAUTHORIZED');
 
-    const token = yield jwt.sign({ id: user.id, role: user.role });
+    const token = jwt.sign({ id: user.id, role: user.role });
+    delete(user.password);
 
-    return { token, user: Object.assign({}, user, { password: undefined }) };
+    return { token, user };
   },
   {{/isUser}}
   *delete(id) {

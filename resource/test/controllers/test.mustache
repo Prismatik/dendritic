@@ -1,3 +1,6 @@
+{{#isUser}}
+const HttpError = require('standard-http-error');
+{{/isUser}}
 const {{pascalCase}} = require('../../src/models/{{snakeCase}}');
 const {{camelCasePlural}} = require('../../src/controllers/{{snakeCasePlural}}');
 const { thinky: { Errors: { DocumentNotFound, ValidationError } } } = require('../../config');
@@ -10,7 +13,7 @@ describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
 
   beforeEach(function * () {
     validData = {{camelCase}}Fixture.valid();
-    record = yield new {{pascalCase}}({{camelCase}}Fixture.valid()).save();
+    record = yield {{camelCasePlural}}.create(validData);
   });
 
   const pureData = data => Object.assign({}, data, { id: null, rev: null{{#isUser}}, password: null{{/isUser}} });
@@ -43,6 +46,11 @@ describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
   });
 
   describe('.create(data)', () => {
+    beforeEach(function * () {
+      // refreshing the validData to avoid conflicts
+      validData = {{camelCase}}Fixture.valid();
+    });
+
     it('saves valid data and returns a model instance', function * () {
       const record = yield {{camelCasePlural}}.create(validData);
       record.constructor.must.equal({{pascalCase}});
@@ -100,6 +108,7 @@ describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
   describe('.update(params)', () => {
     it('updates params when things are good', function * () {
       const oldId = record.id;
+      const validData = {{camelCase}}Fixture.valid(); delete(validData.id);
       const result = yield {{camelCasePlural}}.update(record.id, validData);
       result.constructor.must.equal({{pascalCase}});
       result.id.must.eql(oldId);
@@ -162,4 +171,33 @@ describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
       }
     });
   });
+  {{#isUser}}
+  describe('.signin(email, password)', () => {
+    it('returns a user and token if everything is correct', function * () {
+      const result = yield {{camelCasePlural}}.signin(validData.email, validData.password);
+      result.token.must.be.string();
+
+      delete(record.password);
+      Object.assign({}, result.user).must.eql(Object.assign({}, record));
+    });
+
+    it('throws UNAUTHORIZED if the email is wrong', function * () {
+      try {
+        yield {{camelCasePlural}}.signin('h4ckr@h4ck.com', validData.password);
+      } catch (e) {
+        e.must.be.instanceOf(HttpError);
+        e.code.must.eql(401);
+      }
+    });
+
+    it('throws UNAUTHORIZED if the password is wrong', function * () {
+      try {
+        yield {{camelCasePlural}}.signin(validData.email, 'hack hack hack');
+      } catch (e) {
+        e.must.be.instanceOf(HttpError);
+        e.code.must.eql(401);
+      }
+    });
+  });
+  {{/isUser}}
 });
