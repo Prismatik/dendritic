@@ -5,6 +5,7 @@ require('dotenv-safe').load({ sample: './example.env' });
 const os = require('os');
 const _ = require('lodash');
 const r = require('lib/db');
+const log = require('lib/logger');
 
 const table = r.table('_migrations');
 
@@ -60,7 +61,7 @@ module.exports = {
       }));
 
       return applyMigration(toBeApplied, (name) => {
-        console.log('migrated up', name);
+        log.info('migrated up', name);
         return table.insert({ name }).run();
       });
     })
@@ -81,7 +82,7 @@ module.exports = {
       }));
 
       return applyMigration(toBeDowned, (name) => {
-        console.log('migrated down', name);
+        log.info('migrated down', name);
         return table.get(name).delete().run();
       });
     })

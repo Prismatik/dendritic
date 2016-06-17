@@ -15,7 +15,6 @@ setup()
   });
 })
 .catch(e => {
-  console.log('Exiting due to error:');
-  console.log(e);
-  process.exit();
+  log.error('Setup error:', e);
+  process.exit(1);
 });
