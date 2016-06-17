@@ -1,3 +1,4 @@
+
 {{#isUser}}
 const HttpError = require('standard-http-error');
 const password = require('simple-password');
@@ -7,6 +8,7 @@ const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
 const errors = require('../../config/errors');
 {{/isUser}}
 const model = require('../models/{{snakeCase}}.js');
+const uuid = require('uuid');
 
 module.exports = {
   get: query => {
