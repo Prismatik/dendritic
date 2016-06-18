@@ -83,6 +83,39 @@ describe('lib/model', () => {
           pattern: '^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$'
         }
       },
+      stuff: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            str: {
+              type: 'string'
+            },
+            bool: {
+              type: 'boolean'
+            },
+            obj: {
+              type: 'object',
+              properties: {
+                str: {
+                  type: 'string'
+                }
+              }
+            },
+            arr: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  str: {
+                    type: 'string'
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       secrets: {
         type: 'object',
         properties: {
@@ -111,6 +144,16 @@ describe('lib/model', () => {
         password: String,
         score: thinky.type.number().integer(),
         things: [String],
+        stuff: [{
+          str: String,
+          bool: Boolean,
+          obj: {
+            str: String
+          },
+          arr: [{
+            str: String
+          }]
+        }],
         secrets: {
           short: String,
           numeric: Number

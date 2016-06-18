@@ -90,10 +90,18 @@ exports.toThinkyType = (property) => {
   const type = property.type;
   const Type = typesToTypes[type];
 
-  if (!Type) throw new Error(`can't compute property type: ${type} for property: ${name}`);
+  if (!Type) throw new Error(`can't compute property type: ${type} for property: ${property}`);
 
   switch (type) {
-    case 'array': return [typesToTypes[property.items.type]];
+    case 'array': {
+      if (property.items.type === 'object') {
+        return [exports.toThinkySchema(property.items.properties)];
+      }
+      if (property.items.type === 'array') {
+        return property.items.map(exports.toThinkySchema);
+      }
+      return [typesToTypes[property.items.type]];
+    }
     case 'object': return exports.toThinkySchema(property.properties);
     case 'string': return property.enum ? thinky.type.string().enum(property.enum) : Type;
     default:
