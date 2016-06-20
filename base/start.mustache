@@ -1,7 +1,7 @@
 require('dotenv-safe').load({ sample: './example.env' });
 require('app-module-path').addPath(__dirname);
 
-const log = require('./lib/logger');
+const log = require('./src/utils/logger');
 const setup = require('./setup');
 
 setup()

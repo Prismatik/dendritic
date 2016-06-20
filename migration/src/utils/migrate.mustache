@@ -5,7 +5,7 @@ require('dotenv-safe').load({ sample: './example.env' });
 const os = require('os');
 const _ = require('lodash');
 const r = require('lib/db');
-const log = require('lib/logger');
+const log = require('src/utils/logger');
 
 const table = r.table('_migrations');
 

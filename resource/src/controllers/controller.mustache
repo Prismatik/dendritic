@@ -3,7 +3,7 @@ const { {{pascalCase}} } = require('../models');
 {{#isUser}}
 const HttpError = require('standard-http-error');
 const password = require('simple-password');
-const jwt = require('../../lib/jwt');
+const jwt = require('../utils/jwt');
 const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
 function * hashPassword(params) {
   return Object.assign({}, params, params.password ? {

@@ -7,7 +7,7 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const { thinky: { Errors: { DocumentNotFound, ValidationError } } } = require('../config');
 
-const log = require('../lib/logger');
+const log = require('../src/utils/logger');
 const routes = require('./routes');
 const middleware = require('./middleware');
 

@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const deref = require('json-schema-deref-sync');
-const r = require('lib/db');
 
 let schemaIndexes = {};
 
@@ -27,14 +26,6 @@ const transformSchema = (indexes, schema) => {
     model.properties = indexModel(modelIndexes, model.properties);
     return model;
   }));
-};
-
-exports.setIndexes = () => {
-  return r.tableList().run()
-  .then(tables => _.reject(tables, t => t === '_migrations'))
-  .then(tables => Promise.all(tables.map(getIndexes)))
-  .then(_.zipObject)
-  .then(result => { schemaIndexes = result; });
 };
 
 exports.getSchema = () => transformSchema(schemaIndexes, appSchema);
