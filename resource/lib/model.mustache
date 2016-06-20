@@ -12,8 +12,8 @@ exports.create = (modelName) => {
   const validator = exports.thinkyValidatorFor(schema);
   const model = thinky.createModel(
     schema.camelCasePlural,
-    exports.toThinkySchema(schema.properties),
-    { validator, enforce_extra: 'strict' }
+    { /* we are relying on the JSON schema validator to ensure data consitency */ },
+    { validator, enforce_extra: 'none', enforce_type: 'none' }
   );
 
   exports.findIndexes(schema).forEach(name => {
@@ -52,61 +52,6 @@ exports.thinkyValidatorFor = (schema) => {
       );
     }
   };
-};
-
-/**
- * Converts a JSON schema properties into a Thinky model properties config
- *
- * @param {Object} model JSON schema properties
- * @return {Object} thinky compatible properties config
- */
-exports.toThinkySchema = (properties) => {
-  const schema = {};
-
-  Object.keys(properties).forEach(name => {
-    schema[name] = exports.toThinkyType(properties[name]);
-  });
-
-  return schema;
-};
-
-const typesToTypes = {
-  string: String,
-  number: Number,
-  integer: thinky.type.number().integer(),
-  date: Date,
-  boolean: Boolean,
-  array: [],
-  object: {}
-};
-
-/**
- * Converts a JSON schema field config into a Thinky based field type
- *
- * @param {Object} JSON property definition
- * @return {Object} thinky type thing
- */
-exports.toThinkyType = (property) => {
-  const type = property.type;
-  const Type = typesToTypes[type];
-
-  if (!Type) throw new Error(`can't compute property type: ${type} for property: ${property}`);
-
-  switch (type) {
-    case 'array': {
-      if (property.items.type === 'object') {
-        return [exports.toThinkySchema(property.items.properties)];
-      }
-      if (property.items.type === 'array') {
-        return property.items.map(exports.toThinkySchema);
-      }
-      return [typesToTypes[property.items.type]];
-    }
-    case 'object': return exports.toThinkySchema(property.properties);
-    case 'string': return property.enum ? thinky.type.string().enum(property.enum) : Type;
-    default:
-      return Type;
-  }
 };
 
 /**

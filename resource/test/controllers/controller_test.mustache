@@ -7,7 +7,7 @@ const { thinky: { Errors: { DocumentNotFound, ValidationError } } } = require('.
 const {{camelCase}}Fixture = require('../../fixtures/{{snakeCase}}');
 const UUID_RE = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/;
 
-describe('{{snakeCasePlural}} controller', () => {
+describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
   let validData;
   let {{camelCase}};
 
