@@ -13,4 +13,8 @@ setup()
 
     log.info('{{camelCase}} API listening at http://%s:%s', host, port);
   });
+})
+.catch(e => {
+  log.error('Setup error:', e);
+  process.exit(1);
 });
