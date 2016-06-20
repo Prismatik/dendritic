@@ -10,15 +10,10 @@ services:
       - ./bin:/opt/app/bin
       - ./config:/opt/app/config
       - ./src:/opt/app/src
-      - ./fixtures:/opt/app/fixtures
-      - ./lib:/opt/app/lib
       - ./migrations:/opt/app/migrations
       - ./package.json:/opt/app/package.json
-      - ./schema.js:/opt/app/schema.js
-      - ./schemas:/opt/app/schemas
       - ./setup.js:/opt/app/setup.js
       - ./start.js:/opt/app/start.js
-      - ./tables:/opt/app/tables
       - ./test:/opt/app/test
     depends_on:
       - rethinkdb

@@ -2,7 +2,7 @@ const _ = require('lodash');
 const deref = require('json-schema-deref-sync');
 const appSchema = require('./schemas');
 
-let schemaIndexes = {}; // TODO move this into individual src/models maybe?
+const schemaIndexes = {}; // TODO move this into individual src/models maybe?
 
 Object.assign(module.exports, transformSchema(schemaIndexes, appSchema));
 

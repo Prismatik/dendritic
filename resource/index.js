@@ -18,7 +18,7 @@ module.exports = (opts) => {
     { n: 'src/routes/route', d: 'src/routes', t: opts.snakeCasePlural },
     { n: 'test/controllers/controller_test', d: 'test/controllers', t: `${opts.snakeCasePlural}_test` },
     { n: 'test/routes/route_test', d: 'test/routes', t: `${opts.snakeCasePlural}_test` },
-    { n: 'fixture', d: 'fixtures', t: opts.snakeCase },
+    { n: 'test/fixtures/fixture', d: 'test/fixtures', t: opts.snakeCase },
     { n: 'config/schemas/schema', d: 'config/schemas', t: opts.snakeCase, e: 'json' }
   ];
 

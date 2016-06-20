@@ -4,7 +4,7 @@ const HttpError = require('standard-http-error');
 const {{pascalCase}} = require('../../src/models/{{snakeCase}}');
 const {{camelCasePlural}} = require('../../src/controllers/{{snakeCasePlural}}');
 const { thinky: { Errors: { DocumentNotFound, ValidationError } } } = require('../../config');
-const {{camelCase}}Fixture = require('../../fixtures/{{snakeCase}}');
+const {{camelCase}}Fixture = require('../fixtures/{{snakeCase}}');
 const UUID_RE = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/;
 
 describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
