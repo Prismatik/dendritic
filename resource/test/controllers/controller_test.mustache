@@ -7,7 +7,7 @@ const { thinky: { Errors: { DocumentNotFound, ValidationError } } } = require('.
 const {{camelCase}}Fixture = require('../fixtures/{{snakeCase}}');
 const UUID_RE = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/;
 
-describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
+describe('{{snakeCasePlural}} controller', () => {
   let validData;
   let {{camelCase}};
 
@@ -166,7 +166,7 @@ describe{{#isUser}}.only{{/isUser}}('{{snakeCasePlural}} controller', () => {
       result.constructor.must.equal({{pascalCase}});
       result.id.must.eql(oldId);
 
-      pureData(result).must.eql(pureData(validData));
+      pureData(result).must.eql(pureData(Object.assign({}, {{camelCase}}, validData)));
     });
 
     it('explodes when data is wrong', function * () {

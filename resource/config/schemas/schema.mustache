@@ -26,12 +26,12 @@
     <%/isUser%>
     <%#singularRelationships%>
     },
-    "<%camelCase%>": {
+    "<%camelCase%>Id": {
       "$ref": "#/definitions/uuid"
     <%/singularRelationships%>
     <%#multiRelationships%>
     },
-    "<%camelCasePlural%>": {
+    "<%camelCasePlural%>Ids": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/uuid"
@@ -44,13 +44,13 @@
     <%#singularRelationships%>
     {
       "rel": "<%camelCase%>",
-      "href": "/<%camelCasePlural%>/{<%camelCase%>}"
+      "href": "/<%camelCasePlural%>/{<%camelCase%>Id}"
     }<%^isLast%>,<%/isLast%><%#isLast%><%#hasMultiRelationships%>,<%/hasMultiRelationships%><%/isLast%>
     <%/singularRelationships%>
     <%#multiRelationships%>
     {
       "rel": "<%camelCase%>",
-      "href": "/<%camelCasePlural%>/{<%camelCasePlural%>[]}"
+      "href": "/<%camelCasePlural%>/{<%camelCasePlural%>Ids[]}"
     }<%^isLast%>,<%/isLast%>
     <%/multiRelationships%>
   ],

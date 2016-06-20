@@ -1,5 +1,5 @@
 const model = require('../../src/utils/model');
-const { thinky, schemas } = require('../../config');
+const { thinky, schema } = require('../../config');
 
 describe('utils/model', () => {
   describe('.create(modelName)', () => {
@@ -29,7 +29,7 @@ describe('utils/model', () => {
     let Model;
 
     before(() => {
-      schemas.thing = TEST_JSON_SCHEMA;
+      schema.thing = TEST_JSON_SCHEMA;
       Model = model.create('thing');
     });
 

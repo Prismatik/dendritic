@@ -1,7 +1,6 @@
 const { Router } = require('express');
 const {{camelCasePlural}} = require('../controllers/{{snakeCasePlural}}');
 
-const router = new Router();
 const serialize = ({{camelCase}}) => {
   const data = Object.assign({}, {{camelCase}});
   {{#isUser}}
@@ -9,6 +8,41 @@ const serialize = ({{camelCase}}) => {
   {{/isUser}}
   return data;
 };
+
+const router = new Router()
+  .get('/{{kebabCasePlural}}', function * (req, res) {
+    const list = yield {{camelCasePlural}}.all(req.query);
+    res.json(list.map(serialize));
+  })
+  .get('/{{kebabCasePlural}}/:id', function * (req, res) {
+    const {{camelCase}} = yield {{camelCasePlural}}.find(req.params.id);
+    res.json(serialize({{camelCase}}));
+  })
+  .post('/{{kebabCasePlural}}', function * (req, res) {
+    const {{camelCase}} = yield {{camelCasePlural}}.create(req.body);
+    res.status(201).json(serialize({{camelCase}}));
+  })
+  .put('/{{kebabCasePlural}}/:id', function * (req, res) {
+    const {{camelCase}} = yield {{camelCasePlural}}.update(req.params.id, req.body);
+    res.json(serialize({{camelCase}}));
+  })
+  .delete('/{{kebabCasePlural}}/:id', function * (req, res) {
+    yield {{camelCasePlural}}.delete(req.params.id);
+    res.json({ ok: true });
+  {{^isUser}}
+  });
+  {{/isUser}}
+  {{#isUser}}
+  })
+  .post('/{{kebabCasePlural}}/signin', function * (req, res) {
+    const result = yield {{camelCasePlural}}.signin(req.body.email, req.body.password);
+    res.json(result);
+  })
+  .post('/{{kebabCasePlural}}/signout', function * (req, res) {
+    const result = yield {{camelCasePlural}}.signout(req.body);
+    res.json(result);
+  });
+  {{/isUser}}
 
 module.exports = {
   http: router,
@@ -30,37 +64,3 @@ module.exports = {
     });
   }
 };
-
-router
-  .get('/{{kebabCasePlural}}', function * (req, res) {
-    const list = yield {{camelCasePlural}}.all(req.query);
-    res.json(list.map(serialize));
-  })
-  .get('/{{kebabCasePlural}}/:id', function * (req, res) {
-    const {{camelCase}} = yield {{camelCasePlural}}.find(req.params.id);
-    res.json(serialize({{camelCase}}));
-  })
-  .post('/{{kebabCasePlural}}', function * (req, res) {
-    const {{camelCase}} = yield {{camelCasePlural}}.create(req.body);
-    res.status(201).json(serialize({{camelCase}}));
-  })
-  .put('/{{kebabCasePlural}}/:id', function * (req, res) {
-    const {{camelCase}} = yield {{camelCasePlural}}.update(req.params.id, req.body);
-    res.json(serialize({{camelCase}}));
-  })
-  .delete('/{{kebabCasePlural}}/:id', function * (req, res) {
-    yield {{camelCasePlural}}.delete(req.params.id);
-    res.json({ ok: true });
-  });
-
-{{#isUser}}
-router
-  .post('/{{kebabCasePlural}}/signin', function * (req, res) {
-    const result = yield {{camelCasePlural}}.signin(req.body.email, req.body.password);
-    res.json(result);
-  })
-  .post('/{{kebabCasePlural}}/signout', function * (req, res) {
-    const result = yield {{camelCasePlural}}.signout(req.body);
-    res.json(result);
-  });
-{{/isUser}}
