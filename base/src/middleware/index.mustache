@@ -1,3 +1,4 @@
 const util = require('../utils/module');
+const modules = util.slurp('src/middleware').obj;
 
-module.exports = util.slurp('src/middleware').arr;
+Object.assign(module.exports, modules);

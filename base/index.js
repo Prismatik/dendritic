@@ -24,6 +24,7 @@ module.exports = (opts) => {
     { p: 'src/routes', n: 'schema' },
     { p: 'src/routes', n: 'index' },
     { p: 'src/middleware', n: 'index' },
+    { p: 'src/middleware', n: 'http_errors' },
     { p: 'test', n: 'helper' },
     { p: 'test', n: 'mocha.opts', t: 'mocha', e: 'opts' },
     { p: 'test/routes', n: 'jwt_test' },
