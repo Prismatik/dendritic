@@ -1,3 +1,25 @@
-const schema = require('../schema');
+const _ = require('lodash');
+const deref = require('json-schema-deref-sync');
+const appSchema = require('./schemas');
 
-Object.assign(module.exports, schema.getSchema());
+let schemaIndexes = {}; // TODO move this into individual src/models maybe?
+
+Object.assign(module.exports, transformSchema(schemaIndexes, appSchema));
+
+function transformSchema(indexes, schema) {
+  return deref(_.mapValues(schema, (model) => {
+    const modelIndexes = indexes[model.camelCasePlural];
+    model.properties = indexModel(modelIndexes, model.properties);
+    return model;
+  }));
+}
+
+// Note: This only adds the .indexed property to the schema's top level
+// properties and not any nested properties that it might have
+function indexModel(indexes, properties) {
+  return _.mapValues(properties, (prop, name) => {
+    if (_.includes(indexes, name)) prop.indexed = true;
+    else prop.indexed = false;
+    return prop;
+  });
+}

@@ -1,14 +1,14 @@
 const generate = require('json-schema-faker');
 const _ = require('lodash');
-const appSchema = require('../schema').getSchema();
-const schema = appSchema.{{camelCase}};
+const { schema } = require('../config');
+const modelSchema = schema.{{camelCase}};
 {{#isUser}}
 const bandname = require('bandname');
 {{/isUser}}
 
 module.exports = {
   valid: (omissions) => {
-    const v = generate(schema);
+    const v = generate(modelSchema);
     {{#isUser}}
     v.password = bandname();
     {{/isUser}}

@@ -1,15 +1,10 @@
-const schema = require('schema').getSchema();
-
-const app = require('../../src/app').app;
-const agent = require('doubleagent')(app);
-
-const url = `/schema`;
+const { schema } = require('../../config');
+const { app } = require('../helper');
 
 describe('/schema route', () => {
-  it('must GET the schema data', () => {
-    return agent.get(url)
-    .then(({ body }) => {
-      body.must.eql(schema);
-    });
+  it('must GET the schema data', function * () {
+    const response = yield app.get('/schema');
+    response.status.must.eql(200);
+    response.body.must.eql(schema);
   });
 });

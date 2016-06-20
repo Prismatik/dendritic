@@ -1,5 +1,5 @@
 const Ajv = require('ajv');
-const { thinky, schemas } = require('../../config');
+const { thinky, schema } = require('../../config');
 
 /**
  * Creates a Thiky model based on a schema definition
@@ -8,19 +8,19 @@ const { thinky, schemas } = require('../../config');
  * @return {Class} thinky model
  */
 exports.create = (modelName) => {
-  const schema = schemas[modelName];
-  const validator = exports.thinkyValidatorFor(schema);
+  const modelSchema = schema[modelName];
+  const validator = exports.thinkyValidatorFor(modelSchema);
   const model = thinky.createModel(
-    schema.camelCasePlural,
+    modelSchema.camelCasePlural,
     { /* we are relying on the JSON schema validator to ensure data consitency */ },
     { validator, enforce_extra: 'none', enforce_type: 'none' }
   );
 
-  exports.findIndexes(schema).forEach(name => {
+  exports.findIndexes(modelSchema).forEach(name => {
     model.ensureIndex(name);
   });
 
-  model.standardQuery = exports.queryBuilder(model, schema);
+  model.standardQuery = exports.queryBuilder(model, modelSchema);
 
   return model;
 };

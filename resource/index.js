@@ -19,7 +19,7 @@ module.exports = (opts) => {
     { n: 'test/controllers/controller_test', d: 'test/controllers', t: `${opts.snakeCasePlural}_test` },
     { n: 'test/routes/route_test', d: 'test/routes', t: `${opts.snakeCasePlural}_test` },
     { n: 'fixture', d: 'fixtures', t: opts.snakeCase },
-    { n: 'schema', d: 'schemas', t: opts.snakeCase, e: 'json' }
+    { n: 'config/schemas/schema', d: 'config/schemas', t: opts.snakeCase, e: 'json' }
   ];
 
   if (opts.isUser) {
