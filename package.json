@@ -45,6 +45,7 @@
     "eslint-config-prismatik": "^1.0.0",
     "express": "^4.13.4",
     "express-jwt": "^3.4.0",
+    "express-ws": "^2.0.0-rc.1",
     "express-yields": "^1.0.0",
     "istanbul": "^0.4.1",
     "jsen": "^0.6.0",

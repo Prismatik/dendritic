@@ -12,8 +12,7 @@ const OPTS = {
   }
 };
 
-module.exports = {
-  http: new Router()
-    .get('/jwt/verify', jwt(OPTS), (req, res) => res.json({ ok: true })),
-  socket: () => {}
-};
+module.exports = new Router()
+  .get('/verify', jwt(OPTS), (req, res) => {
+    res.json({ ok: true });
+  });

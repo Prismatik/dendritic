@@ -1,3 +1,10 @@
+const { Router } = require('express');
 const util = require('../utils/module');
+const routes = util.slurp('src/routes').obj;
 
-module.exports = util.slurp('src/routes').arr;
+const router = module.exports = new Router();
+const kebabize = str => str.replace(/([a-z\d])([A-Z\d])/g, (m, s, e) => `${s}-${e.toLowerCase()}`);
+
+Object.keys(routes).forEach(name => {
+  router.use(`/${kebabize(name)}`, routes[name]);
+});

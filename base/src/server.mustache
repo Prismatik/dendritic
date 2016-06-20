@@ -1,0 +1,14 @@
+require('dotenv-safe').load({ sample: './example.env' });
+require('app-module-path').addPath(__dirname + '/../');
+
+const app = require('./app');
+const log = require('./utils/logger');
+
+app.listen(process.env.PORT, server => {
+  const { address, port } = server.address();
+  log.info('{{camelCase}} API listening at http://%s:%s', address, port);
+});
+
+process.on('unhandledRejection', (reason, p) => {
+  log.error('Unhandled Rejection at: Promise ', p, ' reason: ', reason);
+});

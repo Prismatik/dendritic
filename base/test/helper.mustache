@@ -15,7 +15,7 @@ process.nextTick(() => {
   });
 });
 
-const app = require('../src/app').app;
+const app = require('../src/app');
 const doubleagent = require('doubleagent');
 
 exports.app = doubleagent(app);
