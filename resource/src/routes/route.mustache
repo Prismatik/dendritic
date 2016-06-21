@@ -44,16 +44,21 @@ const router = module.exports = new Router()
   });
   {{/isUser}}
 
+const logger = require('../utils/logger');
 router.socket = (socket, req) => {
-  {{camelCasePlural}}.watch(req.query).then(({ result: cursor, warns = [], count }) => {
-    warns.forEach(warn => socket.emit('warning', warn));
+  {{camelCasePlural}}.watch(req.query).then(({ feed, count }) => {
+    socket.emit('metadata', { count });
 
-    if (count) socket.emit('metadata', { count });
-
-    cursor.each((err, data) => {
-      if (!data) return null;
-      if (data.state) return socket.emit('state', data);
-      return socket.emit('record', data);
+    cursor.each((err, doc) => {
+      if (err) {
+        logger.error(err);
+      } else if (!doc.isSaved()) { // was deleted
+        socket.emit('deleted', doc);
+      } else if (doc.getOldValue()) { // was updated
+        socket.emit('updated', doc);
+      } else { // was created
+        socket.emit('created', doc);
+      }
     });
-  });
+  }).catch(error => logger.error(error));
 };

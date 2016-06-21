@@ -16,6 +16,11 @@ module.exports = {
   *all(params) {
     return yield {{pascalCase}}.standardQuery(params).run();
   },
+  watch(params) {
+    const query = {{pascalCase}}.standardQuery(params);
+    return Promise.all([ query.changes(), query.count() ])
+      .then(([ feed, count ]) => ({ feed, count }));
+  },
   *find(id) {
     return yield {{pascalCase}}.get(id);
   },
@@ -60,9 +65,5 @@ module.exports = {
     const {{camelCase}} = yield this.find(id);
     yield {{camelCase}}.delete();
     return {{camelCase}};
-  },
-  watch: query => {
-    // TODO figure this
-    return query;
   }
 };
