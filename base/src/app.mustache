@@ -1,10 +1,8 @@
 require('express-yields');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
 const app = require('express')();
-require('express-ws')(app);
-
+const io = require('socket.io')();
 const routes = require('./routes');
 const { httpErrors } = require('./middleware');
 
@@ -17,3 +15,11 @@ app.use(routes);
 app.use(httpErrors);
 
 module.exports = app;
+
+// socket.io setup
+exports.io = io;
+routes.sockets.forEach(({ path, handler }) => {
+  io.of(path).on('connection', socket => {
+    handler(socket, socket.handshake);
+  });
+});

@@ -5,6 +5,15 @@ const routes = util.slurp('src/routes').obj;
 const router = module.exports = new Router();
 const kebabize = str => str.replace(/([a-z\d])([A-Z\d])/g, (m, s, e) => `${s}-${e.toLowerCase()}`);
 
+router.sockets = [];
+
 Object.keys(routes).forEach(name => {
-  router.use(`/${kebabize(name)}`, routes[name]);
+  const path = `/${kebabize(name)}`;
+  const route = routes[name];
+
+  router.use(path, route);
+
+  if (route.socket) {
+    router.sockets.push({ path, handler: route.socket });
+  }
 });

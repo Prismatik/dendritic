@@ -2,9 +2,14 @@ require('dotenv-safe').load({ sample: './example.env' });
 require('app-module-path').addPath(__dirname + '/../');
 
 const app = require('./app');
+const server = require('http').createServer(app);
 const log = require('./utils/logger');
 
-app.listen(process.env.PORT, server => {
+if (app.io) {
+  app.io.attach(server);
+}
+
+server.listen(process.env.PORT, () => {
   const { address, port } = server.address();
   log.info('{{camelCase}} API listening at http://%s:%s', address, port);
 });

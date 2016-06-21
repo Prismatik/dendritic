@@ -44,7 +44,7 @@ const router = module.exports = new Router()
   });
   {{/isUser}}
 
-router.ws('', (socket, req) => {
+router.socket = (socket, req) => {
   {{camelCasePlural}}.watch(req.query).then(({ result: cursor, warns = [], count }) => {
     warns.forEach(warn => socket.emit('warning', warn));
 
@@ -56,4 +56,4 @@ router.ws('', (socket, req) => {
       return socket.emit('record', data);
     });
   });
-});
+};
