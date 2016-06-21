@@ -18,8 +18,8 @@ module.exports = {
   },
   watch(params) {
     const query = {{pascalCase}}.standardQuery(params);
-    return Promise.all([ query.changes(), query.count() ])
-      .then(([ feed, count ]) => ({ feed, count }));
+    return Promise.all([query.changes(), query.count().execute()])
+      .then(([feed, count]) => ({ feed, count }));
   },
   *find(id) {
     return yield {{pascalCase}}.get(id);

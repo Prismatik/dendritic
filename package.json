@@ -40,7 +40,7 @@
     "co-mocha": "^1.1.2",
     "cors": "^2.7.1",
     "dotenv-safe": "^2.3.1",
-    "doubleagent": "^1.0.2",
+    "doubleagent": "^1.1.0",
     "eslint": "^2.9.0",
     "eslint-config-prismatik": "^1.0.0",
     "express": "^4.13.4",

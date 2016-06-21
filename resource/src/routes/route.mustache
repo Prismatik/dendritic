@@ -49,16 +49,16 @@ router.socket = (socket, req) => {
   {{camelCasePlural}}.watch(req.query).then(({ feed, count }) => {
     socket.emit('metadata', { count });
 
-    cursor.each((err, doc) => {
+    feed.each((err, doc) => {
       if (err) {
         logger.error(err);
-      } else if (!doc.isSaved()) { // was deleted
+      } else if (!doc.isSaved()) {
         socket.emit('deleted', doc);
-      } else if (doc.getOldValue()) { // was updated
+      } else if (doc.getOldValue()) {
         socket.emit('updated', doc);
-      } else { // was created
+      } else {
         socket.emit('created', doc);
       }
     });
-  }).catch(error => logger.error(error));
+  }).catch(error => console.log(error));
 };

@@ -1,13 +1,11 @@
 require('dotenv-safe').load({ sample: './example.env' });
-require('app-module-path').addPath(__dirname + '/../');
+require('app-module-path').addPath(require('path').resolve(__dirname, '..'));
 
 const app = require('./app');
 const server = require('http').createServer(app);
 const log = require('./utils/logger');
 
-if (app.io) {
-  app.io.attach(server);
-}
+if (app.io) { app.io.listen(server); }
 
 server.listen(process.env.PORT, () => {
   const { address, port } = server.address();

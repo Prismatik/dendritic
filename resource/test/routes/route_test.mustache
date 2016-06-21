@@ -2,6 +2,7 @@ const uuid = require('uuid');
 const { app } = require('../helper');
 const {{camelCasePlural}} = require('../../src/controllers/{{snakeCasePlural}}');
 const {{camelCase}}Fixture = require('../fixtures/{{snakeCase}}');
+const IO = require('socket.io-client');
 
 describe('/{{kebabCasePlural}} route', () => {
   let {{camelCase}};
@@ -148,53 +149,30 @@ describe('/{{kebabCasePlural}} route', () => {
       response.body.must.eql({ error: 'not found' });
     });
   });
+
+  describe('socket connection', () => {
+    let io;
+
+    beforeEach(() => {
+      io = IO(app.urlFor('/{{kebabCasePlural}}'), { forceNew: true });
+    });
+
+    const on = event => new Promise((resolve, reject) => {
+      io.on(event, metadata => {
+        resolve(metadata);
+        io.disconnect();
+      });
+      io.on('error', error => reject(error));
+    });
+
+    it('allows to open up connection and get metadata back', function * () {
+      const metadata = yield on('metadata');
+      metadata.must.eql({ count: 2 });
+    });
+  });
 });
 
 /********************************************************************************
-
-  {{#isUser}}
-  describe('POST /{{kebabCasePlural}}/signin', () => {
-    it('returns 401 response with invalid email', () => {
-      const signin = poster('/{{kebabCasePlural}}/signin');
-      return signin({ email: 'notexist@example.com', password: 'ABCD1234' })
-        .then(statusEquals(401))
-        .then(({ body }) => {
-          body.must.have.property('error', 'Unauthorized');
-        });
-    });
-
-    it('returns 401 response with incorrect password', () => {
-      const data = fixture.valid();
-      return {{camelCase}}Poster(data)
-      .then(unwrapJSON)
-      .then(() => {
-        const signin = poster('/{{kebabCasePlural}}/signin');
-        return signin({ email: data.email, password: 'ABCD1234' })
-          .then(statusEquals(401))
-          .then(({ body }) => {
-            body.must.have.property('error', 'Unauthorized');
-          });
-      });
-    });
-
-    it('POST /{{kebabCasePlural}}/signin with correct credentials should return a valid jwt',
-    () => {
-      const data = fixture.valid();
-      return {{camelCase}}Poster(data)
-      .then(unwrapJSON)
-      .then((user) => {
-        const signin = poster('/{{kebabCasePlural}}/signin');
-        return signin({ email: data.email, password: data.password })
-          .then(statusEquals(200))
-          .then(({ body }) => {
-            body.found.must.be.true();
-            body.token.must.not.be.null();
-            body.user.must.eql(_.omit(user, 'password'));
-          });
-      });
-    });
-  });
-  {{/isUser}}
 
   describe('Socket connection', () => {
     it('opens a web-socket connection and returns a single record', () => {

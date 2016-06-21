@@ -1,7 +1,6 @@
 require('must');
 require('dotenv-safe').load({ sample: './example.env' });
-const path = require('path');
-require('app-module-path').addPath(path.resolve(__dirname, '..'));
+require('app-module-path').addPath(require('path').resolve(__dirname, '..'));
 
 const mocha = require('mocha');
 const coMocha = require('co-mocha');
@@ -19,3 +18,5 @@ const app = require('../src/app');
 const doubleagent = require('doubleagent');
 
 exports.app = doubleagent(app);
+
+if (app.io) { app.io.attach(exports.app.server); }
