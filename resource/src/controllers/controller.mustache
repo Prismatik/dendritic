@@ -48,14 +48,12 @@ module.exports = {
   },
   *signin(email, pass) {
     const [user] = yield {{pascalCase}}.filter({ email }).run();
-
     if (!user) throw new HttpError('UNAUTHORIZED');
 
     const verified = yield password.verify(pass, user.password);
     if (!verified) throw new HttpError('UNAUTHORIZED');
 
     const token = jwt.sign({ id: user.id, role: user.role });
-    delete(user.password);
 
     return { token, user };
   },

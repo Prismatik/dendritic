@@ -35,8 +35,8 @@ const router = module.exports = new Router()
   {{#isUser}}
   })
   .post('/signin', function * (req, res) {
-    const result = yield {{camelCasePlural}}.signin(req.body.email, req.body.password);
-    res.json(result);
+    const { user, token } = yield {{camelCasePlural}}.signin(req.body.email, req.body.password);
+    res.json({ token, user: serialize(user) });
   })
   .post('/signout', function * (req, res) {
     const result = yield {{camelCasePlural}}.signout(req.body);

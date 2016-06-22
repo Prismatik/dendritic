@@ -230,7 +230,6 @@ describe('{{snakeCasePlural}} controller', () => {
       const result = yield {{camelCasePlural}}.signin(validData.email, validData.password);
       result.token.must.be.string();
 
-      delete({{camelCase}}.password);
       Object.assign({}, result.user).must.eql(Object.assign({}, {{camelCase}}));
     });
 
