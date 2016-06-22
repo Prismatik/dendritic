@@ -14,8 +14,7 @@ describe('utils/model', () => {
         },
         email: {
           type: 'string',
-          format: 'email',
-          indexed: true
+          format: 'email'
         },
         password: {
           type: 'string'
@@ -50,12 +49,6 @@ describe('utils/model', () => {
         thinky.Errors.ValidationError,
         'should match format "email"'
       );
-    });
-
-    it('ensures indexes on indexed fields', () => {
-      return Model._promisesReadyPromise.then(() => {
-        Model._getModel()._indexes.must.eql({ email: true });
-      });
     });
   });
 });
