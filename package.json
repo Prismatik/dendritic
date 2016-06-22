@@ -47,7 +47,6 @@
     "express-jwt": "^3.4.0",
     "express-yields": "^1.0.0",
     "istanbul": "^0.4.1",
-    "jsen": "^0.6.0",
     "json-schema-deref-sync": "^0.2.8",
     "json-schema-faker": "^0.3.3",
     "jsonwebtoken": "^5.4.1",

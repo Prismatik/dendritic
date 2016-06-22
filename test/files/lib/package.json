@@ -12,7 +12,6 @@
   },
   "license": "ISC",
   "dependencies": {
-    "jsen": "^0.6.0",
     "json-schema-deref-sync": "^0.2.8",
     "jsonwebtoken": "^5.4.1",
     "lodash": "^3.10.1",
