@@ -9,6 +9,12 @@ describe('/{{kebabCasePlural}} route', () => {
   let {{camelCase}}1;
   let {{camelCase}}2;
 
+  const sorted = (records, param = 'id') => records
+    .sort((a, b) => (a[param] > b[param] ? 1 : -1))
+    .map(i => Object.assign({}, i)){{#isUser}}
+    .map(i => { delete(i.password); return i; })
+    {{/isUser}};
+
   beforeEach(function * () {
     const oldRecords = yield {{camelCasePlural}}.all();
     yield oldRecords.map(r => r.delete());
@@ -22,12 +28,6 @@ describe('/{{kebabCasePlural}} route', () => {
   });
 
   describe('GET /', () => {
-    const sorted = (records, param = 'id') => records
-      .sort((a, b) => (a[param] > b[param] ? 1 : -1))
-      .map(i => Object.assign({}, i)){{#isUser}}
-      .map(i => { delete(i.password); return i; })
-      {{/isUser}};
-
     it('returns all records by default', function * () {
       const response = yield app.get('/{{kebabCasePlural}}');
       response.status.must.eql(200);
@@ -152,195 +152,62 @@ describe('/{{kebabCasePlural}} route', () => {
 
   describe('socket connection', () => {
     let io;
-
-    beforeEach(() => {
-      io = IO(app.urlFor('/{{kebabCasePlural}}'), { forceNew: true });
-    });
-
-    const on = event => new Promise((resolve, reject) => {
-      io.on(event, metadata => {
-        resolve(metadata);
-        io.disconnect();
-      });
+    const wait = timeout => new Promise(resolve => setTimeout(resolve, timeout));
+    const listenFor = event => new Promise((resolve, reject) => {
+      io.on(event, data => resolve(data));
       io.on('error', error => reject(error));
     });
 
+    beforeEach(function * () {
+      yield wait(50);
+      io = IO(app.urlFor('/{{kebabCasePlural}}'), { forceNew: true });
+    });
+
+    afterEach(() => io.disconnect());
+
     it('allows to open up connection and get metadata back', function * () {
-      const metadata = yield on('metadata');
+      const metadata = yield listenFor('metadata');
       metadata.must.eql({ count: 2 });
     });
-  });
-});
 
-/********************************************************************************
-
-  describe('Socket connection', () => {
-    it('opens a web-socket connection and returns a single record', () => {
-      return single{{pascalCase}}Creator()
-        .then(body => {
-          return new Promise(resolve => {
-            const opts = { query: `id=${body.id}`, forceNew: true };
-            const io = IO(`${url}/{{kebabCasePlural}}`, opts);
-            io.on('record', data => {
-              resolve(data.new_val);
-              io.disconnect();
-            });
-          })
-          .must.resolve.to.eql(body);
-        });
+    it('sends through all existing records and the `all:loaded` event', function * () {
+      const records = [];
+      const allDone = listenFor('all:loaded');
+      io.on('existed', record => records.push(record));
+      const result = yield allDone;
+      result.must.eql({});
+      sorted(records).must.eql(sorted([{{camelCase}}1, {{camelCase}}2]));
     });
 
-    it('opens a websocket connection to {{camelCasePlural}} should return all of them', () => {
-      return {{camelCase}}Creator(2)
-        .then(() => {
-          return new Promise(resolve => {
-            const opts = { forceNew: true };
-            const io = IO(`${url}/{{kebabCasePlural}}`, opts);
-            let count = 0;
-            io.on('record', () => {
-              count++;
-              if (count > 1) {
-                resolve(count);
-                io.disconnect();
-              }
-            });
-          })
-          .must.resolve.to.eql(2);
-        });
+    it('sends records through when they are created', function * () {
+      const feed = listenFor('created'); yield wait(50);
+      const newRecord = yield {{camelCasePlural}}.create({{camelCase}}Fixture.valid());
+      const feedRecord = yield feed;
+      {{#isUser}}
+      delete(newRecord.password);
+      {{/isUser}}
+      feedRecord.must.eql(Object.assign({}, newRecord));
     });
 
-    it('opens a websocket connection to {{camelCasePlural}} and returns changed documents',
-    () => {
-      return single{{pascalCase}}Creator()
-        .then(data => {
-          {{^isUser}}
-          const update = Object.assign({}, data, { name: 'ohai' });
-          {{/isUser}}
-          {{#isUser}}
-          const update = Object.assign({}, _.omit(data, 'password'), { name: 'ohai' });
-          {{/isUser}}
-          return new Promise(resolve => {
-            const opts = { forceNew: true };
-            const io = IO(`${url}/{{kebabCasePlural}}`, opts);
-            io.on('state', state => {
-              if (state.state === 'ready') {
-                io.on('record', record => {
-                  {{^isUser}}
-                  const result = record.new_val;
-                  {{/isUser}}
-                  {{#isUser}}
-                  const result = _.omit(record.new_val, 'password');
-                  {{/isUser}}
-                  result.must.eql(update);
-                  io.disconnect();
-                  resolve();
-                });
-                putter(`/{{kebabCasePlural}}/${data.id}`)(update);
-              }
-            });
-          });
-        });
+    it('sends notifications about changed objects', function * () {
+      const feed = listenFor('updated'); yield wait(50);
+      const newData = {{camelCase}}Fixture.valid(); delete(newData.id);
+      const updatedRecord = yield {{camelCasePlural}}.update({{camelCase}}.id, newData);
+      const feedRecord = yield feed;
+      {{#isUser}}
+      delete(updatedRecord.password);
+      {{/isUser}}
+      feedRecord.must.eql(Object.assign({}, updatedRecord));
     });
 
-    it('accepts the same filter params as GET requests', () => {
-      return {{camelCase}}Creator(2)
-        .then({{camelCasePlural}} => {
-          const target = {{camelCasePlural}}[0];
-          const targetKey = Object.keys(target).filter(k => k !== 'id')[0];
-          return new Promise(resolve => {
-            const query = [targetKey].reduce((r, k) => {
-              r[k] = target[k];
-              return r;
-            }, {});
-            const opts = { query, forceNew: true };
-            const io = IO(`${url}/{{kebabCasePlural}}`, opts);
-            io.on('record', data => {
-              data.new_val.must.eql(target);
-            });
-            io.on('state', data => {
-              if (data.state !== 'ready') return;
-              io.disconnect();
-              resolve();
-            });
-          });
-        });
-    });
-
-    it('accepts the same limit param as GET requests', () => {
-      return {{camelCase}}Creator(2)
-        .then(() => {
-          return new Promise(resolve => {
-            const opts = { query: { limit: 1 }, forceNew: true };
-            const io = IO(`${url}/{{kebabCasePlural}}`, opts);
-            let count = 0;
-            io.on('record', () => count++);
-            io.on('state', data => {
-              if (data.state !== 'ready') return;
-              count.must.eql(1);
-              io.disconnect();
-              resolve();
-            });
-          });
-        });
-    });
-
-    it('accepts the same count param as GET requests', () => {
-      return {{camelCase}}Creator(2)
-        .then(() => {
-          return new Promise(resolve => {
-            const opts = { query: { count: true, limit: 1 }, forceNew: true };
-            const io = IO(`${url}/{{kebabCasePlural}}`, opts);
-            io.on('metadata', data => {
-              data.count.must.be.a.number();
-              data.count.must.be.gt(1);
-              io.disconnect();
-              resolve();
-            });
-          });
-        });
-    });
-
-    it('emits a warning on an unchangefeedable query', () => {
-      return {{camelCase}}Creator(2)
-        .then(() => {
-          return new Promise(resolve => {
-            const opts = { query: { limit: 1 }, forceNew: true };
-            const io = IO(`${url}/{{kebabCasePlural}}`, opts);
-            let warned = false;
-            io.on('warning', (warn) => {
-              if (warn === warnings.RESTRICTED_FEED) warned = true;
-            });
-            io.on('state', data => {
-              if (data.state !== 'ready') return;
-              io.disconnect();
-              warned.must.be.true();
-              resolve();
-            });
-          });
-        });
-    });
-
-    it('skips records if asked', () => {
-      return {{camelCase}}Creator(5)
-        .then(() => {
-          return new Promise(resolve => {
-            const opts = { query: { limit: 1 }, forceNew: true };
-            const io = IO(`${url}/{{kebabCasePlural}}`, opts);
-            let first;
-            io.on('record', record => {
-              first = record;
-              io.disconnect();
-              const opts2 = { query: { skip: 1 }, forceNew: true };
-              const io2 = IO(`${url}/{{kebabCasePlural}}`, opts2);
-              io2.on('record', record2 => {
-                record2.must.not.eql(first);
-                io2.disconnect();
-                return resolve();
-              });
-            });
-          });
-        });
+    it('sends notifications through when {{camelCasePlural}} are deleted', function * () {
+      const feed = listenFor('deleted'); yield wait(50);
+      const deletedRecord = yield {{camelCasePlural}}.delete({{camelCase}}.id);
+      const feedRecord = yield feed;
+      {{#isUser}}
+      delete(deletedRecord.password);
+      {{/isUser}}
+      feedRecord.must.eql(Object.assign({}, deletedRecord));
     });
   });
 });
-****************************************************************/

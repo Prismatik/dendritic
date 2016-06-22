@@ -17,9 +17,10 @@ module.exports = {
     return yield {{pascalCase}}.standardQuery(params).run();
   },
   watch(params) {
-    const query = {{pascalCase}}.standardQuery(params);
-    return Promise.all([query.changes(), query.count().execute()])
-      .then(([feed, count]) => ({ feed, count }));
+    return Promise.all([
+      {{pascalCase}}.standardFeed(params),
+      {{pascalCase}}.standardQuery(params).count().execute()
+    ]).then(([feed, count]) => ({ feed, count }));
   },
   *find(id) {
     return yield {{pascalCase}}.get(id);

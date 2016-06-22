@@ -21,6 +21,7 @@ exports.create = (modelName) => {
   });
 
   model.standardQuery = exports.queryBuilder(model, modelSchema);
+  model.standardFeed = exports.feedBuilder(model);
 
   return model;
 };
@@ -89,4 +90,38 @@ exports.queryBuilder = (model, schema) => (params = {}) => {
   }
 
   return query;
+};
+
+/**
+ * Creates a standard change feed for apps
+ *
+ * @param {Classs} model
+ * @return {Function} feed builer
+ */
+exports.feedBuilder = (Model) => (params = {}) => {
+  const changeParams = { includeInitial: true, includeStates: true };
+
+  return Model.standardQuery(params).changes(changeParams).then(feed => Object.assign(feed, {
+    listen(callback) {
+      let allLoaded = false;
+
+      feed.feed.each((err, doc) => {
+        if (err) {
+          callback(err);
+        } else if (doc.state) {
+          if (doc.state === 'ready') {
+            callback(null, 'all:loaded', allLoaded = true);
+          }
+        } else if (doc.new_val && !doc.old_val) {
+          callback(null, allLoaded ? 'created' : 'existed', new Model(doc.new_val));
+        } else if (!doc.new_val && doc.old_val) {
+          callback(null, 'deleted', new Model(doc.old_val));
+        } else if (doc.new_val && doc.old_val) {
+          callback(null, 'updated', new Model(doc.new_val));
+        }
+      });
+
+      return feed;
+    }
+  }));
 };
