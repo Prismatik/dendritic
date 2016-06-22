@@ -120,8 +120,6 @@ exports.feedBuilder = (Model) => (params = {}) => {
           callback(null, 'updated', new Model(doc.new_val));
         }
       });
-
-      return feed;
     }
   }));
 };

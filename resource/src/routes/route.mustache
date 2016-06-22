@@ -44,13 +44,14 @@ const router = module.exports = new Router()
   });
   {{/isUser}}
 
-router.socket = (socket, req) => (
-  {{camelCasePlural}}.watch(req.query).then(({ feed, count }) => {
-    socket.emit('metadata', { count });
+router.socket = function * (socket, req) {
+  const { feed, count } = yield {{camelCasePlural}}.watch(req.query);
+  socket.emit('metadata', { count });
 
-    return feed.listen((err, event, doc) => {
-      if (err) throw err;
-      socket.emit(event, serialize(doc));
-    });
-  })
-);
+  feed.listen((err, event, doc) => {
+    if (err) throw err;
+    socket.emit(event, serialize(doc));
+  });
+
+  return feed;
+};

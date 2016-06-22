@@ -159,7 +159,7 @@ describe('/{{kebabCasePlural}} route', () => {
     });
 
     beforeEach(function * () {
-      yield wait(50);
+      yield wait(50); // waiting for the other beforeEach events to pass
       io = IO(app.urlFor('/{{kebabCasePlural}}'), { forceNew: true });
     });
 

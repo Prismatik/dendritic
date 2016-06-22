@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const app = require('express')();
 const io = require('socket.io')();
 const routes = require('./routes');
-const logger = require('./utils/logger');
 const { httpErrors } = require('./middleware');
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,8 +20,9 @@ module.exports = app;
 app.io = io;
 routes.sockets.forEach(({ path, handler }) => {
   io.of(path).on('connection', socket => {
-    handler(socket, socket.handshake).then(feed => {
+    require('co')(function * () {
+      const feed = yield handler(socket, socket.handshake);
       socket.on('disconnect', () => feed.close());
-    }).catch(error => logger.error(error));
+    });
   });
 });

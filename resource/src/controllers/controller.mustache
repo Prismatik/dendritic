@@ -16,11 +16,12 @@ module.exports = {
   *all(params) {
     return yield {{pascalCase}}.standardQuery(params).run();
   },
-  watch(params) {
-    return Promise.all([
+  *watch(params) {
+    const [feed, count] = yield [
       {{pascalCase}}.standardFeed(params),
       {{pascalCase}}.standardQuery(params).count().execute()
-    ]).then(([feed, count]) => ({ feed, count }));
+    ];
+    return { feed, count };
   },
   *find(id) {
     return yield {{pascalCase}}.get(id);
