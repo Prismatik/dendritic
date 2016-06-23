@@ -2,14 +2,7 @@ const uuid = require('uuid');
 const { {{pascalCase}} } = require('../models');
 {{#isUser}}
 const HttpError = require('standard-http-error');
-const password = require('simple-password');
-const jwt = require('../utils/jwt');
-const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
-function * hashPassword(params) {
-  return Object.assign({}, params, params.password ? {
-    password: yield password.create(params.password, HASH_ROUNDS)
-  } : {});
-}
+const { createToken, hashPassword, verifyPassword } = require('../utils/auth');
 {{/isUser}}
 
 module.exports = {
@@ -50,10 +43,10 @@ module.exports = {
     const [user] = yield {{pascalCase}}.filter({ email }).run();
     if (!user) throw new HttpError('UNAUTHORIZED');
 
-    const verified = yield password.verify(pass, user.password);
+    const verified = yield verifyPassword(pass, user.password);
     if (!verified) throw new HttpError('UNAUTHORIZED');
 
-    const token = jwt.sign({ id: user.id, role: user.role });
+    const token = createToken({ id: user.id, role: user.role });
 
     return { token, user };
   },

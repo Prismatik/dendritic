@@ -27,8 +27,8 @@ module.exports = (opts) => {
     const packagePath = `${opts.path}/package.json`;
     pkg.addDependencies(packagePath, userDependencies);
 
-    // if user is scaffolded, jwt lib required
-    files.push({ p: 'src/utils', n: 'jwt' });
+    // if user is scaffolded, auth utils required
+    files.push({ p: 'src/utils', n: 'auth' });
   }
 
   scaffold({ basePath: __dirname, files, mustacheOpts: opts });
