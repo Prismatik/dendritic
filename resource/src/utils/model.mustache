@@ -11,7 +11,7 @@ exports.create = (modelName) => {
   const modelSchema = schema[modelName];
   const validator = exports.thinkyValidatorFor(modelSchema);
   const model = thinky.createModel(
-    modelSchema.camelCasePlural,
+    modelSchema.pluralName,
     { /* we are relying on the JSON schema validator to ensure data consitency */ },
     { validator, enforce_extra: 'none', enforce_type: 'none' }
   );
