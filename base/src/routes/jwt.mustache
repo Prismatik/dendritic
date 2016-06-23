@@ -1,18 +1,7 @@
 const { Router } = require('express');
-const jwt = require('express-jwt');
-
-const OPTS = {
-  secret: process.env.JWT_SECRET,
-  getToken: req => {
-    const auth = req.headers.authorization;
-
-    if (auth && auth.split(' ')[0] === 'Bearer') return auth.split(' ')[1];
-    else if (req.query && req.query.token) return req.query.token;
-    return null;
-  }
-};
+const { auth } = require('../middleware');
 
 module.exports = new Router()
-  .get('/verify', jwt(OPTS), (req, res) => {
+  .get('/verify', auth, (req, res) => {
     res.json({ ok: true });
   });
