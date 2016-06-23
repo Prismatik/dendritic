@@ -27,8 +27,8 @@ const router = module.exports = new Router()
     res.json(serialize({{camelCase}}));
   })
   .delete('/:id', function * (req, res) {
-    yield {{camelCasePlural}}.delete(req.params.id);
-    res.json({ ok: true });
+    const {{camelCase}} = yield {{camelCasePlural}}.delete(req.params.id);
+    res.json(serialize({{camelCase}}));
   {{^isUser}}
   });
   {{/isUser}}

@@ -209,7 +209,8 @@ describe('{{snakeCasePlural}} controller', () => {
 
   describe('.delete(id)', () => {
     it('deletes a {{camelCase}} for sure when it exists', function * () {
-      yield {{camelCasePlural}}.delete({{camelCase}}.id);
+      const record = yield {{camelCasePlural}}.delete({{camelCase}}.id);
+      Object.assign({}, record).must.eql(Object.assign({}, {{camelCase}}));
 
       const result = yield {{pascalCase}}.getAll({{camelCase}}.id);
       result.must.eql([]);

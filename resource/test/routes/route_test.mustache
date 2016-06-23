@@ -84,7 +84,7 @@ describe('/{{kebabCasePlural}} route', () => {
       const {{camelCase}} = response.body;
 
       delete({{camelCase}}.id); delete({{camelCase}}.rev);
-      delete(data.rev); delete(data.password);
+      delete(data.rev);{{#isUser}} delete(data.password);{{/isUser}}
 
       {{camelCase}}.must.eql(data);
     });
@@ -98,7 +98,7 @@ describe('/{{kebabCasePlural}} route', () => {
     });
     {{#isUser}}
     it('throws 422 if a password is mising', function * () {
-      const data = {{camelCase}}Fixture.valid(); delete(data.password);
+      const data = {{camelCase}}Fixture.valid(); {{#isUser}}delete(data.password);{{/isUser}}
       const response = yield app.post('/{{kebabCasePlural}}', data);
       response.status.must.eql(422);
       response.body.must.eql({
@@ -114,8 +114,8 @@ describe('/{{kebabCasePlural}} route', () => {
       const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
       response.status.must.eql(200);
 
-      const expected = Object.assign({}, {{camelCase}}, data);
-      delete(expected.password);
+      const expected = Object.assign({}, {{camelCase}}, data);{{#isUser}}
+      delete(expected.password);{{/isUser}}
 
       response.body.must.eql(expected);
     });
@@ -140,7 +140,9 @@ describe('/{{kebabCasePlural}} route', () => {
     it('deletes a record if it exists', function * () {
       const response = yield app.delete('/{{kebabCasePlural}}/' + {{camelCase}}.id);
       response.status.must.eql(200);
-      response.body.must.eql({ ok: true });
+      const expected = Object.assign({}, {{camelCase}});{{#isUser}}
+      delete(expected.password);{{/isUser}}
+      response.body.must.eql(expected);
     });
 
     it('throws 404 if the record does not exist', function * () {
