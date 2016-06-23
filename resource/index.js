@@ -11,6 +11,7 @@ module.exports = (opts) => {
   const files = [
     { p: 'config', n: 'warnings' },
     { p: 'src/utils', n: 'model' },
+    { p: 'src/utils', n: 'controller' },
     { p: 'test/utils', n: 'model_test' },
     { p: 'src/models', n: 'index' },
     { n: 'src/models/model', d: 'src/models', t: opts.snakeCase },

@@ -1,44 +1,24 @@
-const uuid = require('uuid');
 const { {{pascalCase}} } = require('../models');
+const { createController } = require('../utils/controller');
 {{#isUser}}
+const uuid = require('uuid');
 const HttpError = require('standard-http-error');
 const { createToken, hashPassword, verifyPassword } = require('../utils/auth');
 {{/isUser}}
 
-module.exports = {
-  *all(params) {
-    return yield {{pascalCase}}.standardQuery(params).run();
-  },
-  *watch(params) {
-    const [feed, count] = yield [
-      {{pascalCase}}.standardFeed(params),
-      {{pascalCase}}.standardQuery(params).count().execute()
-    ];
-    return { feed, count };
-  },
-  *find(id) {
-    return yield {{pascalCase}}.get(id);
-  },
-  {{^isUser}}
-  *create(params) {
-    return yield new {{pascalCase}}(
-      Object.assign({ rev: uuid.v4() }, params)
-    ).save();
-  },
-  *update(id, params) {
-    const {{camelCase}} = yield this.find(id);
-    return yield {{camelCase}}.merge(params).save();
-  },
-  {{/isUser}}
+module.exports = createController({{pascalCase}}, {
+  {{^isUser}}// TODO business logic{{/isUser}}
   {{#isUser}}
   *create(params) {
     const data = Object.assign({ rev: uuid.v4() }, yield hashPassword(params));
     return yield new {{pascalCase}}(data).save();
   },
+
   *update(id, params) {
     const {{camelCase}} = yield this.find(id);
     return yield {{camelCase}}.merge(yield hashPassword(params)).save();
   },
+
   *signin(email, pass) {
     const [user] = yield {{pascalCase}}.filter({ email }).run();
     if (!user) throw new HttpError('UNAUTHORIZED');
@@ -50,13 +30,9 @@ module.exports = {
 
     return { token, user };
   },
+
   *signout() {
     return { ok: true };
-  },
-  {{/isUser}}
-  *delete(id) {
-    const {{camelCase}} = yield this.find(id);
-    yield {{camelCase}}.delete();
-    return {{camelCase}};
   }
-};
+  {{/isUser}}
+});
