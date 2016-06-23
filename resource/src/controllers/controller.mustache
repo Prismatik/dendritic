@@ -1,22 +1,21 @@
 const { {{pascalCase}} } = require('../models');
 const { createController } = require('../utils/controller');
 {{#isUser}}
-const uuid = require('uuid');
 const HttpError = require('standard-http-error');
 const { createToken, hashPassword, verifyPassword } = require('../utils/auth');
 {{/isUser}}
 
 module.exports = createController({{pascalCase}}, {
-  {{^isUser}}// TODO business logic{{/isUser}}
+  {{^isUser}}
+  // TODO business logic
+  {{/isUser}}
   {{#isUser}}
   *create(params) {
-    const data = Object.assign({ rev: uuid.v4() }, yield hashPassword(params));
-    return yield new {{pascalCase}}(data).save();
+    return yield super.create(yield hashPassword(params));
   },
 
   *update(id, params) {
-    const {{camelCase}} = yield this.find(id);
-    return yield {{camelCase}}.merge(yield hashPassword(params)).save();
+    return yield super.update(id, yield hashPassword(params));
   },
 
   *signin(email, pass) {

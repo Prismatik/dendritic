@@ -7,9 +7,10 @@ const uuid = require('uuid');
  * @param {Object} extra methods
  * @return {Object} controller
  */
-exports.createController = (Model, methods) => {
+exports.createController = (Model, subController) => {
   const baseController = exports.baseController(Model);
-  return Object.assign(baseController, methods);
+  Object.setPrototypeOf(subController, baseController);
+  return subController;
 };
 
 /**
