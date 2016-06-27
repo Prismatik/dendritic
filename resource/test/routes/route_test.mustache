@@ -1,5 +1,6 @@
 const uuid = require('uuid');
 const { app } = require('../helper');
+const {{pascalCase}} = require('../../src/models/{{snakeCase}}');
 const {{camelCasePlural}} = require('../../src/controllers/{{snakeCasePlural}}');
 const {{camelCase}}Fixture = require('../fixtures/{{snakeCase}}');
 const IO = require('socket.io-client');
@@ -16,8 +17,7 @@ describe('/{{kebabCasePlural}} route', () => {
     {{/isUser}};
 
   beforeEach(function * () {
-    const oldRecords = yield {{camelCasePlural}}.all();
-    yield oldRecords.map(r => r.delete());
+    yield {{pascalCase}}.delete().execute();
 
     [{{camelCase}}1, {{camelCase}}2] = yield [
       {{camelCasePlural}}.create({{camelCase}}Fixture.valid()),

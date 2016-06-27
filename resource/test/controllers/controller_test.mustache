@@ -28,8 +28,7 @@ describe('{{snakeCasePlural}} controller', () => {
       .map(i => Object.assign({}, i));
 
     beforeEach(function * () {
-      const oldRecords = yield {{pascalCase}}.run();
-      yield oldRecords.map(r => r.delete());
+      yield {{pascalCase}}.delete().execute();
 
       [{{camelCase}}1, {{camelCase}}2, {{camelCase}}3] = yield [
         {{camelCasePlural}}.create({{camelCase}}Fixture.valid()),
