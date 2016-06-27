@@ -1,0 +1,110 @@
+const Ajv = require('ajv');
+const { thinky, schema } = require('../../config');
+
+/**
+ * Creates a Thiky model based on a schema definition
+ *
+ * @param {String} model name (in JSON schema)
+ * @return {Class} thinky model
+ */
+exports.create = (modelName) => {
+  const modelSchema = schema[modelName];
+  const validator = exports.thinkyValidatorFor(modelSchema);
+  const model = thinky.createModel(
+    modelSchema.pluralName,
+    { /* we are relying on the JSON schema validator to ensure data consitency */ },
+    { validator, enforce_extra: 'none', enforce_type: 'none' }
+  );
+
+  model.standardQuery = exports.queryBuilder(model, modelSchema);
+  model.standardFeed = exports.feedBuilder(model);
+
+  return model;
+};
+
+/**
+ * Builds a Thinky compatible data validator out of the JSON Schema
+ *
+ * @param {Object} model JSON schema
+ * @return {Function} thinky compatible validator
+ */
+exports.thinkyValidatorFor = (schema) => {
+  const ajv = new Ajv({ allErrors: true });
+  const validate = ajv.compile(schema);
+  return document => {
+    if (!validate(document)) {
+      throw new thinky.Errors.ValidationError(
+        validate.errors.map(e => e.message).join(', ')
+      );
+    }
+  };
+};
+
+/**
+ * A standard query builder (used in controllers)
+ *
+ * @param {Class} thinky model
+ * @param {Object} model json schema
+ * @return {Function} a query builder
+ */
+exports.queryBuilder = (model, schema) => (params = {}) => {
+  let query = model;
+  const filter = {};
+
+  Object.keys(params).forEach(key => {
+    if (schema.properties[key]) {
+      filter[key] = params[key];
+    }
+  });
+
+  if (Object.keys(filter).length > 0) {
+    query = query.filter(filter);
+  }
+
+  if (params.orderBy && schema.properties[params.orderBy]) {
+    const direction = params.order || 'asc';
+    query = query.orderBy(params.orderBy, direction);
+  }
+
+  if (params.skip && !isNaN(parseInt(params.skip, 10))) {
+    query = query.skip(parseInt(params.skip, 10));
+  }
+
+  if (params.limit && !isNaN(parseInt(params.limit, 10))) {
+    query = query.limit(parseInt(params.limit, 10));
+  }
+
+  return query;
+};
+
+/**
+ * Creates a standard change feed for apps
+ *
+ * @param {Classs} model
+ * @return {Function} feed builer
+ */
+exports.feedBuilder = (Model) => (params = {}) => {
+  const changeParams = { includeInitial: true, includeStates: true };
+
+  return Model.standardQuery(params).changes(changeParams).then(feed => Object.assign(feed, {
+    listen(callback) {
+      let allLoaded = false;
+
+      feed.feed.each((err, doc) => {
+        if (err) {
+          callback(err);
+        } else if (doc.state) {
+          if (doc.state === 'ready') {
+            callback(null, 'all:loaded', allLoaded = true);
+          }
+        } else if (doc.new_val && !doc.old_val) {
+          callback(null, allLoaded ? 'created' : 'existed', new Model(doc.new_val));
+        } else if (!doc.new_val && doc.old_val) {
+          callback(null, 'deleted', new Model(doc.old_val));
+        } else if (doc.new_val && doc.old_val) {
+          callback(null, 'updated', new Model(doc.new_val));
+        }
+      });
+    }
+  }));
+};

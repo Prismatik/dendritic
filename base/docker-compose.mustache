@@ -4,27 +4,16 @@ services:
     build: .
     environment:
       JWT_SECRET: foo
-      RETHINK_HOST: rethinkdb
-      RETHINK_PORT: 28015
-      RETHINK_NAME: {{snakeCasePlural}}
+      RETHINKDB_URL: rethinkdb://rethinkdb:28015/{{snakeCasePlural}}
       PORT: 3005
     volumes:
       - ./bin:/opt/app/bin
-      - ./constants:/opt/app/constants
-      - ./controllers:/opt/app/controllers
-      - ./env:/opt/app/env
-      - ./fixtures:/opt/app/fixtures
-      - ./index.js:/opt/app/index.js
-      - ./lib:/opt/app/lib
-      - ./middleware:/opt/app/middleware
+      - ./config:/opt/app/config
+      - ./src:/opt/app/src
       - ./migrations:/opt/app/migrations
       - ./package.json:/opt/app/package.json
-      - ./routes:/opt/app/routes
-      - ./schema.js:/opt/app/schema.js
-      - ./schemas:/opt/app/schemas
       - ./setup.js:/opt/app/setup.js
       - ./start.js:/opt/app/start.js
-      - ./tables:/opt/app/tables
       - ./test:/opt/app/test
     depends_on:
       - rethinkdb

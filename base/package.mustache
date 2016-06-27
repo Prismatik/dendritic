@@ -1,20 +1,23 @@
 {
-  "name": "{{snakeCasePlural}}",
+  "name": "{{kebabCasePlural}}",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/app.js",
+  "engines": {
+    "node": "^6.1.0",
+    "npm": "^3.8.6"
+  },
   "scripts": {
     "coverage": "istanbul cover _mocha",
-    "migrate": "node ./bin/migrate.js",
-    "migration": "node ./bin/migration.js",
-    "start": "node start",
-    "test": "RETHINK_NAME={{snakeCasePlural}}_test mocha",
+    "start": "node src/server",
+    "test": "NODE_ENV=test mocha",
     "watch": "mocha --watch",
-    "dockertest": "docker-compose run {{snakeCasePlural}} npm test",
-    "dockerwatch": "docker-compose run {{snakeCasePlural}} npm run watch"
+    "dockertest": "docker-compose run {{kebabCasePlural}} npm test",
+    "dockerwatch": "docker-compose run {{kebabCasePlural}} npm run watch"
   },
   "license": "ISC",
   "dependencies": {
+    "ajv": "^4.1.3",
     "app-module-path": "^1.0.6",
     "bandname": "^1.0.0",
     "body-parser": "^1.15.0",
@@ -23,15 +26,17 @@
     "cors": "^2.7.1",
     "express": "^4.13.4",
     "express-jwt": "^3.4.0",
-    "jsen": "^0.6.0",
+    "express-yields": "^1.0.0",
     "json-schema-deref-sync": "^0.2.8",
     "lodash": "^3.10.1",
     "rethinkdbdash": "^2.2.8",
-    "socket.io": "^1.3.7",
     "standard-http-error": "^2.0.0",
+    "socket.io": "^1.4.6",
+    "thinky": "^2.3.2",
     "uuid": "^2.0.2"
   },
   "devDependencies": {
+    "co-mocha": "^1.1.2",
     "doubleagent": "^1.0.2",
     "mocha": "^2.4.5",
     "must": "^0.13.1",
@@ -41,9 +46,5 @@
     "mustache": "^2.2.0",
     "rimraf": "^2.4.4",
     "socket.io-client": "^1.3.7"
-  },
-  "engines": {
-    "node": "^6.1.0",
-    "npm": "^3.8.6"
   }
 }

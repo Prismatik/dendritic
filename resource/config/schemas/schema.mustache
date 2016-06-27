@@ -1,0 +1,64 @@
+{{=<% %>=}}
+{
+  "type": "object",
+  "name": "<%camelCase%>",
+  "pluralName": "<%camelCasePlural%>",
+  "properties": {
+    "id": {
+      "$ref": "#/definitions/uuid"
+    },
+    "rev": {
+      "$ref": "#/definitions/uuid"
+    },
+    "name": {
+      "type": "string",
+      "faker": "name.findName"
+    <%#isUser%>
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "faker": "internet.exampleEmail"
+    },
+    "password": {
+      "type": "string",
+      "faker": "internet.password"
+    <%/isUser%>
+    <%#singularRelationships%>
+    },
+    "<%camelCase%>Id": {
+      "$ref": "#/definitions/uuid"
+    <%/singularRelationships%>
+    <%#multiRelationships%>
+    },
+    "<%camelCasePlural%>Ids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/uuid"
+      }
+    <%/multiRelationships%>
+    }
+  },
+  <%#hasRelationships%>
+  "links": [
+    <%#singularRelationships%>
+    {
+      "rel": "<%camelCase%>",
+      "href": "/<%camelCasePlural%>/{<%camelCase%>Id}"
+    }<%^isLast%>,<%/isLast%><%#isLast%><%#hasMultiRelationships%>,<%/hasMultiRelationships%><%/isLast%>
+    <%/singularRelationships%>
+    <%#multiRelationships%>
+    {
+      "rel": "<%camelCase%>",
+      "href": "/<%camelCasePlural%>/{<%camelCasePlural%>Ids[]}"
+    }<%^isLast%>,<%/isLast%>
+    <%/multiRelationships%>
+  ],
+  <%/hasRelationships%>
+  <%^isUser%>
+  "required": ["name"]
+  <%/isUser%>
+  <%#isUser%>
+  "required": ["name", "email", "password"]
+  <%/isUser%>
+}

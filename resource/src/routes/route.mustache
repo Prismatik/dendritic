@@ -1,0 +1,57 @@
+const { Router } = require('express');
+const {{camelCasePlural}} = require('../controllers/{{snakeCasePlural}}');
+
+const serialize = ({{camelCase}}) => {
+  const data = Object.assign({}, {{camelCase}});
+  {{#isUser}}
+  delete(data.password);
+  {{/isUser}}
+  return data;
+};
+
+const router = module.exports = new Router()
+  .get('', function * (req, res) {
+    const list = yield {{camelCasePlural}}.all(req.query);
+    res.json(list.map(serialize));
+  })
+  .get('/:id', function * (req, res) {
+    const {{camelCase}} = yield {{camelCasePlural}}.find(req.params.id);
+    res.json(serialize({{camelCase}}));
+  })
+  .post('', function * (req, res) {
+    const {{camelCase}} = yield {{camelCasePlural}}.create(req.body);
+    res.status(201).json(serialize({{camelCase}}));
+  })
+  .put('/:id', function * (req, res) {
+    const {{camelCase}} = yield {{camelCasePlural}}.update(req.params.id, req.body);
+    res.json(serialize({{camelCase}}));
+  })
+  .delete('/:id', function * (req, res) {
+    const {{camelCase}} = yield {{camelCasePlural}}.delete(req.params.id);
+    res.json(serialize({{camelCase}}));
+  {{^isUser}}
+  });
+  {{/isUser}}
+  {{#isUser}}
+  })
+  .post('/signin', function * (req, res) {
+    const { user, token } = yield {{camelCasePlural}}.signin(req.body.email, req.body.password);
+    res.json({ token, user: serialize(user) });
+  })
+  .post('/signout', function * (req, res) {
+    const result = yield {{camelCasePlural}}.signout(req.body);
+    res.json(result);
+  });
+  {{/isUser}}
+
+router.socket = function * (socket, req) {
+  const { feed, count } = yield {{camelCasePlural}}.watch(req.query);
+  socket.emit('metadata', { count });
+
+  feed.listen((err, event, doc) => {
+    if (err) throw err;
+    socket.emit(event, serialize(doc));
+  });
+
+  return feed;
+};

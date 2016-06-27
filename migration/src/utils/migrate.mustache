@@ -1,0 +1,93 @@
+const path = require('path');
+require('app-module-path').addPath(path.join(__dirname, '..'));
+require('dotenv-safe').load({ sample: './example.env' });
+
+const os = require('os');
+const _ = require('lodash');
+const r = require('lib/db');
+const log = require('src/utils/logger');
+
+const table = r.table('_migrations');
+
+const migrationFiles = require('migrations').filenames;
+
+const applyMigration = (migrations, then) => {
+  if (migrations.length === 0) return Promise.resolve();
+  const m = migrations.shift();
+  return m.func()
+  .then(() => {
+    return then(m.name);
+  })
+  .then(() => {
+    return applyMigration(migrations, then);
+  });
+};
+
+const acquireMutex = () => {
+  return r.branch(table.get('migrations_running_mutex'),
+    r.error('mutex locked'),
+    table.insert({
+      hostname: os.hostname(),
+      name: 'migrations_running_mutex',
+      d: new Date().toISOString()
+    })
+  ).run();
+};
+
+const releaseMutex = () => {
+  return table.get('migrations_running_mutex').delete().run();
+};
+
+const queryMutex = () => {
+  return table.get('migrations_running_mutex').run();
+};
+
+const getMigrationRecords = () => {
+  return table.run()
+  .then(records => records.map(_.property('name')));
+};
+
+module.exports = {
+  up: () => {
+    if (migrationFiles.length < 1) return Promise.resolve();
+
+    return acquireMutex()
+    .then(getMigrationRecords)
+    .then(existingMigrations => _.difference(migrationFiles, existingMigrations))
+    .then(missingMigrations => {
+      const toBeApplied = missingMigrations.map(file => ({
+        func: require(`migrations/${file}`).up,
+        name: file
+      }));
+
+      return applyMigration(toBeApplied, (name) => {
+        log.info('migrated up', name);
+        return table.insert({ name }).run();
+      });
+    })
+    .then(releaseMutex);
+  },
+  down: (backstop) => {
+    if (migrationFiles.length < 1) return Promise.resolve();
+
+    migrationFiles.splice(0, migrationFiles.indexOf(backstop));
+
+    return getMigrationRecords()
+    .then(existingMigrations => _.intersection(migrationFiles, existingMigrations))
+    .then(migrationsToDown => {
+      const toBeDowned = migrationsToDown.reverse()
+      .map(file => ({
+        func: require(`migrations/${file}`).down,
+        name: file
+      }));
+
+      return applyMigration(toBeDowned, (name) => {
+        log.info('migrated down', name);
+        return table.get(name).delete().run();
+      });
+    })
+    .then(releaseMutex);
+  },
+  releaseMutex,
+  queryMutex
+};

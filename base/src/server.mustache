@@ -1,0 +1,17 @@
+require('dotenv-safe').load({ sample: './example.env' });
+require('app-module-path').addPath(require('path').resolve(__dirname, '..'));
+
+const app = require('./app');
+const server = require('http').createServer(app);
+const log = require('./utils/logger');
+
+if (app.io) { app.io.listen(server); }
+
+server.listen(process.env.PORT, () => {
+  const { address, port } = server.address();
+  log.info('{{camelCase}} API listening at http://%s:%s', address, port);
+});
+
+process.on('unhandledRejection', (reason, p) => {
+  log.error('Unhandled Rejection at: Promise ', p, ' reason: ', reason);
+});

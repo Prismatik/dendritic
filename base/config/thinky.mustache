@@ -1,0 +1,15 @@
+const url = require('url');
+const thinky = require('thinky');
+
+const rethinkdb = url.parse(process.env.RETHINKDB_URL);
+const params = {
+  host: rethinkdb.hostname,
+  port: rethinkdb.port,
+  db: rethinkdb.pathname.substr(1)
+};
+
+if (process.env.NODE_ENV === 'test') {
+  params.db += '_test';
+}
+
+module.exports = thinky(params);

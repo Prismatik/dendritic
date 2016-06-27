@@ -1,26 +1,22 @@
-require('dotenv-safe').load({ sample: './example.env' });
 require('must');
+require('dotenv-safe').load({ sample: './example.env' });
+require('app-module-path').addPath(require('path').resolve(__dirname, '..'));
 
-const path = require('path');
-require('app-module-path').addPath(path.resolve(__dirname, '..'));
+const mocha = require('mocha');
+const coMocha = require('co-mocha');
+coMocha(mocha);
 
-const setup = require('setup');
-const app = require('index').server;
-const r = require('lib/db');
+const { thinky } = require('../config');
 
-const DB_NAME = process.env.RETHINK_NAME;
-
-app.listen(process.env.PORT, () => {
-  before(function before() {
-    this.timeout(30000);
-
-    return setup()
-      .then(() => {
-        after(() => {
-          return r.dbDrop(DB_NAME)
-            .then(() => r.getPoolMaster().drain())
-            .then(() => Promise.resolve(app.close()));
-        });
-      });
+process.nextTick(() => {
+  before(function * () {
+    yield thinky.dbReady();
   });
 });
+
+const app = require('../src/app');
+const doubleagent = require('doubleagent');
+
+exports.app = doubleagent(app);
+
+if (app.io) { app.io.attach(exports.app.server); }
