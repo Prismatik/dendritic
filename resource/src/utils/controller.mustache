@@ -1,5 +1,3 @@
-const uuid = require('uuid');
-
 /**
  * Creates a controller with extra methods
  *
@@ -37,9 +35,7 @@ exports.baseController = Model => ({
   },
 
   *create(params) {
-    return yield new Model(
-      Object.assign({ rev: uuid.v4() }, params)
-    ).save();
+    return yield new Model(params).save();
   },
 
   *update(id, params) {

@@ -1,4 +1,5 @@
 const Ajv = require('ajv');
+const uuid = require('uuid');
 const { thinky, schema } = require('../../config');
 
 /**
@@ -15,6 +16,10 @@ exports.create = (modelName, opts = {}) => {
     { /* we are relying on the JSON schema validator to ensure data consitency */ },
     { validator, enforce_extra: 'none', enforce_type: 'none' }
   );
+
+  if (modelSchema.properties.rev) {
+    exports.setRevLifecycle(model);
+  }
 
   model.standardQuery = exports.queryBuilder(model, modelSchema);
   model.standardFeed = exports.feedBuilder(model);
@@ -142,4 +147,19 @@ exports.setupAuditLog = (model) => {
   });
 
   model.AuditModel = AuditModel;
+
+/**
+ * Sets up the `rev` properties lifecycles
+ *
+ * @param {class} thinky model
+ * @return void
+ */
+exports.setRevLifecycle = Model => {
+  Model.pre('save', function (next) {
+    if (!this.isSaved() && !this.rev) {
+      this.rev = uuid.v4();
+    }
+
+    next();
+  });
 };
