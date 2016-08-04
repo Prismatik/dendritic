@@ -6,13 +6,13 @@ const migrationName = `${now}_${process.argv[2]}`;
 
 const opts = { migrationName };
 
-const migrationTemplate = fs.readFileSync('./bin/migration_template.mustache').toString();
-const migrationTestTemplate = fs.readFileSync('./bin/migration_template_test.mustache').toString();
+const migrationTemplate = fs.readFileSync('./migration_template.mustache').toString();
+const migrationTestTemplate = fs.readFileSync('./migration_template_test.mustache').toString();
 
 const migrationFile = mustache.render(migrationTemplate, opts);
 const migrationTest = mustache.render(migrationTestTemplate, opts);
 
-['./migrations/', './test/migrations/'].forEach(p => {
+['../migrations/', '../test/migrations/'].forEach(p => {
   try {
     fs.mkdirSync(p);
   } catch (e) {
@@ -20,5 +20,5 @@ const migrationTest = mustache.render(migrationTestTemplate, opts);
   }
 });
 
-fs.writeFileSync(`./migrations/${migrationName}.js`, migrationFile);
-fs.writeFileSync(`./test/migrations/${migrationName}.js`, migrationTest);
+fs.writeFileSync(`../migrations/${migrationName}.js`, migrationFile);
+fs.writeFileSync(`../test/migrations/${migrationName}.js`, migrationTest);
