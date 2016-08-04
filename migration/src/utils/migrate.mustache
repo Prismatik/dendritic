@@ -84,7 +84,7 @@ module.exports = {
 
       return applyMigration(toBeDowned, (name) => {
         log.info('migrated down', name);
-        return table.get(name).delete().run();
+        return table.filter({ name }).delete().run();
       });
     })
     .then(releaseMutex);
