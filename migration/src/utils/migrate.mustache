@@ -24,7 +24,8 @@ const applyMigration = (migrations, then) => {
 };
 
 const acquireMutex = () => {
-  return r.branch(table.get('migrations_running_mutex'),
+  return r.branch(
+    table.filter({ name: 'migrations_running_mutex' }).coerceTo('array').ne([]),
     r.error('mutex locked'),
     table.insert({
       hostname: os.hostname(),
@@ -35,11 +36,11 @@ const acquireMutex = () => {
 };
 
 const releaseMutex = () => {
-  return table.get('migrations_running_mutex').delete().run();
+  return table.filter({ name: 'migrations_running_mutex' }).delete().run();
 };
 
 const queryMutex = () => {
-  return table.get('migrations_running_mutex').run();
+  return table.filter({ name: 'migrations_running_mutex' }).run();
 };
 
 const getMigrationRecords = () => {
