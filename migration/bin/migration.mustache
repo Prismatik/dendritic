@@ -1,18 +1,19 @@
 const fs = require('fs');
 const mustache = require('mustache');
+const path = require('path');
 
 const now = new Date().toISOString();
 const migrationName = `${now}_${process.argv[2]}`;
-
+const root = path.resolve(__dirname, '..');
 const opts = { migrationName };
 
-const migrationTemplate = fs.readFileSync('./migration_template.mustache').toString();
-const migrationTestTemplate = fs.readFileSync('./migration_template_test.mustache').toString();
+const migrationTemplate = fs.readFileSync(`${root}/bin/migration_template.mustache`).toString();
+const migrationTestTemplate = fs.readFileSync(`${root}/bin/migration_template_test.mustache`).toString();
 
 const migrationFile = mustache.render(migrationTemplate, opts);
 const migrationTest = mustache.render(migrationTestTemplate, opts);
 
-['../migrations/', '../test/migrations/'].forEach(p => {
+[`${root}/migrations/`, `${root}/test/migrations/`].forEach(p => {
   try {
     fs.mkdirSync(p);
   } catch (e) {
@@ -20,5 +21,5 @@ const migrationTest = mustache.render(migrationTestTemplate, opts);
   }
 });
 
-fs.writeFileSync(`../migrations/${migrationName}.js`, migrationFile);
-fs.writeFileSync(`../test/migrations/${migrationName}.js`, migrationTest);
+fs.writeFileSync(`${root}/migrations/${migrationName}.js`, migrationFile);
+fs.writeFileSync(`${root}/test/migrations/${migrationName}.js`, migrationTest);
