@@ -45,6 +45,7 @@ if (command === 'show_mutex' && arg1) {
 
 if (command === 'release_mutex') {
   migrate.releaseMutex()
+  .then(console.log)
   .then(() => r.getPoolMaster().drain())
   .then(() => process.exit());
 }
