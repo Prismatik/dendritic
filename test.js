@@ -29,6 +29,7 @@ exec(['node', index, 'base', appName].join(' '), opts);
 exec(['node', index, 'resource', modelName1].join(' '), opts);
 exec(['node', index, 'resource', modelName2, '-s', modelName1].join(' '), opts);
 exec(['node', index, 'user', userName, '-m', modelName2].join(' '), opts);
+exec(['node', index, 'migration'].join(' '), opts); // eslint only
 if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
 exec(['cp', 'example.env', '.env'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
