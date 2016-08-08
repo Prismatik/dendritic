@@ -1,0 +1,11 @@
+const thinky = require('config/thinky');
+const { type } = thinky;
+
+module.exports = thinky.createModel(
+  '_migrations',
+  {
+    hostname: type.string(),
+    name: type.string().required(),
+    d: type.string()
+  }
+);

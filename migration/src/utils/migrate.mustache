@@ -4,8 +4,10 @@ require('dotenv-safe').load({ sample: './example.env' });
 
 const _ = require('lodash');
 const os = require('os');
-const { r } = require('config/thinky');
 const log = require('src/utils/logger');
+const thinky = require('config/thinky');
+const { r } = thinky;
+require('src/models/_migration'); // setup the _migrations table
 
 const table = r.table('_migrations');
 
@@ -35,60 +37,59 @@ const acquireMutex = () => {
   ).run();
 };
 
-const releaseMutex = () => {
-  return table.filter({ name: 'migrations_running_mutex' }).delete().run();
-};
-
-const queryMutex = () => {
-  return table.filter({ name: 'migrations_running_mutex' }).run();
-};
-
 const getMigrationRecords = () => {
   return table.run()
   .then(records => records.map(_.property('name')));
 };
 
-module.exports = {
-  up: () => {
-    if (migrationFiles.length < 1) return Promise.resolve();
+exports.releaseMutex = () => {
+  return table.filter({ name: 'migrations_running_mutex' }).delete().run();
+};
 
-    return acquireMutex()
-    .then(getMigrationRecords)
-    .then(existingMigrations => _.difference(migrationFiles, existingMigrations))
-    .then(missingMigrations => {
-      const toBeApplied = missingMigrations.map(file => ({
-        func: require(`migrations/${file}`).up,
-        name: file
-      }));
+exports.queryMutex = () => {
+  return table.filter({ name: 'migrations_running_mutex' }).run();
+};
 
-      return applyMigration(toBeApplied, (name) => {
-        log.info('migrated up', name);
-        return table.insert({ name }).run();
-      });
-    })
-    .then(releaseMutex);
-  },
-  down: (backstop) => {
-    if (migrationFiles.length < 1) return Promise.resolve();
+exports.up = () => {
+  if (migrationFiles.length < 1) return Promise.resolve();
 
-    migrationFiles.splice(0, migrationFiles.indexOf(backstop));
+  return thinky.dbReady()
+  .then(acquireMutex)
+  .then(getMigrationRecords)
+  .then(existingMigrations => _.difference(migrationFiles, existingMigrations))
+  .then(missingMigrations => {
+    const toBeApplied = missingMigrations.map(file => ({
+      func: require(`migrations/${file}`).up,
+      name: file
+    }));
 
-    return getMigrationRecords()
-    .then(existingMigrations => _.intersection(migrationFiles, existingMigrations))
-    .then(migrationsToDown => {
-      const toBeDowned = migrationsToDown.reverse()
-      .map(file => ({
-        func: require(`migrations/${file}`).down,
-        name: file
-      }));
+    return applyMigration(toBeApplied, (name) => {
+      log.info('migrated up', name);
+      return table.insert({ name }).run();
+    });
+  })
+  .then(exports.releaseMutex);
+};
 
-      return applyMigration(toBeDowned, (name) => {
-        log.info('migrated down', name);
-        return table.filter({ name }).delete().run();
-      });
-    })
-    .then(releaseMutex);
-  },
-  releaseMutex,
-  queryMutex
+exports.down = (backstop) => {
+  if (migrationFiles.length < 1) return Promise.resolve();
+
+  migrationFiles.splice(0, migrationFiles.indexOf(backstop));
+
+  return thinky.dbReady()
+  .then(getMigrationRecords)
+  .then(existingMigrations => _.intersection(migrationFiles, existingMigrations))
+  .then(migrationsToDown => {
+    const toBeDowned = migrationsToDown.reverse()
+    .map(file => ({
+      func: require(`migrations/${file}`).down,
+      name: file
+    }));
+
+    return applyMigration(toBeDowned, (name) => {
+      log.info('migrated down', name);
+      return table.filter({ name }).delete().run();
+    });
+  })
+  .then(exports.releaseMutex);
 };

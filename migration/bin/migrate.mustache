@@ -56,9 +56,11 @@ if (command === 'show_mutex') {
   .then(() => process.exit());
 }
 
-migrate[command](process.argv[3])
-.then(() => {
-  r.getPoolMaster().drain()
-  .then(() => process.exit());
-})
-.catch(barf);
+if (command === 'up' || command === 'down') {
+  migrate[command](process.argv[3])
+  .then(() => {
+    r.getPoolMaster().drain()
+    .then(() => process.exit());
+  })
+  .catch(barf);
+}
