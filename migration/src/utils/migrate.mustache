@@ -43,11 +43,13 @@ const getMigrationRecords = () => {
 };
 
 exports.releaseMutex = () => {
-  return table.filter({ name: 'migrations_running_mutex' }).delete().run();
+  return thinky.dbReady()
+  .then(() => table.filter({ name: 'migrations_running_mutex' }).delete().run());
 };
 
 exports.queryMutex = () => {
-  return table.filter({ name: 'migrations_running_mutex' }).run();
+  return thinky.dbReady()
+  .then(() => table.filter({ name: 'migrations_running_mutex' }).run());
 };
 
 exports.up = () => {
