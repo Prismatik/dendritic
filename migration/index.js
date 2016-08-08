@@ -7,8 +7,8 @@ module.exports = (opts) => {
   // p: source path, n: filename
   // d: destination path, t: target filename, e: target extension
   const files = [
-    { p: 'bin', n: 'migration' },
-    { p: 'bin', n: 'migrate' },
+    { p: 'bin', n: 'migration', e: '' },
+    { p: 'bin', n: 'migrate', e: '' },
     { p: 'bin', n: 'migration_template', e: 'mustache' },
     { p: 'bin', n: 'migration_template_test', e: 'mustache' },
     { p: 'src/utils', n: 'migrate' },
@@ -17,6 +17,9 @@ module.exports = (opts) => {
   ];
 
   scaffold({ basePath: __dirname, files, mustacheOpts: opts });
+
+  fs.chmodSync(`${process.cwd()}/bin/migrate`, '0744');
+  fs.chmodSync(`${process.cwd()}/bin/migration`, '0744');
 
   const modulesDir = path.join(process.cwd(), 'node_modules');
   if (!fs.existsSync(modulesDir)) mkdirp.sync(modulesDir);
