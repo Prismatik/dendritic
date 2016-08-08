@@ -1,27 +1,33 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const mustache = require('mustache');
-const path = require('path');
+const migration = require('../src/utils/migration');
+const log = require('../src/utils/logger');
 
-const now = new Date().toISOString();
-const migrationName = `${now}_${process.argv[2]}`;
-const root = path.resolve(__dirname, '..');
-const opts = { migrationName };
+const commands = [
+  'create'
+];
 
-const migrationTemplate = fs.readFileSync(`${root}/bin/migration_template.mustache`).toString();
-const migrationTestTemplate = fs.readFileSync(`${root}/bin/migration_template_test.mustache`).toString();
+const command = process.argv[2];
+const arg1 = process.argv[3];
 
-const migrationFile = mustache.render(migrationTemplate, opts);
-const migrationTest = mustache.render(migrationTestTemplate, opts);
+const barf = (msg) => {
+  log.error('migration error', msg);
+  process.exit(1);
+};
 
-[`${root}/migrations/`, `${root}/test/migrations/`].forEach(p => {
-  try {
-    fs.mkdirSync(p);
-  } catch (e) {
-    if (e.code !== 'EEXIST') throw e;
-  }
-});
+if (!command) {
+  barf('usage: migration [COMMAND] [ARGUMENTS]');
+}
 
-fs.writeFileSync(`${root}/migrations/${migrationName}.js`, migrationFile);
-fs.writeFileSync(`${root}/test/migrations/${migrationName}.js`, migrationTest);
+if (commands.indexOf(command) < 0) {
+  barf(`migration command must be one of: ${commands.join(' ')}`);
+}
+
+if (command === 'create' && !arg1) {
+  barf('migrate create requires a NAME');
+}
+
+if (command === 'create') {
+  migration.create(arg1);
+  process.exit();
+}

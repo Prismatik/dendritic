@@ -2,8 +2,8 @@ const path = require('path');
 require('app-module-path').addPath(path.join(__dirname, '../..'));
 require('dotenv-safe').load({ sample: './example.env' });
 
-const os = require('os');
 const _ = require('lodash');
+const os = require('os');
 const { r } = require('config/thinky');
 const log = require('src/utils/logger');
 

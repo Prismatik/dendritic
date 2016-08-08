@@ -1,0 +1,27 @@
+const fs = require('fs');
+const mustache = require('mustache');
+const path = require('path');
+
+exports.create = function create(name) {
+  const now = new Date().toISOString();
+  const migrationName = `${now}_${name}`;
+  const root = path.resolve(__dirname, '../..');
+  const templates = `${root}/src/utils/templates`;
+
+  const migrationTemplate = fs.readFileSync(`${templates}/migration_template.mustache`).toString();
+  const migrationTestTemplate = fs.readFileSync(`${templates}/migration_template_test.mustache`).toString();
+
+  const migrationFile = mustache.render(migrationTemplate, { migrationName });
+  const migrationTest = mustache.render(migrationTestTemplate, { migrationName });
+
+  [`${root}/migrations/`, `${root}/test/migrations/`].forEach(p => {
+    try {
+      fs.mkdirSync(p);
+    } catch (e) {
+      if (e.code !== 'EEXIST') throw e;
+    }
+  });
+
+  fs.writeFileSync(`${root}/migrations/${migrationName}.js`, migrationFile);
+  fs.writeFileSync(`${root}/test/migrations/${migrationName}_test.js`, migrationTest);
+};

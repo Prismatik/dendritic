@@ -12,6 +12,7 @@ const commands = [
 ];
 
 const command = process.argv[2];
+const arg1 = process.argv[3];
 
 const barf = (msg) => {
   log.error('migration error', msg);
@@ -19,29 +20,37 @@ const barf = (msg) => {
 };
 
 if (!command) {
-  barf('usage: npm run migrate [DIRECTION] [BACKSTOP]');
+  barf('usage: migrate [COMMAND] [ARGUMENTS]');
 }
 
 if (commands.indexOf(command) < 0) {
   barf(`migration command must be one of: ${commands.join(' ')}`);
 }
 
-if (command === 'up' && process.argv[3]) {
+if (command === 'up' && arg1) {
   barf('migrate up does not take an argument');
 }
 
-if (command === 'release_mutex' && process.argv[3]) {
+if (command === 'down' && !arg1) {
+  barf('migrate down requires a BACKSTOP');
+}
+
+if (command === 'release_mutex' && arg1) {
   barf('migrate release_mutex does not take an argument');
 }
 
+if (command === 'show_mutex' && arg1) {
+  barf('migrate show_mutex does not take an argument');
+}
+
 if (command === 'release_mutex') {
-  return migrate.releaseMutex()
+  migrate.releaseMutex()
   .then(() => r.getPoolMaster().drain())
   .then(() => process.exit());
 }
 
 if (command === 'show_mutex') {
-  return migrate.queryMutex()
+  migrate.queryMutex()
   .then(console.log)
   .then(() => r.getPoolMaster().drain())
   .then(() => process.exit());
