@@ -23,5 +23,7 @@ exports.create = name => {
   });
 
   fs.writeFileSync(`${root}/migrations/${migrationName}.js`, migrationFile);
+  console.log(`created migration at ./migrations/${migrationName}.js`);
   fs.writeFileSync(`${root}/test/migrations/${migrationName}_test.js`, migrationTest);
+  console.log(`created migration test at ./test/migrations/${migrationName}_test.js`);
 };
