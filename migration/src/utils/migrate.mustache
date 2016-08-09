@@ -79,7 +79,7 @@ exports.down = (backstopName) => {
   return thinky.dbReady()
   .then(getMigrationRecords)
   .then(migrationsApplied => {
-    const backstop = (backstopName === 'ALL') ? 0 : migrationsApplied.indexOf(backstopName);
+    const backstop = migrationsApplied.indexOf(backstopName);
     if (backstop === -1) return Promise.reject("Migration could not be found");
 
     const migrationsToRollback = migrationFiles.splice(backstop, migrationFiles.length);
