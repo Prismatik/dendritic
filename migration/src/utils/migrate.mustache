@@ -58,9 +58,9 @@ exports.up = () => {
   return thinky.dbReady()
   .then(acquireMutex)
   .then(getMigrationRecords)
-  .then(existingMigrations => _.difference(migrationFiles, existingMigrations))
-  .then(missingMigrations => {
-    const toBeApplied = missingMigrations.map(file => ({
+  .then(migrationsApplied => _.difference(migrationFiles, migrationsApplied))
+  .then(migrationsToApply => {
+    const toBeApplied = migrationsToApply.map(file => ({
       func: require(`migrations/${file}`).up,
       name: file
     }));
@@ -73,22 +73,28 @@ exports.up = () => {
   .then(exports.releaseMutex);
 };
 
-exports.down = (backstop) => {
+exports.down = (backstopName) => {
   if (migrationFiles.length < 1) return Promise.resolve();
-
-  migrationFiles.splice(0, migrationFiles.indexOf(backstop));
 
   return thinky.dbReady()
   .then(getMigrationRecords)
-  .then(existingMigrations => _.intersection(migrationFiles, existingMigrations))
-  .then(migrationsToDown => {
-    const toBeDowned = migrationsToDown.reverse()
+  .then(migrationsApplied => {
+    const backstop = (backstopName === 'ALL') ? 0 : migrationsApplied.indexOf(backstopName);
+    if (backstop === -1) throw new Error("Migration could not be found");
+
+    const migrationsToRollback = migrationFiles.splice(backstop, migrationFiles.length);
+    if (migrationsToRollback.length === 0) throw new Error("No migrations to be downed");
+
+    return migrationsToRollback;
+  })
+  .then(migrationsToRollback => {
+    const toRollback = migrationsToRollback.reverse()
     .map(file => ({
       func: require(`migrations/${file}`).down,
       name: file
     }));
 
-    return applyMigration(toBeDowned, (name) => {
+    return applyMigration(toRollback, (name) => {
       log.info('migrated down', name);
       return table.filter({ name }).delete().run();
     });
