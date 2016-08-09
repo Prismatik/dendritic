@@ -101,9 +101,10 @@ exports.down = function * (backstopName) {
     name: file
   }));
 
-  yield applyMigration(toRollback, (name) => {
+  yield applyMigration(toRollback, function * (name) {
     log.info('migrated down', name);
-    return table.filter({ name }).delete().run();
+    const migrations = yield Migration.filter({ name }).run();
+    return yield migrations[0].delete();
   });
 
   yield exports.releaseMutex;
