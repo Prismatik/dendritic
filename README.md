@@ -85,6 +85,65 @@ authentication.
 Finally providing a model-name when running the command is optional, the model
 name will default to user, but an alternative can be provided i.e. `admin`.
 
+### Migrations
+
+Redbeard can provide a framework for running migrations against the rethinkdb database.
+To scaffold the migration framework run...
+
+```
+redbeard migration
+```
+
+You can then use the following commands...
+
+#### Create a migration
+
+```
+migration create migration_name
+```
+
+This will generate a migration file and a migration test file. The migration file contains an `up` function to run your migration and a `down` function to rollback your migration. Migrations are created with the name you specify but prepended with a timestamp which ensures the files are ordered based on their creation date.
+
+#### Run migrations
+
+```
+migrate up
+```
+
+This will run all migrations (execute the `up` function) that have not yet been run i.e. files in the `/migrations` folder. Redbeard tracks which migrations have already been run in the `_migrations` table in rethinkdb.
+
+#### Rollback migrations
+
+```
+migrate down file_name
+```
+
+This will rollback all migrations (execute the `down` function) that have previously been run, up until AND including the file_name that you specify. For example if you had three migrations file1.js, file2.js, file3.js and all of these have been run, if you then use `migrate down file2.js`, `file2.js` and `file3.js` would be rolled back.
+
+#### List migrations
+
+```
+migrate list
+```
+
+This will list all migrations that exist (based on the files found in `/migrations`) and inform you if they have yet been run.
+
+#### Show mutex
+
+```
+migrate show_mutex
+```
+
+This will inform the user if the migrations table is currently locked which means either a migration is currently running OR a prior migration has failed and the lock has not been manually released.
+
+#### Release mutex
+
+```
+migrate release_mutex
+```
+
+This will release any lock that exists on the migrations table, necessary when a migration has failed and the table has therefore not been automatically unlocked.
+
 ## Notes
 
 * Project names and model names should be singular and not plural. e.g. `redbeard model motor_vehicle`. This will be automatically pluralized as needed.
