@@ -16,6 +16,8 @@ If you're unfamiliar, the Pirate stack is made up of:
 
 (Get it? RRRRR)
 
+- - -
+
 ## Development
 
 ### Requirements
@@ -31,6 +33,8 @@ redbeard base project_name_singular
 ```
 
 And you'll have a minimal, well thought-out base app scaffold. Next:
+
+- - -
 
 ### Creating Controllers
 
@@ -70,6 +74,8 @@ Note: You can also use this switch when creating users since users are
 effectively just a special type of controller / schema i.e.
 `redbeard user -s drivers_license -m motor_vehicle`
 
+- - -
+
 ### Creating Users
 
 ```
@@ -84,6 +90,8 @@ authentication.
 
 Finally providing a model-name when running the command is optional, the model
 name will default to user, but an alternative can be provided i.e. `admin`.
+
+- - -
 
 ### Migrations
 
@@ -144,6 +152,8 @@ migrate release_mutex
 
 This will release any lock that exists on the migrations table, necessary when a migration has failed and the table has therefore not been automatically unlocked.
 
+- - -
+
 ## Notes
 
 * Project names and model names should be singular and not plural. e.g. `redbeard model motor_vehicle`. This will be automatically pluralized as needed.
@@ -152,6 +162,8 @@ This will release any lock that exists on the migrations table, necessary when a
 when developing locally, but you should never commit this to source control.
 The risk is that it doesn't get overridden in production and testing
 variables leak to prod.
+
+- - -
 
 ## TODO
 
