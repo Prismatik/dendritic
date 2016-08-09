@@ -89,6 +89,9 @@ exports.down = (backstopName) => {
   return thinky.dbReady()
   .then(getMigrationRecords)
   .then(migrationsApplied => {
+    // safeguard to ensure migration files deleted but in database
+    migrationsApplied = _.intersection(migrationsApplied, migrationFiles);
+
     const backstop = migrationsApplied.indexOf(backstopName);
     if (backstop === -1) return Promise.reject("Migration could not be found");
 
