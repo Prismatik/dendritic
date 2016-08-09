@@ -34,7 +34,7 @@ require('co')(function * () {
   }
 
   if (command === 'down' && !arg1) {
-    barf('migrate down requires a filename as the first arguement');
+    barf('migrate down requires a [FILENAME] as the first arguement');
   }
 
   if (command === 'release_mutex' && arg1) {

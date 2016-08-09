@@ -3,9 +3,7 @@
 const migration = require('../src/utils/migration');
 const log = require('../src/utils/logger');
 
-const commands = [
-  'create'
-];
+const commands = ['create'];
 
 const command = process.argv[2];
 const arg1 = process.argv[3];
@@ -24,7 +22,7 @@ if (commands.indexOf(command) < 0) {
 }
 
 if (command === 'create' && !arg1) {
-  barf('migrate create requires a NAME');
+  barf('migrate create requires a [NAME] as the first arguement');
 }
 
 if (command === 'create') {
