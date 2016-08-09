@@ -46,23 +46,35 @@ require('co')(function * () {
   }
 
   if (command === 'release_mutex') {
-    const output = yield migrate.releaseMutex();
-    console.log(output);
-    yield r.getPoolMaster().drain();
-    process.exit();
+    try {
+      const output = yield migrate.releaseMutex();
+      console.log(output);
+      yield r.getPoolMaster().drain();
+      process.exit();
+    } catch (e) {
+      barf(e.message);
+    }
   }
 
   if (command === 'show_mutex') {
-    const output = yield migrate.queryMutex();
-    console.log(output);
-    yield r.getPoolMaster().drain();
-    process.exit();
+    try {
+      const output = yield migrate.queryMutex();
+      console.log(output);
+      yield r.getPoolMaster().drain();
+      process.exit();
+    } catch (e) {
+      barf(e.message);
+    }
   }
 
   if (command === 'list') {
-    const list = yield migrate.list();
-    list.forEach(migration => console.log(JSON.stringify(migration)));
-    process.exit();
+    try {
+      const list = yield migrate.list();
+      list.forEach(migration => console.log(JSON.stringify(migration)));
+      process.exit();
+    } catch (e) {
+      barf(e.message);
+    }
   }
 
   if (command === 'up' || command === 'down') {
@@ -71,7 +83,7 @@ require('co')(function * () {
       yield r.getPoolMaster().drain();
       process.exit();
     } catch (e) {
-      barf(e);
+      barf(e.message);
     }
   }
 });
