@@ -80,10 +80,10 @@ exports.down = (backstopName) => {
   .then(getMigrationRecords)
   .then(migrationsApplied => {
     const backstop = (backstopName === 'ALL') ? 0 : migrationsApplied.indexOf(backstopName);
-    if (backstop === -1) throw new Error("Migration could not be found");
+    if (backstop === -1) return Promise.reject("Migration could not be found");
 
     const migrationsToRollback = migrationFiles.splice(backstop, migrationFiles.length);
-    if (migrationsToRollback.length === 0) throw new Error("No migrations to be downed");
+    if (migrationsToRollback.length === 0) return Promise.reject("No migrations to be downed");
 
     return migrationsToRollback;
   })
