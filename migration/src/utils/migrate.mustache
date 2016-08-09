@@ -52,6 +52,16 @@ exports.queryMutex = () => {
   .then(() => table.filter({ name: 'migrations_running_mutex' }).run());
 };
 
+exports.list = () => {
+  return thinky.dbReady()
+  .then(getMigrationRecords)
+  .then(migrationsApplied => {
+    return migrationFiles.sort().map(file =>
+      ({ name: file, applied: migrationsApplied.indexOf(file) > -1 })
+    )
+  })
+}
+
 exports.up = () => {
   if (migrationFiles.length < 1) return Promise.resolve();
 

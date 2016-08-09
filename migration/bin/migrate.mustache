@@ -5,10 +5,11 @@ const log = require('../src/utils/logger');
 const { r } = require('../config/thinky');
 
 const commands = [
-  'up',
-  'down',
   'release_mutex',
-  'show_mutex'
+  'show_mutex',
+  'list',
+  'up',
+  'down'
 ];
 
 const command = process.argv[2];
@@ -54,6 +55,16 @@ if (command === 'show_mutex') {
   migrate.queryMutex()
   .then(console.log)
   .then(() => r.getPoolMaster().drain())
+  .then(() => process.exit());
+}
+
+if (command === 'list') {
+  migrate.list()
+  .then(list =>
+    list.forEach(migration =>
+      console.log(JSON.stringify(migration))
+    )
+  )
   .then(() => process.exit());
 }
 
