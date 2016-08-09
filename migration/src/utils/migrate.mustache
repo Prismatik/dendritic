@@ -13,15 +13,15 @@ const table = r.table('_migrations');
 
 const migrationFiles = require('migrations').filenames;
 
-function * applyMigration (migrations, then) {
-  if (migrations.length === 0) return; /*Promise.resolve();*/
+function * applyMigration(migrations, then) {
+  if (migrations.length === 0) return undefined;
   const m = migrations.shift();
   yield m.func();
   yield then(m.name);
   return yield applyMigration(migrations, then);
-};
+}
 
-function * acquireMutex () {
+function * acquireMutex() {
   return r.branch(
     table.filter({ name: 'migrations_running_mutex' }).coerceTo('array').ne([]),
     r.error('mutex locked'),
@@ -31,15 +31,15 @@ function * acquireMutex () {
       d: new Date().toISOString()
     })
   ).run();
-};
+}
 
-function * getMigrationRecords () {
-  const records = yield table.run()
+function * getMigrationRecords() {
+  const records = yield table.run();
   return records.map(_.property('name'));
-};
+}
 
 exports.releaseMutex = function * () {
-  yield thinky.dbReady()
+  yield thinky.dbReady();
   return yield table.filter({ name: 'migrations_running_mutex' }).delete().run();
 };
 
@@ -57,11 +57,11 @@ exports.list = function * () {
 };
 
 exports.up = function * () {
-  if (migrationFiles.length < 1) return Promise.resolve();
+  if (migrationFiles.length < 1) return undefined;
 
-  yield thinky.dbReady()
-  yield acquireMutex
-  const migrationsApplied = yield getMigrationRecords
+  yield thinky.dbReady();
+  yield acquireMutex;
+  const migrationsApplied = yield getMigrationRecords;
   const migrationsToApply = _.difference(migrationFiles, migrationsApplied);
 
   const toBeApplied = migrationsToApply.map(file => ({
@@ -74,23 +74,23 @@ exports.up = function * () {
     return Migration.save({ name });
   });
 
-  yield exports.releaseMutex;
+  return yield exports.releaseMutex;
 };
 
 exports.down = function * (backstopName) {
   if (migrationFiles.length < 1) return Promise.resolve();
 
-  yield thinky.dbReady()
+  yield thinky.dbReady();
   const records = yield getMigrationRecords;
 
   // safeguard to ensure migration files deleted but in database
   const migrationsApplied = _.intersection(records, migrationFiles);
 
   const backstop = migrationsApplied.indexOf(backstopName);
-  if (backstop === -1) return Promise.reject("Migration could not be found");
+  if (backstop === -1) return Promise.reject('Migration could not be found');
 
   const migrationsToRollback = migrationFiles.splice(backstop, migrationFiles.length);
-  if (migrationsToRollback.length === 0) return Promise.reject("No migrations to be downed");
+  if (migrationsToRollback.length === 0) return Promise.reject('No migrations to be downed');
 
   const toRollback = migrationsToRollback.reverse()
   .map(file => ({
@@ -102,6 +102,6 @@ exports.down = function * (backstopName) {
     log.info('migrated down', name);
     return table.filter({ name }).delete().run();
   });
-  
-  yield exports.releaseMutex;
+
+  return yield exports.releaseMutex;
 };
