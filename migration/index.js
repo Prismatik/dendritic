@@ -10,8 +10,6 @@ module.exports = (opts) => {
     { p: 'bin', n: 'migrate', e: '' },
     { p: 'bin', n: 'migration', e: '' },
     { p: 'src/models', n: '_migration' },
-    { p: 'src/utils/templates', n: 'migration_template', e: 'mustache' },
-    { p: 'src/utils/templates', n: 'migration_template_test', e: 'mustache' },
     { p: 'src/utils', n: 'migrate' },
     { p: 'src/utils', n: 'migration' },
     { p: 'migrations', n: 'index' }

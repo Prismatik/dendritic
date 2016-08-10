@@ -2,16 +2,41 @@ const fs = require('fs');
 const mustache = require('mustache');
 const path = require('path');
 
+const migrationFileTemplate =
+`const thinky = require('../config/thinky');
+const r = thinky.r;
+
+module.exports = {
+  up: () => {
+    return Promise.resolve();
+  },
+  down: () => {
+    return Promise.resolve();
+  }
+};
+`;
+
+const migrationTestTemplate =
+`{{=<% %>=}}const migration = require('../../migrations/{{migrationName}}');
+
+describe('{{migrationName}}', () => {
+  it.skip('should migrate up', function * () {
+    // FIXME write a test to ensure the up function works as expected
+  });
+
+  it.skip('should migrate down', function * () {
+    // FIXME write a test to ensure the down function works as expected
+  });
+});
+`;
+
 exports.create = name => {
   const now = new Date().toISOString();
   const migrationName = `${now}_${name}`;
   const root = path.resolve(__dirname, '../..');
   const templates = `${root}/src/utils/templates`;
 
-  const migrationTemplate = fs.readFileSync(`${templates}/migration_template.mustache`).toString();
-  const migrationTestTemplate = fs.readFileSync(`${templates}/migration_template_test.mustache`).toString();
-
-  const migrationFile = mustache.render(migrationTemplate, { migrationName });
+  const migrationFile = mustache.render(migrationFileTemplate, { migrationName });
   const migrationTest = mustache.render(migrationTestTemplate, { migrationName });
 
   [`${root}/migrations/`, `${root}/test/migrations/`].forEach(p => {
