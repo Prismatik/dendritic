@@ -1,93 +1,109 @@
 const path = require('path');
-require('app-module-path').addPath(path.join(__dirname, '..'));
+require('app-module-path').addPath(path.join(__dirname, '../..'));
 require('dotenv-safe').load({ sample: './example.env' });
 
-const os = require('os');
 const _ = require('lodash');
-const r = require('lib/db');
+const os = require('os');
 const log = require('src/utils/logger');
-
-const table = r.table('_migrations');
+const thinky = require('config/thinky');
+const { r } = thinky;
+const Migration = require('src/models/_migration');
 
 const migrationFiles = require('migrations').filenames;
 
-const applyMigration = (migrations, then) => {
-  if (migrations.length === 0) return Promise.resolve();
+function * applyMigration(migrations, then) {
+  if (migrations.length === 0) return undefined;
   const m = migrations.shift();
-  return m.func()
-  .then(() => {
-    return then(m.name);
-  })
-  .then(() => {
-    return applyMigration(migrations, then);
-  });
-};
+  yield m.func();
+  yield then(m.name);
+  return yield applyMigration(migrations, then);
+}
 
-const acquireMutex = () => {
-  return r.branch(table.get('migrations_running_mutex'),
+function * acquireMutex() {
+  return r.branch(
+    Migration.filter({ name: 'migrations_running_mutex' }).count().gt(0)._query,
     r.error('mutex locked'),
-    table.insert({
+    Migration.insert({
       hostname: os.hostname(),
       name: 'migrations_running_mutex',
       d: new Date().toISOString()
-    })
+    })._query
   ).run();
+}
+
+function * getMigrationRecords() {
+  const records = yield Migration.run();
+  return records.map(_.property('name'));
+}
+
+exports.releaseMutex = function * () {
+  yield thinky.dbReady();
+  const mutex = yield Migration.filter({ name: 'migrations_running_mutex' }).run();
+  if (mutex.length === 0) throw new Error('Mutex not found');
+  return yield mutex[0].delete();
 };
 
-const releaseMutex = () => {
-  return table.get('migrations_running_mutex').delete().run();
+exports.queryMutex = function * () {
+  yield thinky.dbReady();
+  return yield Migration.filter({ name: 'migrations_running_mutex' }).run();
 };
 
-const queryMutex = () => {
-  return table.get('migrations_running_mutex').run();
+exports.list = function * () {
+  yield thinky.dbReady();
+  const migrationsApplied = yield getMigrationRecords;
+  return migrationFiles.sort().map(file =>
+    ({ name: file, applied: migrationsApplied.indexOf(file) > -1 })
+  );
 };
 
-const getMigrationRecords = () => {
-  return table.run()
-  .then(records => records.map(_.property('name')));
+exports.up = function * () {
+  if (migrationFiles.length < 1) throw new Error('No migration files found');
+
+  yield thinky.dbReady();
+  yield acquireMutex();
+  const migrationsApplied = yield getMigrationRecords;
+  const migrationsToApply = _.difference(migrationFiles, migrationsApplied);
+
+  const toBeApplied = migrationsToApply.map(file => ({
+    func: require(`migrations/${file}`).up,
+    name: file
+  }));
+
+  yield applyMigration(toBeApplied, (name) => {
+    log.info('migrated up', name);
+    return Migration.save({ name });
+  });
+
+  yield exports.releaseMutex;
 };
 
-module.exports = {
-  up: () => {
-    if (migrationFiles.length < 1) return Promise.resolve();
+exports.down = function * (backstopName) {
+  if (migrationFiles.length < 1) throw new Error('No migration files found');
 
-    return acquireMutex()
-    .then(getMigrationRecords)
-    .then(existingMigrations => _.difference(migrationFiles, existingMigrations))
-    .then(missingMigrations => {
-      const toBeApplied = missingMigrations.map(file => ({
-        func: require(`migrations/${file}`).up,
-        name: file
-      }));
+  yield thinky.dbReady();
+  yield acquireMutex();
+  const records = yield getMigrationRecords;
 
-      return applyMigration(toBeApplied, (name) => {
-        log.info('migrated up', name);
-        return table.insert({ name }).run();
-      });
-    })
-    .then(releaseMutex);
-  },
-  down: (backstop) => {
-    if (migrationFiles.length < 1) return Promise.resolve();
+  // safeguard to ensure migration files deleted but in database
+  const migrationsApplied = _.intersection(records, migrationFiles);
 
-    migrationFiles.splice(0, migrationFiles.indexOf(backstop));
+  const backstop = migrationsApplied.indexOf(backstopName);
+  if (backstop === -1) throw new Error('Migration could not be found');
 
-    return getMigrationRecords()
-    .then(existingMigrations => _.intersection(migrationFiles, existingMigrations))
-    .then(migrationsToDown => {
-      const toBeDowned = migrationsToDown.reverse()
-      .map(file => ({
-        func: require(`migrations/${file}`).down,
-        name: file
-      }));
+  const migrationsToRollback = migrationFiles.splice(backstop, migrationFiles.length);
+  if (migrationsToRollback.length === 0) throw new Error('No migrations to be downed');
 
-      return applyMigration(toBeDowned, (name) => {
-        log.info('migrated down', name);
-        return table.get(name).delete().run();
-      });
-    })
-    .then(releaseMutex);
-  },
-  releaseMutex,
-  queryMutex
+  const toRollback = migrationsToRollback.reverse()
+  .map(file => ({
+    func: require(`migrations/${file}`).down,
+    name: file
+  }));
+
+  yield applyMigration(toRollback, function * (name) {
+    log.info('migrated down', name);
+    const migrations = yield Migration.filter({ name }).run();
+    return yield migrations[0].delete();
+  });
+
+  yield exports.releaseMutex;
 };

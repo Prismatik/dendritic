@@ -1,52 +1,90 @@
-const migrate = require('../src/utils/migrate');
-const log = require('../src/utils/logger');
+#!/usr/bin/env node
 
-const commands = [
-  'up',
-  'down',
-  'release_mutex',
-  'show_mutex'
-];
+require('co')(function * () {
+  const migrate = require('../src/utils/migrate');
+  const log = require('../src/utils/logger');
+  const { r } = require('../config/thinky');
 
-const command = process.argv[2];
+  const commands = [
+    'release_mutex',
+    'show_mutex',
+    'list',
+    'up',
+    'down'
+  ];
 
-const barf = (msg) => {
-  log.error('migration error', msg);
-  process.exit(1);
-};
+  const command = process.argv[2];
+  const arg1 = process.argv[3];
 
-if (!command) {
-  barf('usage: npm run migrate [DIRECTION] [BACKSTOP]');
-}
+  const barf = (msg) => {
+    log.error('migration error', msg);
+    process.exit(1);
+  };
 
-if (commands.indexOf(command) < 0) {
-  barf(`migration command must be one of: ${commands.join(' ')}`);
-}
+  if (!command) {
+    barf('usage: migrate [COMMAND] [ARGUMENTS]');
+  }
 
-if (command === 'up' && process.argv[3]) {
-  barf('migrate up does not take an argument');
-}
+  if (commands.indexOf(command) < 0) {
+    barf(`migration command must be one of: ${commands.join(' ')}`);
+  }
 
-if (command === 'release_mutex' && process.argv[3]) {
-  barf('migrate release_mutex does not take an argument');
-}
+  if (command === 'up' && arg1) {
+    barf('migrate up does not take an argument');
+  }
 
-if (command === 'release_mutex') {
-  return migrate.releaseMutex()
-  .then(() => r.getPoolMaster().drain())
-  .then(() => process.exit());
-}
+  if (command === 'down' && !arg1) {
+    barf('migrate down requires a [FILENAME] as the first arguement');
+  }
 
-if (command === 'show_mutex') {
-  return migrate.queryMutex()
-  .then(console.log)
-  .then(() => r.getPoolMaster().drain())
-  .then(() => process.exit());
-}
+  if (command === 'release_mutex' && arg1) {
+    barf('migrate release_mutex does not take an argument');
+  }
 
-migrate[command](process.argv[3])
-.then(() => {
-  r.getPoolMaster().drain()
-  .then(() => process.exit());
-})
-.catch(barf);
+  if (command === 'show_mutex' && arg1) {
+    barf('migrate show_mutex does not take an argument');
+  }
+
+  if (command === 'release_mutex') {
+    try {
+      const output = yield migrate.releaseMutex();
+      console.log(output);
+      yield r.getPoolMaster().drain();
+      process.exit();
+    } catch (e) {
+      barf(e.message);
+    }
+  }
+
+  if (command === 'show_mutex') {
+    try {
+      const output = yield migrate.queryMutex();
+      console.log(output);
+      yield r.getPoolMaster().drain();
+      process.exit();
+    } catch (e) {
+      barf(e.message);
+    }
+  }
+
+  if (command === 'list') {
+    try {
+      const list = yield migrate.list();
+      list.forEach(migration => console.log(JSON.stringify(migration)));
+      yield r.getPoolMaster().drain();
+      process.exit();
+    } catch (e) {
+      barf(e.message);
+    }
+  }
+
+  if (command === 'up' || command === 'down') {
+    try {
+      yield migrate[command](process.argv[3]);
+      yield r.getPoolMaster().drain();
+      process.exit();
+    } catch (e) {
+      barf(e.message);
+    }
+  }
+});
