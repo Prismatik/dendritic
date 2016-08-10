@@ -71,6 +71,7 @@ require('co')(function * () {
     try {
       const list = yield migrate.list();
       list.forEach(migration => console.log(JSON.stringify(migration)));
+      yield r.getPoolMaster().drain();
       process.exit();
     } catch (e) {
       barf(e.message);
