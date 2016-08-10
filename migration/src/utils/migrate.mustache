@@ -23,7 +23,7 @@ function * applyMigration(migrations, then) {
 
 function * acquireMutex() {
   return r.branch(
-    table.filter({ name: 'migrations_running_mutex' }).coerceTo('array').ne([]),
+    table.filter({ name: 'migrations_running_mutex' }).count().gt(0),
     r.error('mutex locked'),
     table.insert({
       hostname: os.hostname(),
