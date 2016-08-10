@@ -7,9 +7,7 @@ const os = require('os');
 const log = require('src/utils/logger');
 const thinky = require('config/thinky');
 const { r } = thinky;
-const Migration = require('src/models/_migration'); // setup the _migrations table
-
-const table = r.table('_migrations');
+const Migration = require('src/models/_migration');
 
 const migrationFiles = require('migrations').filenames;
 
@@ -23,13 +21,13 @@ function * applyMigration(migrations, then) {
 
 function * acquireMutex() {
   return r.branch(
-    table.filter({ name: 'migrations_running_mutex' }).count().gt(0),
+    Migration.filter({ name: 'migrations_running_mutex' }).count().gt(0)._query,
     r.error('mutex locked'),
-    table.insert({
+    Migration.insert({
       hostname: os.hostname(),
       name: 'migrations_running_mutex',
       d: new Date().toISOString()
-    })
+    })._query
   ).run();
 }
 
