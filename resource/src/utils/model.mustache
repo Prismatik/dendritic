@@ -7,7 +7,7 @@ const { thinky, schema } = require('../../config');
  * @param {String} model name (in JSON schema)
  * @return {Class} thinky model
  */
-exports.create = (modelName) => {
+exports.create = (modelName, opts = {}) => {
   const modelSchema = schema[modelName];
   const validator = exports.thinkyValidatorFor(modelSchema);
   const model = thinky.createModel(
@@ -18,6 +18,26 @@ exports.create = (modelName) => {
 
   model.standardQuery = exports.queryBuilder(model, modelSchema);
   model.standardFeed = exports.feedBuilder(model);
+
+  if (opts.audit) {
+    const auditModel = thinky.createModel(
+      modelSchema.pluralName + '_audit_log',
+      {
+        created_at: thinky.type.string(),
+        doc: thinky.type.object()
+      },
+      {}
+    );
+
+    model.post('save', function (next) {
+      new auditModel({
+        created_at: new Date().toISOString(),
+        doc: this
+      }).save(next);
+    });
+
+    model.auditModel = auditModel;
+  }
 
   return model;
 };
