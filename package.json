@@ -51,6 +51,7 @@
     "json-schema-faker": "^0.3.3",
     "jsonwebtoken": "^5.4.1",
     "mocha": "^2.4.5",
+    "morgan": "^1.7.0",
     "must": "^0.13.1",
     "rethinkdbdash": "^2.2.8",
     "simple-password": "^1.0.1",
