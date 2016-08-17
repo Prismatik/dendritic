@@ -18,6 +18,10 @@ module.exports = createController({{pascalCase}}, {
     return yield super.update(id, yield hashPassword(params));
   },
 
+  *replace(id, params) {
+    return yield super.replace(id, yield hashPassword(params));
+  },
+
   *signin(email, pass) {
     const [user] = yield {{pascalCase}}.filter({ email }).run();
     if (!user) throw new HttpError('UNAUTHORIZED');

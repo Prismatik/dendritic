@@ -47,6 +47,17 @@ exports.baseController = Model => ({
     return yield record.merge(params).save();
   },
 
+  *replace(id, params) {
+    const record = yield this.find(id);
+
+    // cleaning up the existing data
+    Object.getOwnPropertyNames(record)
+      .filter(key => key !== 'id')
+      .forEach(key => delete(record[key]));
+
+    return yield record.merge(params).save();
+  },
+
   *delete(id) {
     const record = yield this.find(id);
     yield record.delete();
