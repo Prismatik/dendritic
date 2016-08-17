@@ -23,6 +23,10 @@ const router = module.exports = new Router()
     res.status(201).json(serialize({{camelCase}}));
   })
   .put('/:id', function * (req, res) {
+    const {{camelCase}} = yield {{camelCasePlural}}.replace(req.params.id, req.body);
+    res.json(serialize({{camelCase}}));
+  })
+  .patch('/:id', function * (req, res) {
     const {{camelCase}} = yield {{camelCasePlural}}.update(req.params.id, req.body);
     res.json(serialize({{camelCase}}));
   })

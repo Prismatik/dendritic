@@ -109,12 +109,18 @@ describe('/{{kebabCasePlural}} route', () => {
   });
 
   describe('PUT /:id', () => {
-    it('updates the data and returns the updated record back', function * () {
-      const data = { rev: uuid.v4() };
+    let validData;
+
+    beforeEach(() => {
+      validData = {{camelCase}}Fixture.valid(); delete(validData.id);
+    });
+
+    it('replaces an entire document and returns the updated record back', function * () {
+      const data = Object.assign({}, validData, { rev: uuid.v4() });
       const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
       response.status.must.eql(200);
 
-      const expected = Object.assign({}, {{camelCase}}, data);{{#isUser}}
+      const expected = Object.assign({ id: {{camelCase}}.id }, data);{{#isUser}}
       delete(expected.password);{{/isUser}}
 
       response.body.must.eql(expected);
@@ -126,9 +132,48 @@ describe('/{{kebabCasePlural}} route', () => {
       response.body.must.eql({ error: 'not found' });
     });
 
+    it('throws 422 if some data is missing', function * () {
+      const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, {});
+      response.status.must.eql(422);
+      response.body.error.must.contain('is required');
+    });
+
+    it('throws 422 if the data is malformed', function * () {
+      const data = Object.assign({}, validData, { rev: 'hack hack hack' });
+      const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
+      response.status.must.eql(422);
+      response.body.must.eql({
+        error: '`rev` must match pattern "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"'
+      });
+    });
+  });
+
+  describe('PATCH /:id', () => {
+    it('updates the data and returns the updated record back', function * () {
+      const data = { rev: uuid.v4() };
+      const response = yield app.patch('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
+      response.status.must.eql(200);
+
+      const expected = Object.assign({}, {{camelCase}}, data);{{#isUser}}
+      delete(expected.password);{{/isUser}}
+
+      response.body.must.eql(expected);
+    });
+
+    it('throws 404 if the record does not exist', function * () {
+      const response = yield app.patch('/{{kebabCasePlural}}/hack', {});
+      response.status.must.eql(404);
+      response.body.must.eql({ error: 'not found' });
+    });
+
+    it('does not explode if not all data was send through', function * () {
+      const response = yield app.patch('/{{kebabCasePlural}}/' + {{camelCase}}.id, {});
+      response.status.must.eql(200);
+    });
+
     it('throws 422 if the data is malformed', function * () {
       const data = { rev: 'hack hack hack' };
-      const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
+      const response = yield app.patch('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
       response.status.must.eql(422);
       response.body.must.eql({
         error: '`rev` must match pattern "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"'
