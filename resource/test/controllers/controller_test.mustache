@@ -124,7 +124,7 @@ describe('{{snakeCasePlural}} controller', () => {
         throw new Error('should fail');
       } catch (e) {
         e.must.be.instanceOf(ValidationError);
-        e.message.must.contain('should have required property');
+        e.message.must.contain('is required');
       }
     });
     {{#isUser}}
@@ -134,8 +134,8 @@ describe('{{snakeCasePlural}} controller', () => {
         throw new Error('must fail here');
       } catch (e) {
         e.must.be.instanceOf(ValidationError);
-        e.message.must.contain("should have required property 'email'");
-        e.message.must.contain("should have required property 'password'");
+        e.message.must.contain('`email` is required');
+        e.message.must.contain('`password` is required');
       }
     });
 
@@ -145,7 +145,7 @@ describe('{{snakeCasePlural}} controller', () => {
         throw new Error('should fail');
       } catch (e) {
         e.must.be.instanceOf(ValidationError);
-        e.message.must.contain('should match format "email"');
+        e.message.must.contain('`email` must match format "email"');
       }
     });
 
@@ -174,7 +174,7 @@ describe('{{snakeCasePlural}} controller', () => {
         throw new Error('should fail');
       } catch (e) {
         e.must.be.instanceOf(ValidationError);
-        e.message.must.contain('should match pattern');
+        e.message.must.contain('`rev` must match pattern');
       }
     });
 
@@ -192,7 +192,7 @@ describe('{{snakeCasePlural}} controller', () => {
         throw new Error('should fail');
       } catch (e) {
         e.must.be.instanceOf(ValidationError);
-        e.message.must.contain('should match format "email"');
+        e.message.must.contain('`email` must match format "email"');
       }
     });
 

@@ -33,10 +33,18 @@ exports.create = (modelName, opts = {}) => {
 exports.thinkyValidatorFor = (schema) => {
   const ajv = new Ajv({ allErrors: true });
   const validate = ajv.compile(schema);
+  const humanReadableErrors = errors => errors.map(error => {
+    const { dataPath, message, keyword, params: { missingProperty } } = error;
+    const path = keyword === 'required' ? dataPath + `.${missingProperty}` : dataPath;
+    const text = keyword === 'required' ? 'is required' : message.replace('should', 'must');
+
+    return `\`${path.replace(/^\./, '')}\` ${text}`;
+  });
+
   return document => {
     if (!validate(document)) {
       throw new thinky.Errors.ValidationError(
-        validate.errors.map(e => e.message).join(', ')
+        humanReadableErrors(validate.errors).join(', ')
       );
     }
   };
