@@ -19,25 +19,7 @@ exports.create = (modelName, opts = {}) => {
   model.standardQuery = exports.queryBuilder(model, modelSchema);
   model.standardFeed = exports.feedBuilder(model);
 
-  if (opts.audit) {
-    const auditModel = thinky.createModel(
-      modelSchema.pluralName + '_audit_log',
-      {
-        created_at: thinky.type.string(),
-        doc: thinky.type.object()
-      },
-      {}
-    );
-
-    model.post('save', function (next) {
-      new auditModel({
-        created_at: new Date().toISOString(),
-        doc: this
-      }).save(next);
-    });
-
-    model.auditModel = auditModel;
-  }
+  if (opts.audit) { exports.setupAuditLog(model); }
 
   return model;
 };
@@ -127,4 +109,29 @@ exports.feedBuilder = (Model) => (params = {}) => {
       });
     }
   }));
+};
+
+/**
+ * Sets up an audit log model that saves previous states of records
+ *
+ * @param {Class} model
+ * @return void
+ */
+exports.setupAuditLog = (model) => {
+  const AuditModel = thinky.createModel(
+    `${model.getTableName()}AuditLog`,
+    {
+      createdAt: Date,
+      doc: Object
+    }
+  );
+
+  model.post('save', function (next) {
+    new AuditModel({
+      createdAt: new Date(),
+      doc: Object.assign({}, this)
+    }).save(next);
+  });
+
+  model.AuditModel = AuditModel;
 };

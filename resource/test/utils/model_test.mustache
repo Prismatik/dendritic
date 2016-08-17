@@ -83,14 +83,13 @@ describe('utils/model', () => {
       Model = model.create('auditableThing', { audit: true });
     });
 
-    it('should populate the audit log', function*() {
-      const thing = yield new Model(params).save();
+    it('should populate the audit log', function * () {
+      const record = yield new Model(params).save();
 
-      const audit = yield Model.auditModel.filter({ doc: { id: thing.id } }).run();
+      const audit = yield Model.AuditModel.filter({ doc: { id: record.id } }).run();
 
-      audit[0].created_at.must.exist();
-      audit[0].doc.email.must.eql(params.email);
-      audit[0].doc.password.must.eql(params.password);
+      audit[0].createdAt.must.be.a(Date);
+      audit[0].doc.must.eql(Object.assign({}, record));
     });
   });
 });
