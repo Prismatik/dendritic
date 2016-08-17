@@ -12,6 +12,9 @@ const serialize = ({{camelCase}}) => {
 
 const router = module.exports = new Router()
   .get('', function * (req, res) {
+    {{#softDelete}}
+    req.query.deleted = false;
+    {{/softDelete}}
     const list = yield {{camelCasePlural}}.all(req.query);
     res.json(list.map(serialize));
   })

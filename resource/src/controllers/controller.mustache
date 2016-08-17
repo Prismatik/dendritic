@@ -38,4 +38,15 @@ module.exports = createController({{pascalCase}}, {
     return { ok: true };
   }
   {{/isUser}}
+  {{#softDelete}}
+  *delete(id) {
+    const record = yield this.find(id);
+    record.deleted = true;
+    return yield record.save();
+  }
+  *create(params) {
+    params.deleted = false;
+    return yield super.create(params);
+  },
+  {{/softDelete}}
 });

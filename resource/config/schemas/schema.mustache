@@ -10,6 +10,11 @@
     "rev": {
       "$ref": "#/definitions/uuid"
     },
+    <%#softDelete%>
+    "deleted": {
+      "type": "boolean"
+    },
+    <%/softDelete%>
     "name": {
       "type": "string",
       "faker": "name.findName"
