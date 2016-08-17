@@ -94,7 +94,7 @@ describe('/{{kebabCasePlural}} route', () => {
       response.status.must.eql(422);
       response.body.must.be.object();
       response.body.must.have.property('error');
-      response.body.error.must.contain('should have required property');
+      response.body.error.must.contain('is required');
     });
     {{#isUser}}
     it('throws 422 if a password is mising', function * () {
@@ -102,7 +102,7 @@ describe('/{{kebabCasePlural}} route', () => {
       const response = yield app.post('/{{kebabCasePlural}}', data);
       response.status.must.eql(422);
       response.body.must.eql({
-        error: "should have required property 'password'"
+        error: '`password` is required'
       });
     });
     {{/isUser}}
@@ -131,7 +131,7 @@ describe('/{{kebabCasePlural}} route', () => {
       const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
       response.status.must.eql(422);
       response.body.must.eql({
-        error: 'should match pattern "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"'
+        error: '`rev` must match pattern "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"'
       });
     });
   });

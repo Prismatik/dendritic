@@ -39,7 +39,7 @@ describe('utils/model', () => {
     it('should pick up validations correctly', () => {
       return new Model({}).save().must.reject.with.error(
         thinky.Errors.ValidationError,
-        "should have required property 'email', should have required property 'password'"
+        '`email` is required, `password` is required'
       );
     });
 
@@ -47,7 +47,7 @@ describe('utils/model', () => {
       const params = { email: 'blah!', password: 'blah!' };
       return new Model(params).save().must.reject.with.error(
         thinky.Errors.ValidationError,
-        'should match format "email"'
+        '`email` must match format "email"'
       );
     });
   });
