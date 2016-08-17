@@ -181,6 +181,35 @@ describe('/{{kebabCasePlural}} route', () => {
     });
   });
 
+  describe('PATCH /:id', () => {
+    let {{camelCase}}ExtraProp;
+    const propText = 'oh hi I am an extra prop';
+    beforeEach(function * () {
+      const data = {{camelCase}}Fixture.valid();
+      data.extraProp = propText;
+      data.foo = {};
+      data.foo.bar = propText;
+      {{camelCase}}ExtraProp = yield {{camelCasePlural}}.create(data);
+    });
+    it('interprets null as a delete', function * () {
+      // https://tools.ietf.org/html/rfc7396
+      const existing = yield app.get('/{{kebabCasePlural}}/' + {{camelCase}}ExtraProp.id);
+      existing.body.extraProp.must.eql(propText);
+      existing.body.foo.bar.must.eql(propText);
+      const data = { extraProp: null, foo: { bar: null } };
+      const response = yield app.patch('/{{kebabCasePlural}}/' + {{camelCase}}ExtraProp.id, data);
+      response.status.must.eql(200);
+
+      const expected = Object.assign({}, {{camelCase}}ExtraProp, data);{{#isUser}}
+      delete(expected.password);{{/isUser}}
+      delete(expected.extraProp);
+      delete(expected.foo.bar);
+
+      response.body.must.eql(expected);
+    });
+  });
+
+
   describe('DELETE /:id', () => {
     it('deletes a record if it exists', function * () {
       const response = yield app.delete('/{{kebabCasePlural}}/' + {{camelCase}}.id);
