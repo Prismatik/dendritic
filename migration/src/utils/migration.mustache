@@ -34,7 +34,6 @@ exports.create = name => {
   const now = new Date().toISOString();
   const migrationName = `${now}_${name}`;
   const root = path.resolve(__dirname, '../..');
-  const templates = `${root}/src/utils/templates`;
 
   const migrationFile = mustache.render(migrationFileTemplate, { migrationName });
   const migrationTest = mustache.render(migrationTestTemplate, { migrationName });

@@ -7,7 +7,7 @@ const { thinky, schema } = require('../../config');
  * @param {String} model name (in JSON schema)
  * @return {Class} thinky model
  */
-exports.create = (modelName) => {
+exports.create = (modelName, opts = {}) => {
   const modelSchema = schema[modelName];
   const validator = exports.thinkyValidatorFor(modelSchema);
   const model = thinky.createModel(
@@ -18,6 +18,8 @@ exports.create = (modelName) => {
 
   model.standardQuery = exports.queryBuilder(model, modelSchema);
   model.standardFeed = exports.feedBuilder(model);
+
+  if (opts.audit) { exports.setupAuditLog(model); }
 
   return model;
 };
@@ -107,4 +109,29 @@ exports.feedBuilder = (Model) => (params = {}) => {
       });
     }
   }));
+};
+
+/**
+ * Sets up an audit log model that saves previous states of records
+ *
+ * @param {Class} model
+ * @return void
+ */
+exports.setupAuditLog = (model) => {
+  const AuditModel = thinky.createModel(
+    `${model.getTableName()}AuditLog`,
+    {
+      createdAt: Date,
+      doc: Object
+    }
+  );
+
+  model.post('save', function (next) {
+    new AuditModel({
+      createdAt: new Date(),
+      doc: Object.assign({}, this)
+    }).save(next);
+  });
+
+  model.AuditModel = AuditModel;
 };
