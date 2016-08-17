@@ -206,6 +206,69 @@ describe('{{snakeCasePlural}} controller', () => {
     {{/isUser}}
   });
 
+  describe('.replace(id, params)', () => {
+    it('replaces the entire document with the new data', function * () {
+      const oldId = {{camelCase}}.id;
+      const validData = {{camelCase}}Fixture.valid(); delete(validData.id);
+      const result = yield {{camelCasePlural}}.replace({{camelCase}}.id, validData);
+      result.constructor.must.equal({{pascalCase}});
+      result.id.must.eql(oldId);
+
+      pureData(result).must.eql(pureData(validData));
+    });
+
+    it('explodes when data is missing', function * () {
+      try {
+        yield {{camelCasePlural}}.replace({{camelCase}}.id, {});
+        throw new Error('should fail');
+      } catch (e) {
+        e.must.be.instanceOf(ValidationError);
+        e.message.must.contain('is required');
+      }
+    });
+
+    it('explodes when data is wrong', function * () {
+      const data = Object.assign({}, validData, { rev: 'hack!' });
+
+      try {
+        yield {{camelCasePlural}}.replace({{camelCase}}.id, data);
+        throw new Error('should fail');
+      } catch (e) {
+        e.must.be.instanceOf(ValidationError);
+        e.message.must.contain('`rev` must match pattern');
+      }
+    });
+
+    it('throws DocumentNotFound when the document does not exist', function * () {
+      try {
+        yield {{camelCasePlural}}.replace('hack!', validData);
+      } catch (e) {
+        e.must.be.instanceOf(DocumentNotFound);
+      }
+    });
+    {{#isUser}}
+    it('does not allow update to borked emails', function * () {
+      const data = Object.assign({}, validData, { email: 'hack!' });
+
+      try {
+        yield {{camelCasePlural}}.replace({{camelCase}}.id, data);
+        throw new Error('should fail');
+      } catch (e) {
+        e.must.be.instanceOf(ValidationError);
+        e.message.must.contain('`email` must match format "email"');
+      }
+    });
+
+    it('re-encrypts new passwords', function * () {
+      const oldPassword = {{camelCase}}.password;
+      const data = Object.assign({}, validData, { password: '84(0/\\/' });
+      const result = yield {{camelCasePlural}}.replace({{camelCase}}.id, data);
+      result.password.must.not.eql(data.password);
+      result.password.must.not.eql(oldPassword);
+    });
+    {{/isUser}}
+  });
+
   describe('.delete(id)', () => {
     it('deletes a {{camelCase}} for sure when it exists', function * () {
       const record = yield {{camelCasePlural}}.delete({{camelCase}}.id);
