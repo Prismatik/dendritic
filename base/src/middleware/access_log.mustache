@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
       httpVersion: `${req.httpVersionMajor}.${req.httpVersionMinor}`,
       userAgent: req.headers['user-agent'],
       status: res._header ? res.statusCode : undefined
-    });
+    }, 'access_log');
   });
   next();
 };
