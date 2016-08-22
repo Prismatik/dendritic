@@ -167,6 +167,10 @@ exports.setRevLifecycle = Model => {
   });
 };
 
+/**
+ * The document #update/#replace functionality that
+ * takes in account the `rev` versions
+ */
 const Document = require('thinky/lib/document');
 
 Object.defineProperty(Document.prototype, 'update', {
@@ -185,13 +189,13 @@ Object.defineProperty(Document.prototype, 'replace', {
     Object.getOwnPropertyNames(this).forEach(key => key !== 'id' && delete(this[key]));
 
     // setting new data with a new `rev` if necessary
-    this.merge(Object.assign({ }, data, rev ? { rev: uuid.v4() } : { }));
+    this.merge(Object.assign({ }, data));
 
     // NOTE: `validate()` can return a Promise
     return Promise.resolve(this.validate()).then(() => {
       const Model = this.getModel();
       const { _thinky: { r } } = Model;
-      const newData = Object.assign({ }, this);
+      const newData = Object.assign({ }, this, rev ? { rev: uuid.v4() } : { });
       const REV_MISMATCH_ERROR = '`rev` was changed by another update';
 
       // making a low level `replace` request that validates the current `rev` on the DB side
@@ -202,7 +206,7 @@ Object.defineProperty(Document.prototype, 'replace', {
           throw new thinky.Errors.ValidationError(REV_MISMATCH_ERROR);
         }
 
-        return this;
+        return Object.assign(this, newData);
       });
     });
   }

@@ -94,11 +94,11 @@ describe('utils/model', () => {
     });
   });
 
-  describe.only('update/replace data', () => {
+  describe('update/replace data', () => {
     const TEST_JSON_SCHEMA = {
       type: 'object',
-      name: 'revThing',
-      pluralName: 'revThings',
+      name: 'updThing',
+      pluralName: 'updThings',
       properties: {
         id: {
           type: 'string',
@@ -120,8 +120,8 @@ describe('utils/model', () => {
     let record;
 
     before(() => {
-      schema.revThing = TEST_JSON_SCHEMA;
-      Model = model.create('revThing');
+      schema.updThing = TEST_JSON_SCHEMA;
+      Model = model.create('updThing');
     });
 
     beforeEach(function * () {
@@ -147,6 +147,15 @@ describe('utils/model', () => {
       const dbRecord = yield Model.get(record.id).run();
       dbRecord.firstName.must.eql(record.firstName);
       dbRecord.must.not.have.property('lastName');
+    });
+
+    it('explodes when validation fails', function * () {
+      try {
+        yield record.update({ firstName: null });
+        throw new Error('validation must fail');
+      } catch (error) {
+        error.message.must.eql('`firstName` must be string');
+      }
     });
   });
 
@@ -214,6 +223,17 @@ describe('utils/model', () => {
         throw new Error('must fail the `rev` check');
       } catch (error) {
         error.message.must.eql('`rev` was changed by another update');
+      }
+    });
+
+    it('validates revs format before trying to save things', function * () {
+      const thing = yield new Model(Object.assign({ id: uuid.v4() }, params)).save();
+
+      try {
+        yield thing.update({ name: 'new name', rev: 'hack hack hack' });
+        throw new Error('must validate rev format');
+      } catch (error) {
+        error.message.must.contain('`rev` must match pattern');
       }
     });
   });
