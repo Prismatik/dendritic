@@ -11,22 +11,24 @@ const { thinky, schema } = require('../../config');
 exports.create = (modelName, opts = {}) => {
   const modelSchema = schema[modelName];
   const validator = exports.thinkyValidatorFor(modelSchema);
-  const model = thinky.createModel(
+  const Model = thinky.createModel(
     modelSchema.pluralName,
     { /* we are relying on the JSON schema validator to ensure data consitency */ },
     { validator, enforce_extra: 'none', enforce_type: 'none' }
   );
 
-  if (modelSchema.properties.rev) {
-    exports.setRevLifecycle(model);
+  if (opts.audit) {
+    exports.setupAuditLog(Model);
   }
 
-  model.standardQuery = exports.queryBuilder(model, modelSchema);
-  model.standardFeed = exports.feedBuilder(model);
+  if (modelSchema.properties.rev) {
+    exports.setRevLifecycle(Model);
+  }
 
-  if (opts.audit) { exports.setupAuditLog(model); }
+  Model.standardQuery = exports.queryBuilder(Model, modelSchema);
+  Model.standardFeed = exports.feedBuilder(Model);
 
-  return model;
+  return Model;
 };
 
 /**
@@ -130,23 +132,24 @@ exports.feedBuilder = (Model) => (params = {}) => {
  * @param {Class} model
  * @return void
  */
-exports.setupAuditLog = (model) => {
+exports.setupAuditLog = Model => {
   const AuditModel = thinky.createModel(
-    `${model.getTableName()}AuditLog`,
+    `${Model.getTableName()}AuditLog`,
     {
       createdAt: Date,
       doc: Object
     }
   );
 
-  model.post('save', function (next) {
+  Model.post('save', function (next) {
     new AuditModel({
       createdAt: new Date(),
       doc: Object.assign({}, this)
     }).save(next);
   });
 
-  model.AuditModel = AuditModel;
+  Model.AuditModel = AuditModel;
+};
 
 /**
  * Sets up the `rev` properties lifecycles
@@ -163,3 +166,44 @@ exports.setRevLifecycle = Model => {
     next();
   });
 };
+
+const Document = require('thinky/lib/document');
+
+Object.defineProperty(Document.prototype, 'update', {
+  enumerable: false,
+  value(data) {
+    return this.replace(Object.assign({ }, this, data));
+  }
+});
+
+Object.defineProperty(Document.prototype, 'replace', {
+  enumerable: false,
+  value(data) {
+    const { rev = this.rev } = data || { };
+
+    // cleaing up all the existing data
+    Object.getOwnPropertyNames(this).forEach(key => key !== 'id' && delete(this[key]));
+
+    // setting new data with a new `rev` if necessary
+    this.merge(Object.assign({ }, data, rev ? { rev: uuid.v4() } : { }));
+
+    // NOTE: `validate()` can return a Promise
+    return Promise.resolve(this.validate()).then(() => {
+      const Model = this.getModel();
+      const { _thinky: { r } } = Model;
+      const newData = Object.assign({ }, this);
+      const REV_MISMATCH_ERROR = '`rev` was changed by another update';
+
+      // making a low level `replace` request that validates the current `rev` on the DB side
+      return r.table(Model.getTableName()).get(this.id).replace(doc =>
+        r.branch(doc('rev').eq(rev), newData, r.error(REV_MISMATCH_ERROR))
+      ).run().then(result => {
+        if (result.first_error === REV_MISMATCH_ERROR) {
+          throw new thinky.Errors.ValidationError(REV_MISMATCH_ERROR);
+        }
+
+        return this;
+      });
+    });
+  }
+});
