@@ -11,7 +11,7 @@
     "coverage": "istanbul cover _mocha",
     "start": "node src/server",
     "test": "NODE_ENV=test mocha",
-    "watch": "mocha --watch",
+    "watch": "NODE_ENV=test mocha --watch",
     "dockertest": "docker-compose run {{kebabCasePlural}} npm test",
     "dockerwatch": "docker-compose run {{kebabCasePlural}} npm run watch"
   },

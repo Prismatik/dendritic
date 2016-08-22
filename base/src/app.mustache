@@ -4,7 +4,9 @@ const bodyParser = require('body-parser');
 const app = require('express')();
 const io = require('socket.io')();
 const routes = require('./routes');
-const { httpErrors } = require('./middleware');
+const { accessLog, httpErrors } = require('./middleware');
+
+app.use(accessLog);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
