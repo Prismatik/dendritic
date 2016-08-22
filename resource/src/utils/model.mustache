@@ -195,9 +195,9 @@ Object.defineProperty(Document.prototype, 'replace', {
       const REV_MISMATCH_ERROR = '`rev` was changed by another update';
 
       // making a low level `replace` request that validates the current `rev` on the DB side
-      return r.table(Model.getTableName()).get(this.id).replace(doc =>
-        r.branch(doc('rev').eq(rev), newData, r.error(REV_MISMATCH_ERROR))
-      ).run().then(result => {
+      return r.table(Model.getTableName()).get(this.id).replace(doc => {
+        return rev ? r.branch(doc('rev').eq(rev), newData, r.error(REV_MISMATCH_ERROR)) : newData;
+      }).run().then(result => {
         if (result.first_error === REV_MISMATCH_ERROR) {
           throw new thinky.Errors.ValidationError(REV_MISMATCH_ERROR);
         }

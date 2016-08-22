@@ -94,7 +94,63 @@ describe('utils/model', () => {
     });
   });
 
-  describe.only('model with a `rev`', () => {
+  describe.only('update/replace data', () => {
+    const TEST_JSON_SCHEMA = {
+      type: 'object',
+      name: 'revThing',
+      pluralName: 'revThings',
+      properties: {
+        id: {
+          type: 'string',
+          pattern: '^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$'
+        },
+        firstName: {
+          type: 'string'
+        },
+        lastName: {
+          type: 'string'
+        }
+      },
+      required: [
+        'firstName'
+      ]
+    };
+
+    let Model;
+    let record;
+
+    before(() => {
+      schema.revThing = TEST_JSON_SCHEMA;
+      Model = model.create('revThing');
+    });
+
+    beforeEach(function * () {
+      record = yield new Model({ id: uuid.v4(), firstName: 'nikolay', lastName: 'theosom' }).save();
+    });
+
+    it('partially updates data with #udpate', function * () {
+      yield record.update({ lastName: 'new name' });
+
+      record.firstName.must.eql('nikolay');
+      record.lastName.must.eql('new name');
+
+      const dbRecord = yield Model.get(record.id).run();
+      dbRecord.lastName.must.eql(record.lastName);
+    });
+
+    it('fully updates data with #replace', function * () {
+      yield record.replace({ firstName: 'new name' });
+
+      record.firstName.must.eql('new name');
+      record.must.not.have.property('lastName');
+
+      const dbRecord = yield Model.get(record.id).run();
+      dbRecord.firstName.must.eql(record.firstName);
+      dbRecord.must.not.have.property('lastName');
+    });
+  });
+
+  describe('model with a `rev`', () => {
     const TEST_JSON_SCHEMA = {
       type: 'object',
       name: 'revThing',
