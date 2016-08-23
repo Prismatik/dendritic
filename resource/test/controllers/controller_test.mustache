@@ -161,6 +161,7 @@ describe('{{snakeCasePlural}} controller', () => {
     it('updates params when things are good', function * () {
       const oldId = {{camelCase}}.id;
       const validData = {{camelCase}}Fixture.valid(); delete(validData.id);
+      validData.rev = {{camelCase}}.rev;
       const result = yield {{camelCasePlural}}.update({{camelCase}}.id, validData);
       result.constructor.must.equal({{pascalCase}});
       result.id.must.eql(oldId);
@@ -210,6 +211,7 @@ describe('{{snakeCasePlural}} controller', () => {
     it('replaces the entire document with the new data', function * () {
       const oldId = {{camelCase}}.id;
       const validData = {{camelCase}}Fixture.valid(); delete(validData.id);
+      validData.rev = {{camelCase}}.rev;
       const result = yield {{camelCasePlural}}.replace({{camelCase}}.id, validData);
       result.constructor.must.equal({{pascalCase}});
       result.id.must.eql(oldId);

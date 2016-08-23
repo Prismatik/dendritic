@@ -1,5 +1,3 @@
-const uuid = require('uuid');
-
 /**
  * Creates a controller with extra methods
  *
@@ -37,25 +35,17 @@ exports.baseController = Model => ({
   },
 
   *create(params) {
-    return yield new Model(
-      Object.assign({ rev: uuid.v4() }, params)
-    ).save();
+    return yield new Model(params).save();
   },
 
   *update(id, params) {
     const record = yield this.find(id);
-    return yield record.merge(params).save();
+    return yield record.update(params);
   },
 
   *replace(id, params) {
     const record = yield this.find(id);
-
-    // cleaning up the existing data
-    Object.getOwnPropertyNames(record)
-      .filter(key => key !== 'id')
-      .forEach(key => delete(record[key]));
-
-    return yield record.merge(params).save();
+    return yield record.replace(params);
   },
 
   *delete(id) {
