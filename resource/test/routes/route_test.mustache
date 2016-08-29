@@ -12,10 +12,10 @@ describe('/{{kebabCasePlural}} route', () => {
   const sorted = (records, param = 'id') => records
     .sort((a, b) => (a[param] > b[param] ? 1 : -1))
     .map(i => Object.assign({}, i)){{#isUser}}
-    .map(i => { delete(i.password); return i; })
+    .map(i => { delete i.password; return i; })
     {{/isUser}};
 
-  beforeEach(function * () {
+  beforeEach(function* () {
     yield {{pascalCase}}.delete().execute();
 
     [{{camelCase}}1, {{camelCase}}2] = yield [
@@ -27,26 +27,26 @@ describe('/{{kebabCasePlural}} route', () => {
   });
 
   describe('GET /', () => {
-    it('returns all records by default', function * () {
+    it('returns all records by default', function* () {
       const response = yield app.get('/{{kebabCasePlural}}');
       response.status.must.eql(200);
       response.body.must.be.an(Array);
       sorted(response.body).must.eql(sorted([{{camelCase}}1, {{camelCase}}2]));
     });
 
-    it('allows to specify property filters', function * () {
+    it('allows to specify property filters', function* () {
       const response = yield app.get('/{{kebabCasePlural}}', { id: {{camelCase}}1.id });
       response.status.must.eql(200);
       sorted(response.body).must.eql(sorted([{{camelCase}}1]));
     });
 
-    it('allows to sort data by fields', function * () {
+    it('allows to sort data by fields', function* () {
       const response = yield app.get('/{{kebabCasePlural}}', { orderBy: 'rev' });
       response.status.must.eql(200);
       sorted(response.body, 'rev').must.eql(sorted([{{camelCase}}1, {{camelCase}}2], 'rev'));
     });
 
-    it('allows `limit` data', function * () {
+    it('allows `limit` data', function* () {
       const response = yield app.get('/{{kebabCasePlural}}', { limit: 1, orderBy: 'rev' });
       response.status.must.eql(200);
       response.body.must.eql(sorted([{{camelCase}}1, {{camelCase}}2], 'rev').slice(0, 1));
@@ -54,17 +54,17 @@ describe('/{{kebabCasePlural}} route', () => {
   });
 
   describe('GET /:id', () => {
-    it('returns the record if exists', function * () {
+    it('returns the record if exists', function* () {
       const response = yield app.get('/{{kebabCasePlural}}/' + {{camelCase}}.id);
       response.status.must.eql(200);
       response.body.must.be.object();
       {{#isUser}}
-      delete({{camelCase}}.password);
+      delete {{camelCase}}.password;
       {{/isUser}}
       response.body.must.eql(Object.assign({}, {{camelCase}}));
     });
 
-    it('throws 404 when the record does not exist', function * () {
+    it('throws 404 when the record does not exist', function* () {
       const response = yield app.get(`/{{kebabCasePlural}}/hack`);
       response.status.must.eql(404);
       response.body.must.eql({ error: 'not found' });
@@ -72,8 +72,8 @@ describe('/{{kebabCasePlural}} route', () => {
   });
 
   describe('POST /', () => {
-    it('creates new record when data is good', function * () {
-      const data = {{camelCase}}Fixture.valid(); delete(data.id);
+    it('creates new record when data is good', function* () {
+      const data = {{camelCase}}Fixture.valid(); delete data.id;
       const response = yield app.post('/{{kebabCasePlural}}', data);
       response.status.must.eql(201);
       response.body.must.be.object();
@@ -82,13 +82,13 @@ describe('/{{kebabCasePlural}} route', () => {
       {{/isUser}}
       const {{camelCase}} = response.body;
 
-      delete({{camelCase}}.id); delete({{camelCase}}.rev);
-      delete(data.rev);{{#isUser}} delete(data.password);{{/isUser}}
+      delete {{camelCase}}.id; delete {{camelCase}}.rev;
+      delete data.rev;{{#isUser}} delete data.password;{{/isUser}}
 
       {{camelCase}}.must.eql(data);
     });
 
-    it('throws 422 if the data is bad', function * () {
+    it('throws 422 if the data is bad', function* () {
       const response = yield app.post('/{{kebabCasePlural}}', {});
       response.status.must.eql(422);
       response.body.must.be.object();
@@ -96,8 +96,8 @@ describe('/{{kebabCasePlural}} route', () => {
       response.body.error.must.contain('is required');
     });
     {{#isUser}}
-    it('throws 422 if a password is mising', function * () {
-      const data = {{camelCase}}Fixture.valid(); {{#isUser}}delete(data.password);{{/isUser}}
+    it('throws 422 if a password is mising', function* () {
+      const data = {{camelCase}}Fixture.valid(); {{#isUser}}delete data.password;{{/isUser}}
       const response = yield app.post('/{{kebabCasePlural}}', data);
       response.status.must.eql(422);
       response.body.must.eql({
@@ -111,35 +111,35 @@ describe('/{{kebabCasePlural}} route', () => {
     let validData;
 
     beforeEach(() => {
-      validData = {{camelCase}}Fixture.valid(); delete(validData.id);
+      validData = {{camelCase}}Fixture.valid(); delete validData.id;
       validData.rev = {{camelCase}}.rev;
     });
 
-    it('replaces an entire document and returns the updated record back', function * () {
+    it('replaces an entire document and returns the updated record back', function* () {
       const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, validData);
       response.status.must.eql(200);
 
       const expected = Object.assign({ id: {{camelCase}}.id }, validData);{{#isUser}}
-      delete(expected.password);{{/isUser}}
-      delete(expected.rev);
-      delete(response.body.rev);
+      delete expected.password;{{/isUser}}
+      delete expected.rev;
+      delete response.body.rev;
 
       response.body.must.eql(expected);
     });
 
-    it('throws 404 if the record does not exist', function * () {
+    it('throws 404 if the record does not exist', function* () {
       const response = yield app.put('/{{kebabCasePlural}}/hack', {});
       response.status.must.eql(404);
       response.body.must.eql({ error: 'not found' });
     });
 
-    it('throws 422 if some data is missing', function * () {
+    it('throws 422 if some data is missing', function* () {
       const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, {});
       response.status.must.eql(422);
       response.body.error.must.contain('is required');
     });
 
-    it('throws 422 if the data is malformed', function * () {
+    it('throws 422 if the data is malformed', function* () {
       const data = Object.assign({}, validData, { rev: 'hack hack hack' });
       const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
       response.status.must.eql(422);
@@ -150,31 +150,31 @@ describe('/{{kebabCasePlural}} route', () => {
   });
 
   describe('PATCH /:id', () => {
-    it('updates the data and returns the updated record back', function * () {
+    it('updates the data and returns the updated record back', function* () {
       const data = { rev: {{camelCase}}.rev };
       const response = yield app.patch('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
       response.status.must.eql(200);
 
       const expected = Object.assign({}, {{camelCase}}, data);{{#isUser}}
-      delete(expected.password);{{/isUser}}
-      delete(expected.rev);
-      delete(response.body.rev);
+      delete expected.password;{{/isUser}}
+      delete expected.rev;
+      delete response.body.rev;
 
       response.body.must.eql(expected);
     });
 
-    it('throws 404 if the record does not exist', function * () {
+    it('throws 404 if the record does not exist', function* () {
       const response = yield app.patch('/{{kebabCasePlural}}/hack', {});
       response.status.must.eql(404);
       response.body.must.eql({ error: 'not found' });
     });
 
-    it('does not explode if not all data was send through', function * () {
+    it('does not explode if not all data was send through', function* () {
       const response = yield app.patch('/{{kebabCasePlural}}/' + {{camelCase}}.id, {});
       response.status.must.eql(200);
     });
 
-    it('throws 422 if the data is malformed', function * () {
+    it('throws 422 if the data is malformed', function* () {
       const data = { rev: 'hack hack hack' };
       const response = yield app.patch('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
       response.status.must.eql(422);
@@ -187,7 +187,7 @@ describe('/{{kebabCasePlural}} route', () => {
   describe('PATCH /:id', () => {
     let {{camelCase}}ExtraProp;
     const propText = 'oh hi I am an extra prop';
-    beforeEach(function * () {
+    beforeEach(function* () {
       const data = {{camelCase}}Fixture.valid();
       data.extraProp = propText;
       data.foo = {};
@@ -195,7 +195,7 @@ describe('/{{kebabCasePlural}} route', () => {
       {{camelCase}}ExtraProp = yield {{camelCasePlural}}.create(data);
       data.rev = {{camelCase}}ExtraProp.rev;
     });
-    it('interprets null as a delete', function * () {
+    it('interprets null as a delete', function* () {
       // https://tools.ietf.org/html/rfc7396
       const existing = yield app.get('/{{kebabCasePlural}}/' + {{camelCase}}ExtraProp.id);
       existing.body.extraProp.must.eql(propText);
@@ -205,11 +205,11 @@ describe('/{{kebabCasePlural}} route', () => {
       response.status.must.eql(200);
 
       const expected = Object.assign({}, {{camelCase}}ExtraProp, data);{{#isUser}}
-      delete(expected.password);{{/isUser}}
-      delete(expected.extraProp);
-      delete(expected.foo.bar);
-      delete(expected.rev);
-      delete(response.body.rev);
+      delete expected.password;{{/isUser}}
+      delete expected.extraProp;
+      delete expected.foo.bar;
+      delete expected.rev;
+      delete response.body.rev;
 
       response.body.must.eql(expected);
     });
@@ -217,15 +217,15 @@ describe('/{{kebabCasePlural}} route', () => {
 
 
   describe('DELETE /:id', () => {
-    it('deletes a record if it exists', function * () {
+    it('deletes a record if it exists', function* () {
       const response = yield app.delete('/{{kebabCasePlural}}/' + {{camelCase}}.id);
       response.status.must.eql(200);
       const expected = Object.assign({}, {{camelCase}});{{#isUser}}
-      delete(expected.password);{{/isUser}}
+      delete expected.password;{{/isUser}}
       response.body.must.eql(expected);
     });
 
-    it('throws 404 if the record does not exist', function * () {
+    it('throws 404 if the record does not exist', function* () {
       const response = yield app.delete('/{{kebabCasePlural}}/hack', {});
       response.status.must.eql(404);
       response.body.must.eql({ error: 'not found' });
@@ -240,19 +240,19 @@ describe('/{{kebabCasePlural}} route', () => {
       io.on('error', error => reject(error));
     });
 
-    beforeEach(function * () {
+    beforeEach(function* () {
       yield wait(50); // waiting for the other beforeEach events to pass
       io = IO(app.urlFor('/{{kebabCasePlural}}'), { forceNew: true });
     });
 
     afterEach(() => io.disconnect());
 
-    it('allows to open up connection and get metadata back', function * () {
+    it('allows to open up connection and get metadata back', function* () {
       const metadata = yield listenFor('metadata');
       metadata.must.eql({ count: 2 });
     });
 
-    it('sends through all existing records and the `all:loaded` event', function * () {
+    it('sends through all existing records and the `all:loaded` event', function* () {
       const records = [];
       const allDone = listenFor('all:loaded');
       io.on('existed', record => records.push(record));
@@ -261,34 +261,34 @@ describe('/{{kebabCasePlural}} route', () => {
       sorted(records).must.eql(sorted([{{camelCase}}1, {{camelCase}}2]));
     });
 
-    it('sends records through when they are created', function * () {
+    it('sends records through when they are created', function* () {
       const feed = listenFor('created'); yield wait(50);
       const newRecord = yield {{camelCasePlural}}.create({{camelCase}}Fixture.valid());
       const feedRecord = yield feed;
       {{#isUser}}
-      delete(newRecord.password);
+      delete newRecord.password;
       {{/isUser}}
       feedRecord.must.eql(Object.assign({}, newRecord));
     });
 
-    it('sends notifications about changed objects', function * () {
+    it('sends notifications about changed objects', function* () {
       const feed = listenFor('updated'); yield wait(50);
-      const newData = {{camelCase}}Fixture.valid(); delete(newData.id);
+      const newData = {{camelCase}}Fixture.valid(); delete newData.id;
       newData.rev = {{camelCase}}.rev;
       const updatedRecord = yield {{camelCasePlural}}.update({{camelCase}}.id, newData);
       const feedRecord = yield feed;
       {{#isUser}}
-      delete(updatedRecord.password);
+      delete updatedRecord.password;
       {{/isUser}}
       feedRecord.must.eql(Object.assign({}, updatedRecord));
     });
 
-    it('sends notifications through when {{camelCasePlural}} are deleted', function * () {
+    it('sends notifications through when {{camelCasePlural}} are deleted', function* () {
       const feed = listenFor('deleted'); yield wait(50);
       const deletedRecord = yield {{camelCasePlural}}.delete({{camelCase}}.id);
       const feedRecord = yield feed;
       {{#isUser}}
-      delete(deletedRecord.password);
+      delete deletedRecord.password;
       {{/isUser}}
       feedRecord.must.eql(Object.assign({}, deletedRecord));
     });

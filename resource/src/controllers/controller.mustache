@@ -10,19 +10,19 @@ module.exports = createController({{pascalCase}}, {
   // TODO business logic
   {{/isUser}}
   {{#isUser}}
-  *create(params) {
+  * create(params) {
     return yield super.create(yield hashPassword(params));
   },
 
-  *update(id, params) {
+  * update(id, params) {
     return yield super.update(id, yield hashPassword(params));
   },
 
-  *replace(id, params) {
+  * replace(id, params) {
     return yield super.replace(id, yield hashPassword(params));
   },
 
-  *signin(email, pass) {
+  * signin(email, pass) {
     const [user] = yield {{pascalCase}}.filter({ email }).run();
     if (!user) throw new HttpError('UNAUTHORIZED');
 
@@ -34,7 +34,7 @@ module.exports = createController({{pascalCase}}, {
     return { token, user };
   },
 
-  *signout() {
+  signout() {
     return { ok: true };
   }
   {{/isUser}}

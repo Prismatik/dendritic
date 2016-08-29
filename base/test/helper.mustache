@@ -4,12 +4,13 @@ require('app-module-path').addPath(require('path').resolve(__dirname, '..'));
 
 const mocha = require('mocha');
 const coMocha = require('co-mocha');
+
 coMocha(mocha);
 
 const { thinky } = require('../config');
 
 process.nextTick(() => {
-  before(function * () {
+  before(function* () {
     yield thinky.dbReady();
   });
 });
