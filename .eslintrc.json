@@ -2,7 +2,6 @@
   "extends": "prismatik",
   "rules": {
     "import/no-extraneous-dependencies": "off",
-    
     "arrow-body-style": "off",
     "camelcase": "off",
     "global-require": "off",
@@ -13,8 +12,6 @@
     "no-param-reassign": "off",
     "spaced-comment": "off",
     "no-underscore-dangle": "off",
-    "func-names": "off",
-    "no-shadow": "off",
     "prefer-template": "off"
   }
 }

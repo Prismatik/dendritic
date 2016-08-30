@@ -18,11 +18,11 @@ exports.createController = (Model, subController) => {
  * @return {Object} base controller generator
  */
 exports.baseController = Model => ({
-  * all(params) {
+  *all(params) {
     return yield Model.standardQuery(params).run();
   },
 
-  * watch(params) {
+  *watch(params) {
     const [feed, count] = yield [
       Model.standardFeed(params),
       Model.standardQuery(params).count().execute()
@@ -30,25 +30,25 @@ exports.baseController = Model => ({
     return { feed, count };
   },
 
-  * find(id) {
+  *find(id) {
     return yield Model.get(id);
   },
 
-  * create(params) {
+  *create(params) {
     return yield new Model(params).save();
   },
 
-  * update(id, params) {
+  *update(id, params) {
     const record = yield this.find(id);
     return yield record.update(params);
   },
 
-  * replace(id, params) {
+  *replace(id, params) {
     const record = yield this.find(id);
     return yield record.replace(params);
   },
 
-  * delete(id) {
+  *delete(id) {
     const record = yield this.find(id);
     yield record.delete();
     return record;

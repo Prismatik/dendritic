@@ -10,7 +10,7 @@ coMocha(mocha);
 const { thinky } = require('../config');
 
 process.nextTick(() => {
-  before(function* () {
+  before(function *() {
     yield thinky.dbReady();
   });
 });

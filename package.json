@@ -42,7 +42,7 @@
     "dotenv-safe": "^2.3.1",
     "doubleagent": "^1.1.0",
     "eslint": "^3.4.0",
-    "eslint-config-prismatik": "^2.1.0",
+    "eslint-config-prismatik": "^2.2.0",
     "express": "^4.13.4",
     "express-jwt": "^3.4.0",
     "express-yields": "^1.0.0",

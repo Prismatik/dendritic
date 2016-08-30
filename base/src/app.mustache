@@ -22,7 +22,7 @@ module.exports = app;
 app.io = io;
 routes.sockets.forEach(({ path, handler }) => {
   io.of(path).on('connection', socket => {
-    require('co')(function* () {
+    require('co')(function *() {
       const feed = yield handler(socket, socket.handshake);
       socket.on('disconnect', () => feed.close());
     });

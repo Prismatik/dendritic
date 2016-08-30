@@ -42,7 +42,7 @@ exports.thinkyValidatorFor = (schema) => {
   const validate = ajv.compile(schema);
   const humanReadableErrors = errors => errors.map(error => {
     const { dataPath, message, keyword, params: { missingProperty } } = error;
-    const path = keyword === 'required' ? dataPath + `.${missingProperty}` : dataPath;
+    const path = keyword === 'required' ? `${dataPath}.${missingProperty}` : dataPath;
     const text = keyword === 'required' ? 'is required' : message.replace('should', 'must');
 
     return `\`${path.replace(/^\./, '')}\` ${text}`;
