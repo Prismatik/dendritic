@@ -37,12 +37,12 @@ describe('utils/model', () => {
       Model.must.equal(thinky.models.things);
     });
 
-    it('should pick up validations correctly', () => {
-      return new Model({}).save().must.reject.with.error(
+    it('should pick up validations correctly', () => (
+      new Model({}).save().must.reject.with.error(
         thinky.Errors.ValidationError,
         '`email` is required, `password` is required'
-      );
-    });
+      )
+    ));
 
     it('should handle malformed data as well', () => {
       const params = { email: 'blah!', password: 'blah!' };
@@ -84,7 +84,7 @@ describe('utils/model', () => {
       Model = model.create('auditableThing', { audit: true });
     });
 
-    it('should populate the audit log', function * () {
+    it('should populate the audit log', function *() {
       const record = yield new Model(params).save();
 
       const audit = yield Model.AuditModel.filter({ doc: { id: record.id } }).run();
@@ -124,11 +124,11 @@ describe('utils/model', () => {
       Model = model.create('updThing');
     });
 
-    beforeEach(function * () {
+    beforeEach(function *() {
       record = yield new Model({ id: uuid.v4(), firstName: 'nikolay', lastName: 'theosom' }).save();
     });
 
-    it('partially updates data with #udpate', function * () {
+    it('partially updates data with #udpate', function *() {
       yield record.update({ lastName: 'new name' });
 
       record.firstName.must.eql('nikolay');
@@ -138,7 +138,7 @@ describe('utils/model', () => {
       dbRecord.lastName.must.eql(record.lastName);
     });
 
-    it('fully updates data with #replace', function * () {
+    it('fully updates data with #replace', function *() {
       yield record.replace({ firstName: 'new name' });
 
       record.firstName.must.eql('new name');
@@ -149,7 +149,7 @@ describe('utils/model', () => {
       dbRecord.must.not.have.property('lastName');
     });
 
-    it('explodes when validation fails', function * () {
+    it('explodes when validation fails', function *() {
       try {
         yield record.update({ firstName: null });
         throw new Error('validation must fail');
@@ -191,12 +191,12 @@ describe('utils/model', () => {
       Model = model.create('revThing');
     });
 
-    it('sets a new `rev` automatically for new records', function * () {
+    it('sets a new `rev` automatically for new records', function *() {
       const thing = yield new Model(Object.assign({ id: uuid.v4() }, params)).save();
       thing.rev.must.match(REV_RE);
     });
 
-    it('replaces the `rev` automatically every time the data is saved', function * () {
+    it('replaces the `rev` automatically every time the data is saved', function *() {
       const thing = yield new Model(Object.assign({ id: uuid.v4() }, params)).save();
       const oldRev = thing.rev;
 
@@ -206,7 +206,7 @@ describe('utils/model', () => {
       thing.rev.must.not.eql(oldRev);
     });
 
-    it('works fine if the provided `rev` is the same', function * () {
+    it('works fine if the provided `rev` is the same', function *() {
       const thing = yield new Model(Object.assign({ id: uuid.v4() }, params)).save();
       const oldRev = thing.rev;
 
@@ -215,7 +215,7 @@ describe('utils/model', () => {
       thing.name.must.eql('new name');
     });
 
-    it('explodes if the `rev` was changed to something else', function * () {
+    it('explodes if the `rev` was changed to something else', function *() {
       const thing = yield new Model(Object.assign({ id: uuid.v4() }, params)).save();
 
       try {
@@ -226,7 +226,7 @@ describe('utils/model', () => {
       }
     });
 
-    it('validates revs format before trying to save things', function * () {
+    it('validates revs format before trying to save things', function *() {
       const thing = yield new Model(Object.assign({ id: uuid.v4() }, params)).save();
 
       try {

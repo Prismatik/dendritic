@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const password = require('simple-password');
+
 const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
 
 exports.createToken = function (data, expires) {
@@ -15,12 +16,12 @@ exports.verifyToken = function (token, opts = {}) {
   });
 };
 
-exports.hashPassword = function * (params) {
+exports.hashPassword = function *(params) {
   return Object.assign({}, params, params.password ? {
     password: yield password.create(params.password, HASH_ROUNDS)
   } : {});
 };
 
-exports.verifyPassword = function * (one, another) {
+exports.verifyPassword = function *(one, another) {
   return yield password.verify(one, another);
 };

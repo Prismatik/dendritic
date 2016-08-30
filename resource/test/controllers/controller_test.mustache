@@ -5,13 +5,14 @@ const {{pascalCase}} = require('../../src/models/{{snakeCase}}');
 const {{camelCasePlural}} = require('../../src/controllers/{{snakeCasePlural}}');
 const { thinky: { Errors: { DocumentNotFound, ValidationError } } } = require('../../config');
 const {{camelCase}}Fixture = require('../fixtures/{{snakeCase}}');
+
 const UUID_RE = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/;
 
 describe('{{snakeCasePlural}} controller', () => {
   let validData;
   let {{camelCase}};
 
-  beforeEach(function * () {
+  beforeEach(function *() {
     validData = {{camelCase}}Fixture.valid();
     {{camelCase}} = yield {{camelCasePlural}}.create(validData);
   });
@@ -27,7 +28,7 @@ describe('{{snakeCasePlural}} controller', () => {
       .sort((a, b) => (a[param] > b[param] ? 1 : -1))
       .map(i => Object.assign({}, i));
 
-    beforeEach(function * () {
+    beforeEach(function *() {
       yield {{pascalCase}}.delete().execute();
 
       [{{camelCase}}1, {{camelCase}}2, {{camelCase}}3] = yield [
@@ -37,25 +38,29 @@ describe('{{snakeCasePlural}} controller', () => {
       ];
     });
 
-    it('returns all the records by default', function * () {
+    it('returns all the records by default', function *() {
       const result = yield {{camelCasePlural}}.all();
       result.must.be.an(Array);
-      sorted(result).must.eql(sorted([{{camelCase}}1, {{camelCase}}2, {{camelCase}}3]));
+      sorted(result).must.eql(sorted([
+        {{camelCase}}1, {{camelCase}}2, {{camelCase}}3
+      ]));
     });
 
-    it('allows to filter the list by a specific field', function * () {
+    it('allows to filter the list by a specific field', function *() {
       const filter = { id: {{camelCase}}1.id };
       const result = yield {{camelCasePlural}}.all(filter);
       sorted(result).must.eql(sorted([{{camelCase}}1]));
     });
 
-    it('ignores totally unsupported params', function * () {
+    it('ignores totally unsupported params', function *() {
       const filter = { totalMonkey: 123 };
       const result = yield {{camelCasePlural}}.all(filter);
-      sorted(result).must.eql(sorted([{{camelCase}}1, {{camelCase}}2, {{camelCase}}3]));
+      sorted(result).must.eql(sorted([
+        {{camelCase}}1, {{camelCase}}2, {{camelCase}}3
+      ]));
     });
 
-    it('allows to order things by a specific field', function * () {
+    it('allows to order things by a specific field', function *() {
       const params = { orderBy: 'rev' };
       const result = yield {{camelCasePlural}}.all(params);
       result.map(i => Object.assign({}, i)).must.eql(
@@ -63,7 +68,7 @@ describe('{{snakeCasePlural}} controller', () => {
       );
     });
 
-    it('allows to skip records', function * () {
+    it('allows to skip records', function *() {
       const params = { orderBy: 'rev', skip: 1 };
       const result = yield {{camelCasePlural}}.all(params);
       result.map(i => Object.assign({}, i)).must.eql(
@@ -71,7 +76,7 @@ describe('{{snakeCasePlural}} controller', () => {
       );
     });
 
-    it('allows to limit records', function * () {
+    it('allows to limit records', function *() {
       const params = { orderBy: 'rev', limit: 2 };
       const result = yield {{camelCasePlural}}.all(params);
       result.map(i => Object.assign({}, i)).must.eql(
@@ -81,13 +86,13 @@ describe('{{snakeCasePlural}} controller', () => {
   });
 
   describe('.find(id)', () => {
-    it('returns the {{camelCase}} when it exists', function * () {
+    it('returns the {{camelCase}} when it exists', function *() {
       const result = yield {{camelCasePlural}}.find({{camelCase}}.id);
 
       Object.assign({}, result).must.eql(Object.assign({}, {{camelCase}}));
     });
 
-    it('throws DocumentNotFound if the {{camelCase}} does not exist', function * () {
+    it('throws DocumentNotFound if the {{camelCase}} does not exist', function *() {
       try {
         yield {{camelCasePlural}}.find('hack!');
         throw new Error('must fail here!');
@@ -98,12 +103,12 @@ describe('{{snakeCasePlural}} controller', () => {
   });
 
   describe('.create(data)', () => {
-    beforeEach(function * () {
+    beforeEach(() => {
       // refreshing the validData to avoid conflicts
       validData = {{camelCase}}Fixture.valid();
     });
 
-    it('saves valid data and returns a model instance', function * () {
+    it('saves valid data and returns a model instance', function *() {
       const {{camelCase}} = yield {{camelCasePlural}}.create(validData);
       {{camelCase}}.constructor.must.equal({{pascalCase}});
 
@@ -112,13 +117,13 @@ describe('{{snakeCasePlural}} controller', () => {
       pureData({{camelCase}}).must.eql(pureData(validData));
     });
 
-    it('automatically adds a `rev` property onto new records', function * () {
-      delete(validData.rev);
+    it('automatically adds a `rev` property onto new records', function *() {
+      delete validData.rev;
       const {{camelCase}} = yield {{camelCasePlural}}.create(validData);
       {{camelCase}}.rev.must.match(UUID_RE);
     });
 
-    it('throws validation errors when data is missing', function * () {
+    it('throws validation errors when data is missing', function *() {
       try {
         yield {{camelCasePlural}}.create({});
         throw new Error('should fail');
@@ -128,9 +133,11 @@ describe('{{snakeCasePlural}} controller', () => {
       }
     });
     {{#isUser}}
-    it('must require `email` and `password`', function * () {
+    it('must require `email` and `password`', function *() {
       try {
-        yield {{camelCasePlural}}.create(Object.assign(validData, { email: undefined, password: undefined }));
+        yield {{camelCasePlural}}.create(Object.assign(
+          validData, { email: undefined, password: undefined }
+        ));
         throw new Error('must fail here');
       } catch (e) {
         e.must.be.instanceOf(ValidationError);
@@ -139,7 +146,7 @@ describe('{{snakeCasePlural}} controller', () => {
       }
     });
 
-    it('must validate `email` format', function * () {
+    it('must validate `email` format', function *() {
       try {
         yield {{camelCasePlural}}.create(Object.assign(validData, { email: 'hack!' }));
         throw new Error('should fail');
@@ -149,7 +156,7 @@ describe('{{snakeCasePlural}} controller', () => {
       }
     });
 
-    it('must encrypt passwords', function * () {
+    it('must encrypt passwords', function *() {
       const data = Object.assign(validData, { password: '84(0/\\/' });
       const {{camelCase}} = yield {{camelCasePlural}}.create(data);
       {{camelCase}}.password.must.not.eql(data.password);
@@ -158,9 +165,9 @@ describe('{{snakeCasePlural}} controller', () => {
   });
 
   describe('.update(params)', () => {
-    it('updates params when things are good', function * () {
+    it('updates params when things are good', function *() {
       const oldId = {{camelCase}}.id;
-      const validData = {{camelCase}}Fixture.valid(); delete(validData.id);
+      const validData = {{camelCase}}Fixture.valid(); delete validData.id;
       validData.rev = {{camelCase}}.rev;
       const result = yield {{camelCasePlural}}.update({{camelCase}}.id, validData);
       result.constructor.must.equal({{pascalCase}});
@@ -169,7 +176,7 @@ describe('{{snakeCasePlural}} controller', () => {
       pureData(result).must.eql(pureData(Object.assign({}, {{camelCase}}, validData)));
     });
 
-    it('explodes when data is wrong', function * () {
+    it('explodes when data is wrong', function *() {
       try {
         yield {{camelCasePlural}}.update({{camelCase}}.id, { rev: 'hack!' });
         throw new Error('should fail');
@@ -179,7 +186,7 @@ describe('{{snakeCasePlural}} controller', () => {
       }
     });
 
-    it('throws DocumentNotFound when the document does not exist', function * () {
+    it('throws DocumentNotFound when the document does not exist', function *() {
       try {
         yield {{camelCasePlural}}.update('hack!', validData);
       } catch (e) {
@@ -187,7 +194,7 @@ describe('{{snakeCasePlural}} controller', () => {
       }
     });
     {{#isUser}}
-    it('does not allow update to borked emails', function * () {
+    it('does not allow update to borked emails', function *() {
       try {
         yield {{camelCasePlural}}.update({{camelCase}}.id, { email: 'hack!' });
         throw new Error('should fail');
@@ -197,7 +204,7 @@ describe('{{snakeCasePlural}} controller', () => {
       }
     });
 
-    it('re-encrypts new passwords', function * () {
+    it('re-encrypts new passwords', function *() {
       const oldPassword = {{camelCase}}.password;
       const data = { password: '84(0/\\/' };
       const result = yield {{camelCasePlural}}.update({{camelCase}}.id, data);
@@ -208,9 +215,9 @@ describe('{{snakeCasePlural}} controller', () => {
   });
 
   describe('.replace(id, params)', () => {
-    it('replaces the entire document with the new data', function * () {
+    it('replaces the entire document with the new data', function *() {
       const oldId = {{camelCase}}.id;
-      const validData = {{camelCase}}Fixture.valid(); delete(validData.id);
+      const validData = {{camelCase}}Fixture.valid(); delete validData.id;
       validData.rev = {{camelCase}}.rev;
       const result = yield {{camelCasePlural}}.replace({{camelCase}}.id, validData);
       result.constructor.must.equal({{pascalCase}});
@@ -219,7 +226,7 @@ describe('{{snakeCasePlural}} controller', () => {
       pureData(result).must.eql(pureData(validData));
     });
 
-    it('explodes when data is missing', function * () {
+    it('explodes when data is missing', function *() {
       try {
         yield {{camelCasePlural}}.replace({{camelCase}}.id, {});
         throw new Error('should fail');
@@ -229,7 +236,7 @@ describe('{{snakeCasePlural}} controller', () => {
       }
     });
 
-    it('explodes when data is wrong', function * () {
+    it('explodes when data is wrong', function *() {
       const data = Object.assign({}, validData, { rev: 'hack!' });
 
       try {
@@ -241,7 +248,7 @@ describe('{{snakeCasePlural}} controller', () => {
       }
     });
 
-    it('throws DocumentNotFound when the document does not exist', function * () {
+    it('throws DocumentNotFound when the document does not exist', function *() {
       try {
         yield {{camelCasePlural}}.replace('hack!', validData);
       } catch (e) {
@@ -249,7 +256,7 @@ describe('{{snakeCasePlural}} controller', () => {
       }
     });
     {{#isUser}}
-    it('does not allow update to borked emails', function * () {
+    it('does not allow update to borked emails', function *() {
       const data = Object.assign({}, validData, { email: 'hack!' });
 
       try {
@@ -261,7 +268,7 @@ describe('{{snakeCasePlural}} controller', () => {
       }
     });
 
-    it('re-encrypts new passwords', function * () {
+    it('re-encrypts new passwords', function *() {
       const oldPassword = {{camelCase}}.password;
       const data = Object.assign({}, validData, { password: '84(0/\\/' });
       const result = yield {{camelCasePlural}}.replace({{camelCase}}.id, data);
@@ -272,7 +279,7 @@ describe('{{snakeCasePlural}} controller', () => {
   });
 
   describe('.delete(id)', () => {
-    it('deletes a {{camelCase}} for sure when it exists', function * () {
+    it('deletes a {{camelCase}} for sure when it exists', function *() {
       const record = yield {{camelCasePlural}}.delete({{camelCase}}.id);
       Object.assign({}, record).must.eql(Object.assign({}, {{camelCase}}));
 
@@ -280,7 +287,7 @@ describe('{{snakeCasePlural}} controller', () => {
       result.must.eql([]);
     });
 
-    it('throws DocumentNotFound when the document does not exist', function * () {
+    it('throws DocumentNotFound when the document does not exist', function *() {
       try {
         yield {{camelCasePlural}}.delete('hack!');
         throw new Error('must fail here');
@@ -291,14 +298,14 @@ describe('{{snakeCasePlural}} controller', () => {
   });
   {{#isUser}}
   describe('.signin(email, password)', () => {
-    it('returns a user and token if everything is correct', function * () {
+    it('returns a user and token if everything is correct', function *() {
       const result = yield {{camelCasePlural}}.signin(validData.email, validData.password);
       result.token.must.be.string();
 
       Object.assign({}, result.user).must.eql(Object.assign({}, {{camelCase}}));
     });
 
-    it('throws UNAUTHORIZED if the email is wrong', function * () {
+    it('throws UNAUTHORIZED if the email is wrong', function *() {
       try {
         yield {{camelCasePlural}}.signin('h4ckr@h4ck.com', validData.password);
       } catch (e) {
@@ -307,7 +314,7 @@ describe('{{snakeCasePlural}} controller', () => {
       }
     });
 
-    it('throws UNAUTHORIZED if the password is wrong', function * () {
+    it('throws UNAUTHORIZED if the password is wrong', function *() {
       try {
         yield {{camelCasePlural}}.signin(validData.email, 'hack hack hack');
       } catch (e) {

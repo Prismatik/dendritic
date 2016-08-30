@@ -1,17 +1,17 @@
+/* eslint global-require: 'off' */
 const path = require('path');
 require('app-module-path').addPath(path.join(__dirname, '../..'));
 require('dotenv-safe').load({ sample: './example.env' });
-
 const _ = require('lodash');
 const os = require('os');
 const log = require('src/utils/logger');
 const thinky = require('config/thinky');
-const { r } = thinky;
 const Migration = require('src/models/_migration');
-
 const migrationFiles = require('migrations').filenames;
 
-function * applyMigration(migrations, then) {
+const { r } = thinky;
+
+function *applyMigration(migrations, then) {
   if (migrations.length === 0) return undefined;
   const m = migrations.shift();
   yield m.func();
@@ -19,7 +19,8 @@ function * applyMigration(migrations, then) {
   return yield applyMigration(migrations, then);
 }
 
-function * acquireMutex() {
+function acquireMutex() {
+  /* eslint no-underscore-dangle: 'off' */
   return r.branch(
     Migration.filter({ name: 'migrations_running_mutex' }).count().gt(0)._query,
     r.error('mutex locked'),
@@ -31,24 +32,24 @@ function * acquireMutex() {
   ).run();
 }
 
-function * getMigrationRecords() {
+function *getMigrationRecords() {
   const records = yield Migration.run();
   return records.map(_.property('name'));
 }
 
-exports.releaseMutex = function * () {
+exports.releaseMutex = function *() {
   yield thinky.dbReady();
   const mutex = yield Migration.filter({ name: 'migrations_running_mutex' }).run();
   if (mutex.length === 0) throw new Error('Mutex not found');
   return yield mutex[0].delete();
 };
 
-exports.queryMutex = function * () {
+exports.queryMutex = function *() {
   yield thinky.dbReady();
   return yield Migration.filter({ name: 'migrations_running_mutex' }).run();
 };
 
-exports.list = function * () {
+exports.list = function *() {
   yield thinky.dbReady();
   const migrationsApplied = yield getMigrationRecords;
   return migrationFiles.sort().map(file =>
@@ -56,7 +57,7 @@ exports.list = function * () {
   );
 };
 
-exports.up = function * () {
+exports.up = function *() {
   if (migrationFiles.length < 1) throw new Error('No migration files found');
 
   yield thinky.dbReady();
@@ -77,7 +78,7 @@ exports.up = function * () {
   yield exports.releaseMutex;
 };
 
-exports.down = function * (backstopName) {
+exports.down = function *(backstopName) {
   if (migrationFiles.length < 1) throw new Error('No migration files found');
 
   yield thinky.dbReady();
@@ -99,7 +100,7 @@ exports.down = function * (backstopName) {
     name: file
   }));
 
-  yield applyMigration(toRollback, function * (name) {
+  yield applyMigration(toRollback, function *(name) {
     log.info('migrated down', name);
     const migrations = yield Migration.filter({ name }).run();
     return yield migrations[0].delete();
