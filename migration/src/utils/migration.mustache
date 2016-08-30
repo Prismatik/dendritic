@@ -31,6 +31,7 @@ describe('{{migrationName}}', () => {
 `;
 
 exports.create = name => {
+  /* eslint no-console: 'off' */
   const now = new Date().toISOString();
   const migrationName = `${now}_${name}`;
   const root = path.resolve(__dirname, '../..');

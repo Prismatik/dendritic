@@ -2,7 +2,10 @@ const { app } = require('../helper');
 const {{pascalCase}} = require('../../src/models/{{snakeCase}}');
 const {{camelCasePlural}} = require('../../src/controllers/{{snakeCasePlural}}');
 const {{camelCase}}Fixture = require('../fixtures/{{snakeCase}}');
-const IO = require('socket.io-client');
+const io = require('socket.io-client');
+
+const HEX = '[a-fA-F0-9]';
+const UUID_PATTERN = `^${HEX}{8}-${HEX}{4}-${HEX}{4}-${HEX}{4}-${HEX}{12}$`;
 
 describe('/{{kebabCasePlural}} route', () => {
   let {{camelCase}};
@@ -43,19 +46,23 @@ describe('/{{kebabCasePlural}} route', () => {
     it('allows to sort data by fields', function *() {
       const response = yield app.get('/{{kebabCasePlural}}', { orderBy: 'rev' });
       response.status.must.eql(200);
-      sorted(response.body, 'rev').must.eql(sorted([{{camelCase}}1, {{camelCase}}2], 'rev'));
+      sorted(response.body, 'rev').must.eql(
+        sorted([{{camelCase}}1, {{camelCase}}2], 'rev')
+      );
     });
 
     it('allows `limit` data', function *() {
       const response = yield app.get('/{{kebabCasePlural}}', { limit: 1, orderBy: 'rev' });
       response.status.must.eql(200);
-      response.body.must.eql(sorted([{{camelCase}}1, {{camelCase}}2], 'rev').slice(0, 1));
+      response.body.must.eql(sorted(
+        [{{camelCase}}1, {{camelCase}}2], 'rev'
+      ).slice(0, 1));
     });
   });
 
   describe('GET /:id', () => {
     it('returns the record if exists', function *() {
-      const response = yield app.get('/{{kebabCasePlural}}/' + {{camelCase}}.id);
+      {{=<% %>=}}const response = yield app.get(`/<%kebabCasePlural%>/${<%camelCase%>.id}`);<%={{ }}=%>
       response.status.must.eql(200);
       response.body.must.be.object();
       {{#isUser}}
@@ -65,7 +72,7 @@ describe('/{{kebabCasePlural}} route', () => {
     });
 
     it('throws 404 when the record does not exist', function *() {
-      const response = yield app.get(`/{{kebabCasePlural}}/hack`);
+      const response = yield app.get('/{{kebabCasePlural}}/hack');
       response.status.must.eql(404);
       response.body.must.eql({ error: 'not found' });
     });
@@ -116,7 +123,7 @@ describe('/{{kebabCasePlural}} route', () => {
     });
 
     it('replaces an entire document and returns the updated record back', function *() {
-      const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, validData);
+      {{=<% %>=}}const response = yield app.put(`/<%kebabCasePlural%>/${<%camelCase%>.id}`, validData);<%={{ }}=%>
       response.status.must.eql(200);
 
       const expected = Object.assign({ id: {{camelCase}}.id }, validData);{{#isUser}}
@@ -134,17 +141,17 @@ describe('/{{kebabCasePlural}} route', () => {
     });
 
     it('throws 422 if some data is missing', function *() {
-      const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, {});
+      {{=<% %>=}}const response = yield app.put(`/<%kebabCasePlural%>/${<%camelCase%>.id}`, {});<%={{ }}=%>
       response.status.must.eql(422);
       response.body.error.must.contain('is required');
     });
 
     it('throws 422 if the data is malformed', function *() {
       const data = Object.assign({}, validData, { rev: 'hack hack hack' });
-      const response = yield app.put('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
+      {{=<% %>=}}const response = yield app.put(`/<%kebabCasePlural%>/${<%camelCase%>.id}`, data);<%={{ }}=%>
       response.status.must.eql(422);
       response.body.must.eql({
-        error: '`rev` must match pattern "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"'
+        error: `\`rev\` must match pattern "${UUID_PATTERN}"`
       });
     });
   });
@@ -152,7 +159,7 @@ describe('/{{kebabCasePlural}} route', () => {
   describe('PATCH /:id', () => {
     it('updates the data and returns the updated record back', function *() {
       const data = { rev: {{camelCase}}.rev };
-      const response = yield app.patch('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
+      {{=<% %>=}}const response = yield app.patch(`/<%kebabCasePlural%>/${<%camelCase%>.id}`, data);<%={{ }}=%>
       response.status.must.eql(200);
 
       const expected = Object.assign({}, {{camelCase}}, data);{{#isUser}}
@@ -170,16 +177,16 @@ describe('/{{kebabCasePlural}} route', () => {
     });
 
     it('does not explode if not all data was send through', function *() {
-      const response = yield app.patch('/{{kebabCasePlural}}/' + {{camelCase}}.id, {});
+      {{=<% %>=}}const response = yield app.patch(`/<%kebabCasePlural%>/${<%camelCase%>.id}`, {});<%={{ }}=%>
       response.status.must.eql(200);
     });
 
     it('throws 422 if the data is malformed', function *() {
       const data = { rev: 'hack hack hack' };
-      const response = yield app.patch('/{{kebabCasePlural}}/' + {{camelCase}}.id, data);
+      {{=<% %>=}}const response = yield app.patch(`/<%kebabCasePlural%>/${<%camelCase%>.id}`, data);<%={{ }}=%>
       response.status.must.eql(422);
       response.body.must.eql({
-        error: '`rev` must match pattern "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"'
+        error: `\`rev\` must match pattern "${UUID_PATTERN}"`
       });
     });
   });
@@ -197,11 +204,11 @@ describe('/{{kebabCasePlural}} route', () => {
     });
     it('interprets null as a delete', function *() {
       // https://tools.ietf.org/html/rfc7396
-      const existing = yield app.get('/{{kebabCasePlural}}/' + {{camelCase}}ExtraProp.id);
+      {{=<% %>=}}const existing = yield app.get(`/<%kebabCasePlural%>/${<%camelCase%>ExtraProp.id}`);<%={{ }}=%>
       existing.body.extraProp.must.eql(propText);
       existing.body.foo.bar.must.eql(propText);
       const data = { extraProp: null, foo: { bar: null } };
-      const response = yield app.patch('/{{kebabCasePlural}}/' + {{camelCase}}ExtraProp.id, data);
+      {{=<% %>=}}const response = yield app.patch(`/<%kebabCasePlural%>/${<%camelCase%>ExtraProp.id}`, data);<%={{ }}=%>
       response.status.must.eql(200);
 
       const expected = Object.assign({}, {{camelCase}}ExtraProp, data);{{#isUser}}
@@ -218,7 +225,7 @@ describe('/{{kebabCasePlural}} route', () => {
 
   describe('DELETE /:id', () => {
     it('deletes a record if it exists', function *() {
-      const response = yield app.delete('/{{kebabCasePlural}}/' + {{camelCase}}.id);
+      {{=<% %>=}}const response = yield app.delete(`/<%kebabCasePlural%>/${<%camelCase%>.id}`);<%={{ }}=%>
       response.status.must.eql(200);
       const expected = Object.assign({}, {{camelCase}});{{#isUser}}
       delete expected.password;{{/isUser}}
@@ -233,19 +240,19 @@ describe('/{{kebabCasePlural}} route', () => {
   });
 
   describe('socket connection', () => {
-    let io;
+    let client;
     const wait = timeout => new Promise(resolve => setTimeout(resolve, timeout));
     const listenFor = event => new Promise((resolve, reject) => {
-      io.on(event, data => resolve(data));
-      io.on('error', error => reject(error));
+      client.on(event, data => resolve(data));
+      client.on('error', error => reject(error));
     });
 
     beforeEach(function *() {
       yield wait(50); // waiting for the other beforeEach events to pass
-      io = IO(app.urlFor('/{{kebabCasePlural}}'), { forceNew: true });
+      client = io(app.urlFor('/{{kebabCasePlural}}'), { forceNew: true });
     });
 
-    afterEach(() => io.disconnect());
+    afterEach(() => client.disconnect());
 
     it('allows to open up connection and get metadata back', function *() {
       const metadata = yield listenFor('metadata');
@@ -255,7 +262,7 @@ describe('/{{kebabCasePlural}} route', () => {
     it('sends through all existing records and the `all:loaded` event', function *() {
       const records = [];
       const allDone = listenFor('all:loaded');
-      io.on('existed', record => records.push(record));
+      client.on('existed', record => records.push(record));
       const result = yield allDone;
       result.must.eql({});
       sorted(records).must.eql(sorted([{{camelCase}}1, {{camelCase}}2]));

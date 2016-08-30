@@ -37,12 +37,12 @@ describe('utils/model', () => {
       Model.must.equal(thinky.models.things);
     });
 
-    it('should pick up validations correctly', () => {
-      return new Model({}).save().must.reject.with.error(
+    it('should pick up validations correctly', () => (
+      new Model({}).save().must.reject.with.error(
         thinky.Errors.ValidationError,
         '`email` is required, `password` is required'
-      );
-    });
+      )
+    ));
 
     it('should handle malformed data as well', () => {
       const params = { email: 'blah!', password: 'blah!' };

@@ -1,3 +1,4 @@
+/* eslint global-require: 'off' */
 const path = require('path');
 require('app-module-path').addPath(path.join(__dirname, '../..'));
 require('dotenv-safe').load({ sample: './example.env' });
@@ -19,6 +20,7 @@ function *applyMigration(migrations, then) {
 }
 
 function acquireMutex() {
+  /* eslint no-underscore-dangle: 'off' */
   return r.branch(
     Migration.filter({ name: 'migrations_running_mutex' }).count().gt(0)._query,
     r.error('mutex locked'),

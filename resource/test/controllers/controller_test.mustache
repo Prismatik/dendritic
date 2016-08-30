@@ -41,7 +41,9 @@ describe('{{snakeCasePlural}} controller', () => {
     it('returns all the records by default', function *() {
       const result = yield {{camelCasePlural}}.all();
       result.must.be.an(Array);
-      sorted(result).must.eql(sorted([{{camelCase}}1, {{camelCase}}2, {{camelCase}}3]));
+      sorted(result).must.eql(sorted([
+        {{camelCase}}1, {{camelCase}}2, {{camelCase}}3
+      ]));
     });
 
     it('allows to filter the list by a specific field', function *() {
@@ -53,7 +55,9 @@ describe('{{snakeCasePlural}} controller', () => {
     it('ignores totally unsupported params', function *() {
       const filter = { totalMonkey: 123 };
       const result = yield {{camelCasePlural}}.all(filter);
-      sorted(result).must.eql(sorted([{{camelCase}}1, {{camelCase}}2, {{camelCase}}3]));
+      sorted(result).must.eql(sorted([
+        {{camelCase}}1, {{camelCase}}2, {{camelCase}}3
+      ]));
     });
 
     it('allows to order things by a specific field', function *() {
@@ -131,7 +135,9 @@ describe('{{snakeCasePlural}} controller', () => {
     {{#isUser}}
     it('must require `email` and `password`', function *() {
       try {
-        yield {{camelCasePlural}}.create(Object.assign(validData, { email: undefined, password: undefined }));
+        yield {{camelCasePlural}}.create(Object.assign(
+          validData, { email: undefined, password: undefined }
+        ));
         throw new Error('must fail here');
       } catch (e) {
         e.must.be.instanceOf(ValidationError);
