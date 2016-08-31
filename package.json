@@ -13,12 +13,13 @@
     "redbeard": "./index.js"
   },
   "scripts": {
-    "lint": "./node_modules/.bin/eslint .",
+    "lint": "eslint .",
     "test": "REDBEARD_LOG_LEVEL=silent node test",
     "testredbeard": "mocha",
     "watch": "chokidar '.' -c 'npm test' -i '/node_modules|redbeard_tests/' -d 2000",
     "dockertest": "docker-compose run redbeard npm test",
-    "dockerwatch": "docker-compose run redbeard npm run watch"
+    "dockerwatch": "docker-compose run redbeard npm run watch",
+    "precommit": "npm run lint"
   },
   "dependencies": {
     "lodash": "^4.13.1",
@@ -46,6 +47,7 @@
     "express": "^4.13.4",
     "express-jwt": "^3.4.0",
     "express-yields": "^1.0.0",
+    "husky": "^0.11.6",
     "istanbul": "^0.4.1",
     "json-schema-deref-sync": "^0.2.8",
     "json-schema-faker": "^0.3.3",
