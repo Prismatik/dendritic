@@ -15,7 +15,7 @@ services:
       - ./index.js:/opt/app/index.js
       - ./test.js:/opt/app/test.js
       - ./package.json:/opt/app/package.json
-      - ./.jscsrc:/opt/app/.jscsrc
+      - ./.eslintrc.json:/opt/app/.eslintrc.json
     depends_on:
       - rethinkdb
     links:
