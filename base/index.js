@@ -31,7 +31,8 @@ module.exports = (opts) => {
     { p: 'test', n: 'mocha.opts', t: 'mocha', e: 'opts' },
     { p: 'test/routes', n: 'jwt_test' },
     { p: 'test/routes', n: 'schema_test' },
-    { n: '.gitignore', e: '' }
+    { n: '.gitignore', e: '' },
+    { n: '.eslintrc', e: '' }
   ];
 
   scaffold({ basePath: __dirname, files, mustacheOpts: opts });

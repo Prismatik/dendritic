@@ -13,7 +13,8 @@
     "test": "NODE_ENV=test mocha",
     "watch": "NODE_ENV=test mocha --watch",
     "dockertest": "docker-compose run {{kebabCasePlural}} npm test",
-    "dockerwatch": "docker-compose run {{kebabCasePlural}} npm run watch"
+    "dockerwatch": "docker-compose run {{kebabCasePlural}} npm run watch",
+    "lint": "eslint src test config"
   },
   "license": "ISC",
   "dependencies": {
@@ -37,6 +38,8 @@
   "devDependencies": {
     "co-mocha": "^1.1.2",
     "doubleagent": "^1.0.2",
+    "eslint": "^3.4.0",
+    "eslint-config-prismatik": "^2.2.0",
     "mocha": "^2.4.5",
     "must": "^0.13.1",
     "istanbul": "^0.4.1",
