@@ -1,4 +1,7 @@
 const deref = require('json-schema-deref-sync');
 const schemas = require('./schemas');
 
-Object.assign(module.exports, deref(schemas));
+const derefedSchema = deref(schemas);
+delete derefedSchema.definitions;
+
+Object.assign(module.exports, derefedSchema);
