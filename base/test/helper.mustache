@@ -7,11 +7,16 @@ const coMocha = require('co-mocha');
 
 coMocha(mocha);
 
-const { thinky } = require('../config');
+const models = require('../src/models');
 
 process.nextTick(() => {
   before(function *() {
-    yield thinky.dbReady();
+    this.timeout(30000);
+
+    // waiting on all tables to pop up
+    yield Object.keys(models).map(
+      name => models[name].ready()
+    );
   });
 });
 
