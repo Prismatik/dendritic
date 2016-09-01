@@ -1,0 +1,12 @@
+const co = require('co');
+const { User } = require('../src/models');
+
+co(function * () {
+  yield User.delete();
+  yield new User({
+    username: 'admin',
+    password: 'password'
+  }).save();
+
+  console.log("Seed is finished.");
+});
