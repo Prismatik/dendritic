@@ -7,6 +7,7 @@ module.exports = (opts) => {
   // p: source path, n: filename
   // d: destination path, t: target filename, e: target extension
   const files = [
+    { p: 'bin', n: 'server', e: '' },
     { p: 'config', n: 'index' },
     { p: 'config', n: 'thinky' },
     { p: 'config', n: 'schema' },
@@ -18,7 +19,6 @@ module.exports = (opts) => {
     { p: 'src/utils', n: 'module' },
     { p: 'src/utils', n: 'logger' },
     { p: 'src', n: 'app' },
-    { p: 'src', n: 'server' },
     { n: 'package', e: 'json' },
     { p: 'src/routes', n: 'jwt' },
     { p: 'src/routes', n: 'schema' },
@@ -36,6 +36,7 @@ module.exports = (opts) => {
   ];
 
   scaffold({ basePath: __dirname, files, mustacheOpts: opts });
+  fs.chmodSync(`${process.cwd()}/bin/server`, '0744');
 
   const modulesDir = path.join(process.cwd(), 'node_modules');
   if (!fs.existsSync(modulesDir)) mkdirp.sync(modulesDir);
