@@ -1,12 +1,7 @@
-const thinky = require('config/thinky');
+const { thinky } = require('../../config');
 
-const { type } = thinky;
-
-module.exports = thinky.createModel(
-  '_migrations',
-  {
-    hostname: type.string(),
-    name: type.string().required(),
-    d: type.string()
-  }
-);
+module.exports = thinky.createModel('_migrations', {
+  hostname: String,
+  name: String,
+  d: Date
+});

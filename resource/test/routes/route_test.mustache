@@ -192,26 +192,26 @@ describe('/{{kebabCasePlural}} route', () => {
   });
 
   describe('PATCH /:id', () => {
-    let {{camelCase}}ExtraProp;
+    let extraPropRecord;
     const propText = 'oh hi I am an extra prop';
     beforeEach(function *() {
       const data = {{camelCase}}Fixture.valid();
       data.extraProp = propText;
       data.foo = {};
       data.foo.bar = propText;
-      {{camelCase}}ExtraProp = yield {{camelCasePlural}}.create(data);
-      data.rev = {{camelCase}}ExtraProp.rev;
+      extraPropRecord = yield {{camelCasePlural}}.create(data);
+      data.rev = extraPropRecord.rev;
     });
     it('interprets null as a delete', function *() {
       // https://tools.ietf.org/html/rfc7396
-      {{=<% %>=}}const existing = yield app.get(`/<%kebabCasePlural%>/${<%camelCase%>ExtraProp.id}`);<%={{ }}=%>
+      {{=<% %>=}}const existing = yield app.get(`/<%kebabCasePlural%>/${extraPropRecord.id}`);<%={{ }}=%>
       existing.body.extraProp.must.eql(propText);
       existing.body.foo.bar.must.eql(propText);
       const data = { extraProp: null, foo: { bar: null } };
-      {{=<% %>=}}const response = yield app.patch(`/<%kebabCasePlural%>/${<%camelCase%>ExtraProp.id}`, data);<%={{ }}=%>
+      {{=<% %>=}}const response = yield app.patch(`/<%kebabCasePlural%>/${extraPropRecord.id}`, data);<%={{ }}=%>
       response.status.must.eql(200);
 
-      const expected = Object.assign({}, {{camelCase}}ExtraProp, data);{{#isUser}}
+      const expected = Object.assign({}, extraPropRecord, data);{{#isUser}}
       delete expected.password;{{/isUser}}
       delete expected.extraProp;
       delete expected.foo.bar;

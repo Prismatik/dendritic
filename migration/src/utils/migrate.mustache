@@ -1,13 +1,10 @@
 /* eslint global-require: 'off' */
-const path = require('path');
-require('app-module-path').addPath(path.join(__dirname, '../..'));
-require('dotenv-safe').load({ sample: './example.env' });
 const _ = require('lodash');
 const os = require('os');
-const log = require('src/utils/logger');
-const thinky = require('config/thinky');
-const Migration = require('src/models/_migration');
-const migrationFiles = require('migrations').filenames;
+const log = require('./logger');
+const { thinky } = require('../../config');
+const Migration = require('../models/_migration');
+const migrationFiles = require('../../migrations').keys();
 
 const { r } = thinky;
 
@@ -27,7 +24,7 @@ function acquireMutex() {
     Migration.insert({
       hostname: os.hostname(),
       name: 'migrations_running_mutex',
-      d: new Date().toISOString()
+      d: new Date()
     })._query
   ).run();
 }

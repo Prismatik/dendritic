@@ -3,7 +3,7 @@
 require('co')(function *() {
   const migrate = require('../src/utils/migrate');
   const log = require('../src/utils/logger');
-  const { r } = require('../config/thinky');
+  const { thinky: { r } } = require('../config');
 
   const commands = [
     'release_mutex',
