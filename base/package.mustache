@@ -8,10 +8,10 @@
     "npm": "^3.8.6"
   },
   "scripts": {
-    "coverage": "istanbul cover _mocha",
-    "start": "node src/server",
+    "start": "./bin/server",
     "test": "NODE_ENV=test mocha",
     "watch": "NODE_ENV=test mocha --watch",
+    "coverage": "istanbul cover _mocha",
     "dockertest": "docker-compose run {{kebabCasePlural}} npm test",
     "dockerwatch": "docker-compose run {{kebabCasePlural}} npm run watch",
     "lint": "eslint src test config",

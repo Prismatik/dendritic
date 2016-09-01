@@ -1,6 +1,8 @@
-const app = require('./app');
+#!/usr/bin/env node
+
+const app = require('../src/app');
 const server = require('http').createServer(app);
-const log = require('./utils/logger');
+const log = require('../src/utils/logger');
 
 if (app.io) { app.io.listen(server); }
 
