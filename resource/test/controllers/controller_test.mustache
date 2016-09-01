@@ -79,9 +79,9 @@ describe('{{snakeCasePlural}} controller', () => {
     it('allows to limit records', function *() {
       const params = { orderBy: 'rev', limit: 2 };
       const result = yield {{camelCasePlural}}.all(params);
-      result.map(i => Object.assign({}, i)).must.eql(
-        sorted([{{camelCase}}1, {{camelCase}}2, {{camelCase}}3], 'rev').slice(0, 2)
-      );
+      result.map(i => Object.assign({}, i)).must.eql(sorted([
+        {{camelCase}}1, {{camelCase}}2, {{camelCase}}3
+      ], 'rev').slice(0, 2));
     });
   });
 

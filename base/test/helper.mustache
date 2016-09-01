@@ -1,7 +1,4 @@
 require('must');
-require('dotenv-safe').load({ sample: './example.env' });
-require('app-module-path').addPath(require('path').resolve(__dirname, '..'));
-
 const mocha = require('mocha');
 const coMocha = require('co-mocha');
 
