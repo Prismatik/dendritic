@@ -2,7 +2,9 @@ const uuid = require('uuid');
 const model = require('../../src/utils/model');
 const { thinky, schema } = require('../../config');
 
-describe('utils/model', () => {
+describe('utils/model', function () {
+  this.timeout(5000);
+
   describe('.create(modelName)', () => {
     const TEST_JSON_SCHEMA = {
       type: 'object',
