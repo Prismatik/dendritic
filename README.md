@@ -39,7 +39,7 @@ And you'll have a minimal, well thought-out base app scaffold. Next:
 ### Creating Controllers
 
 ```
-redbeard model model_name_singular
+redbeard resource model_name_singular
 ```
 And it will add routes, a controller and database bootstrapping. You'll have
 Create, Read, Update and Delete. You can pass filter params for any property
@@ -59,11 +59,11 @@ As with model names, the related model names must be singular.
 For example:-
 
 ```
-redbeard model product -s product_category,wholesaler
+redbeard resource product -s product_category,wholesaler
 ```
 OR
 ```
-redbeard model product -m purchaser,warehouse_location
+redbeard resource product -m purchaser,warehouse_location
 ```
 
 This will add the necessary properties to your model schema as well as setup
