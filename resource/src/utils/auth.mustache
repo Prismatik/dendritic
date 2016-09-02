@@ -1,15 +1,14 @@
 const jwt = require('jsonwebtoken');
 const password = require('simple-password');
-
-const HASH_ROUNDS = parseInt(process.env.HASH_ROUNDS, 10);
+const { HASH_ROUNDS, JWT_SECRET } = require('../../config');
 
 exports.createToken = function (data, expires) {
-  return jwt.sign(data, process.env.JWT_SECRET, expires);
+  return jwt.sign(data, JWT_SECRET, expires);
 };
 
 exports.verifyToken = function (token, opts = {}) {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, process.env.JWT_SECRET, opts, (err, decoded) => {
+    jwt.verify(token, JWT_SECRET, opts, (err, decoded) => {
       if (err) return reject(err);
       return resolve(decoded);
     });

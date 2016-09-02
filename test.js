@@ -13,7 +13,7 @@ const pluralizableString = () => {
 
   do {
     name = randomString();
-  } while (name === pluralize(name));
+  } while (name === pluralize(name) || name.length > 15);
 
   return name.toLowerCase();
 };
