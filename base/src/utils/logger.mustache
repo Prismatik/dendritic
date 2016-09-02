@@ -1,8 +1,9 @@
 const bunyan = require('bunyan');
+const { LOG_LEVEL } = require('../../config');
 
 const log = bunyan.createLogger({
   name: '{{kebabCase}}',
-  level: process.env.LOG_LEVEL
+  level: LOG_LEVEL
 });
 
 module.exports = log;

@@ -3,10 +3,11 @@
 const app = require('../src/app');
 const server = require('http').createServer(app);
 const log = require('../src/utils/logger');
+const { PORT } = require('../config');
 
 if (app.io) { app.io.listen(server); }
 
-server.listen(process.env.PORT, () => {
+server.listen(PORT, () => {
   const { address, port } = server.address();
   log.info('{{camelCase}} API listening at http://%s:%s', address, port);
 });

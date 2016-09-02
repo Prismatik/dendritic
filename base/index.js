@@ -12,6 +12,7 @@ module.exports = (opts) => {
     { p: 'config', n: 'index' },
     { p: 'config', n: 'thinky' },
     { p: 'config', n: 'schema' },
+    { p: 'config', n: 'env' },
     { p: 'config/schemas', n: 'index' },
     { p: 'config/schemas', n: 'definitions', e: 'json' },
     { n: 'Dockerfile', e: '' },

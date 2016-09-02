@@ -1,7 +1,8 @@
 const jwt = require('express-jwt');
+const { JWT_SECRET } = require('../../config');
 
 const OPTS = {
-  secret: process.env.JWT_SECRET,
+  secret: JWT_SECRET,
   getToken: req => {
     const { authorization } = req.headers;
     const token = authorization && authorization.replace(/^Bearer\s+/, '');

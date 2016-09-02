@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 const { app } = require('../helper');
+const { JWT_SECRET } = require('../../config');
 
-const token = jwt.sign({ hello: 'world' }, process.env.JWT_SECRET);
+const token = jwt.sign({ hello: 'world' }, JWT_SECRET);
 const url = `/jwt/verify`;
 
 describe('JWT authentication handling', () => {
