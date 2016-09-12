@@ -4,7 +4,7 @@
 Dendritic is a scaffolder and _light_ framework for HTTP APIs. It will give you
 the bones of an API using JSON Schema, Express and RethinkDB.
 
-Dendritic is designed to work in the Pirate stack, hence the name: Dendritic The Pirate.
+Dendritic is designed to work in the Pirate stack.
 
 If you're unfamiliar, the Pirate stack is made up of:
 
