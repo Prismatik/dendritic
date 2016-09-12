@@ -1,10 +1,10 @@
-# Redbeard
-[![Build Status](https://travis-ci.org/Prismatik/redbeard.svg)](https://travis-ci.org/Prismatik/redbeard)
+# Dendritic
+[![Build Status](https://travis-ci.org/Prismatik/dendritic.svg)](https://travis-ci.org/Prismatik/dendritic)
 
-Redbeard is a scaffolder and _light_ framework for HTTP APIs. It will give you
+Dendritic is a scaffolder and _light_ framework for HTTP APIs. It will give you
 the bones of an API using JSON Schema, Express and RethinkDB.
 
-Redbeard is designed to work in the Pirate stack, hence the name: Redbeard The Pirate.
+Dendritic is designed to work in the Pirate stack, hence the name: Dendritic The Pirate.
 
 If you're unfamiliar, the Pirate stack is made up of:
 
@@ -27,9 +27,9 @@ If you're unfamiliar, the Pirate stack is made up of:
 ### Getting started
 
 ```
-npm install -g redbeard
+npm install -g dendritic
 mkdir my_new_project && cd my_new_project
-redbeard base project_name_singular
+dendritic base project_name_singular
 ```
 
 And you'll have a minimal, well thought-out base app scaffold. Next:
@@ -39,7 +39,7 @@ And you'll have a minimal, well thought-out base app scaffold. Next:
 ### Creating Controllers
 
 ```
-redbeard resource model_name_singular
+dendritic resource model_name_singular
 ```
 And it will add routes, a controller and database bootstrapping. You'll have
 Create, Read, Update and Delete. You can pass filter params for any property
@@ -59,11 +59,11 @@ As with model names, the related model names must be singular.
 For example:-
 
 ```
-redbeard resource product -s product_category,wholesaler
+dendritic resource product -s product_category,wholesaler
 ```
 OR
 ```
-redbeard resource product -m purchaser,warehouse_location
+dendritic resource product -m purchaser,warehouse_location
 ```
 
 This will add the necessary properties to your model schema as well as setup
@@ -72,14 +72,14 @@ request).
 
 Note: You can also use this switch when creating users since users are
 effectively just a special type of controller / schema i.e.
-`redbeard user -s drivers_license -m motor_vehicle`
+`dendritic user -s drivers_license -m motor_vehicle`
 
 - - -
 
 ### Creating Users
 
 ```
-redbeard user model_name_singular
+dendritic user model_name_singular
 ```
 
 This will create a controller (as above) but with additions to cater for a
@@ -95,11 +95,11 @@ name will default to user, but an alternative can be provided i.e. `admin`.
 
 ### Migrations
 
-Redbeard can provide a framework for running migrations against the rethinkdb database.
+Dendritic can provide a framework for running migrations against the rethinkdb database.
 To scaffold the migration framework run...
 
 ```
-redbeard migration
+dendritic migration
 ```
 
 You can then use the following commands...
@@ -118,7 +118,7 @@ This will generate a migration file and a migration test file. The migration fil
 migrate up
 ```
 
-This will run all migrations (execute the `up` function) that have not yet been run i.e. files in the `/migrations` folder. Redbeard tracks which migrations have already been run in the `_migrations` table in rethinkdb.
+This will run all migrations (execute the `up` function) that have not yet been run i.e. files in the `/migrations` folder. Dendritic tracks which migrations have already been run in the `_migrations` table in rethinkdb.
 
 #### Rollback migrations
 
@@ -156,8 +156,8 @@ This will release any lock that exists on the migrations table, necessary when a
 
 ## Notes
 
-* Project names and model names should be singular and not plural. e.g. `redbeard model motor_vehicle`. This will be automatically pluralized as needed.
-* Where your project name and/or model name contains more than one word, i.e. product categories, this must be input in snake case (underscore separators between words) e.g. `redbeard model product_category`. This will be automatically be converted to camelCase as needed.
+* Project names and model names should be singular and not plural. e.g. `dendritic model motor_vehicle`. This will be automatically pluralized as needed.
+* Where your project name and/or model name contains more than one word, i.e. product categories, this must be input in snake case (underscore separators between words) e.g. `dendritic model product_category`. This will be automatically be converted to camelCase as needed.
 * There is a default .env file at example.env. You may `cp example.env .env`
 when developing locally, but you should never commit this to source control.
 The risk is that it doesn't get overridden in production and testing

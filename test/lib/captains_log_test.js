@@ -4,8 +4,8 @@ const mkdirp = require('mkdirp');
 const captainsLog = require('../../lib/captains_log');
 
 const root = process.cwd();
-const outputPath = `${root}/redbeard_tests/`;
-const logPath = `${root}/redbeard_tests/captains_log`;
+const outputPath = `${root}/dendritic_tests/`;
+const logPath = `${root}/dendritic_tests/captains_log`;
 
 describe('lib/captainsLog', () => {
   let origwd = '';
@@ -23,13 +23,13 @@ describe('lib/captainsLog', () => {
 
   it('must create captains_log', () => {
     fs.existsSync(logPath).must.be.false();
-    captainsLog(['node', 'redbeard', 'what', 'up']);
+    captainsLog(['node', 'dendritic', 'what', 'up']);
     fs.existsSync(logPath).must.be.true();
   });
 
   it('must add the correct line to the log', () => {
     fs.existsSync(logPath).must.be.false();
-    captainsLog(['node', 'redbeard', 'what', 'up', '-w', 'somearg']);
-    fs.readFileSync(logPath).toString().must.equal('redbeard what up -w somearg\n');
+    captainsLog(['node', 'dendritic', 'what', 'up', '-w', 'somearg']);
+    fs.readFileSync(logPath).toString().must.equal('dendritic what up -w somearg\n');
   });
 });

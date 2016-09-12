@@ -1,9 +1,9 @@
 version: '2'
 services:
-  redbeard:
+  dendritic:
     build: .
     environment:
-      RETHINKDB_URL: rethinkdb://rethinkdb:28015/redbeard
+      RETHINKDB_URL: rethinkdb://rethinkdb:28015/dendritic
       SHELL: /bin/sh
       LOG_LEVEL: fatal
       HASH_ROUNDS: 1

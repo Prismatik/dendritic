@@ -1,14 +1,14 @@
 {
-  "name": "redbeard_test",
+  "name": "dendritic_test",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "coverage": "JWT_SECRET=foo RETHINKDB_URL=rethinkdb://localhost:28015/redbeard PORT=3001  istanbul cover _mocha",
+    "coverage": "JWT_SECRET=foo RETHINKDB_URL=rethinkdb://localhost:28015/dendritic PORT=3001  istanbul cover _mocha",
     "migrate": "node ./bin/migrate.js",
     "migration": "node ./bin/migration.js",
     "start": "node start",
-    "test": "JWT_SECRET=foo RETHINKDB_URL=rethinkdb://localhost:28015/redbeard PORT=3001 mocha"
+    "test": "JWT_SECRET=foo RETHINKDB_URL=rethinkdb://localhost:28015/dendritic PORT=3001 mocha"
   },
   "license": "ISC",
   "dependencies": {
