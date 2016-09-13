@@ -1,5 +1,5 @@
 {
-  "name": "redbeard",
+  "name": "dendritic",
   "version": "2.0.0",
   "description": "",
   "main": "index.js",
@@ -7,18 +7,18 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Prismatik/redbeard.git"
+    "url": "https://github.com/Prismatik/dendritic.git"
   },
   "bin": {
-    "redbeard": "./index.js"
+    "dendritic": "./index.js"
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "REDBEARD_LOG_LEVEL=silent node test",
-    "testredbeard": "mocha",
-    "watch": "chokidar '.' -c 'npm test' -i '/node_modules|redbeard_tests/' -d 2000",
-    "dockertest": "docker-compose run redbeard npm test",
-    "dockerwatch": "docker-compose run redbeard npm run watch",
+    "test": "DENDRITIC_LOG_LEVEL=silent node test",
+    "testdendritic": "mocha",
+    "watch": "chokidar '.' -c 'npm test' -i '/node_modules|dendritic_tests/' -d 2000",
+    "dockertest": "docker-compose run dendritic npm test",
+    "dockerwatch": "docker-compose run dendritic npm run watch",
     "precommit": "npm run lint"
   },
   "dependencies": {

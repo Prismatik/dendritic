@@ -4,8 +4,8 @@ const scaffold = require('../../lib/scaffold');
 
 const root = process.cwd();
 const sourcePath = `${root}/test/files/lib`;
-const outputFolder = '/redbeard_tests/redbeard';
-const outputPath = `${root}/redbeard_tests/redbeard`;
+const outputFolder = '/dendritic_tests/dendritic';
+const outputPath = `${root}/dendritic_tests/dendritic`;
 
 describe('lib/scaffold', () => {
   afterEach(() => {

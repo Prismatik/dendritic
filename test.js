@@ -20,9 +20,9 @@ const pluralizableString = () => {
 
 let dir;
 if (process.env.SLOW_TEST) {
-  dir = path.join(os.tmpdir(), 'redbeard_tests', randomString());
+  dir = path.join(os.tmpdir(), 'dendritic_tests', randomString());
 } else {
-  dir = path.join(__dirname, 'redbeard_tests', randomString());
+  dir = path.join(__dirname, 'dendritic_tests', randomString());
 }
 
 mkdirp.sync(dir);
@@ -30,7 +30,7 @@ mkdirp.sync(dir);
 const opts = { cwd: dir, stdio: 'inherit' };
 const index = path.join(__dirname, 'index.js');
 
-const appName = `redbeard_tests_${randomString()}`;
+const appName = `dendritic_tests_${randomString()}`;
 const modelName1 = pluralizableString();
 const modelName2 = pluralizableString();
 const userName = `${pluralizableString()}_user`;
@@ -43,8 +43,8 @@ exec(['node', index, 'migration'].join(' '), opts); // eslint only
 if (process.env.SLOW_TEST) exec(['npm', 'install'].join(' '), opts);
 exec(['cp', 'example.env', '.env'].join(' '), opts);
 exec(['npm', 'test'].join(' '), opts);
-exec(['npm', 'run', 'testredbeard'].join(' '), _.omit(opts, 'cwd'));
-exec(['./node_modules/.bin/eslint', './redbeard_tests/'].join(' '), _.omit(opts, 'cwd'));
+exec(['npm', 'run', 'testdendritic'].join(' '), _.omit(opts, 'cwd'));
+exec(['./node_modules/.bin/eslint', './dendritic_tests/'].join(' '), _.omit(opts, 'cwd'));
 exec(['npm', 'run', 'lint'].join(' '), _.omit(opts, 'cwd'));
 
 rimraf.sync(dir);
