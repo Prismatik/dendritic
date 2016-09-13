@@ -1,6 +1,5 @@
-const { createRouter } = require('../utils/router');
+const { createRouter, objToRouter } = require('../utils/router');
 const {{camelCasePlural}} = require('../controllers/{{snakeCasePlural}}');
-const { Router } = require('express');
 
 const serialize = {{camelCase}} => {
   const data = Object.assign({}, {{camelCase}});
@@ -11,8 +10,6 @@ const serialize = {{camelCase}} => {
 };
 
 const routerTemplate = createRouter({{camelCasePlural}}, serialize);
-
-const router = new Router();
 
 {{#isUser}}
 routerTemplate.post['/signin'] = function *(req, res) {
@@ -25,14 +22,6 @@ routerTemplate.post['/signout'] = function *(req, res) {
 };
 {{/isUser}}
 
-Object.keys(routerTemplate).forEach(method => {
-  if (method === 'socket') return;
-  Object.keys(routerTemplate[method]).forEach(route => {
-    const handler = routerTemplate[method][route];
-    router[method](route, handler);
-  });
-});
-
-router.socket = routerTemplate.socket;
+const router = objToRouter(routerTemplate);
 
 module.exports = router;

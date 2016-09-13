@@ -1,4 +1,5 @@
 const { nullToUndefined } = require('./helpers');
+const { Router } = require('express');
 
 const defaultSerializer = record => Object.assign({}, record);
 
@@ -51,6 +52,22 @@ exports.createRouter = (controller, serialize = defaultSerializer) => {
       return feed;
     }
   };
+
+  return router;
+};
+
+exports.objToRouter = (routerTemplate) => {
+  const router = new Router();
+
+  Object.keys(routerTemplate).forEach(method => {
+    if (method === 'socket') return;
+    Object.keys(routerTemplate[method]).forEach(route => {
+      const handler = routerTemplate[method][route];
+      router[method](route, handler);
+    });
+  });
+
+  router.socket = routerTemplate.socket;
 
   return router;
 };
