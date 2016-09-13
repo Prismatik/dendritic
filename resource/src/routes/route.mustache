@@ -1,5 +1,6 @@
 const { createRouter } = require('../utils/router');
 const {{camelCasePlural}} = require('../controllers/{{snakeCasePlural}}');
+const { Router } = require('express');
 
 const serialize = {{camelCase}} => {
   const data = Object.assign({}, {{camelCase}});
@@ -9,13 +10,29 @@ const serialize = {{camelCase}} => {
   return data;
 };
 
-module.exports = createRouter({{camelCasePlural}}, serialize){{^isUser}};{{/isUser}}
-  {{#isUser}}
-  .post('/signin', function *(req, res) {
-    const { user, token } = yield {{camelCasePlural}}.signin(req.body.email, req.body.password);
-    res.json({ token, user: serialize(user) });
-  })
-  .post('/signout', function *(req, res) {
-    res.json(yield {{camelCasePlural}}.signout(req.body));
+const routerTemplate = createRouter({{camelCasePlural}}, serialize);
+
+const router = new Router();
+
+{{#isUser}}
+routerTemplate.post['/signin'] = function *(req, res) {
+  const { user, token } = yield {{camelCasePlural}}.signin(req.body.email, req.body.password);
+  res.json({ token, user: serialize(user) });
+};
+
+routerTemplate.post['/signout'] = function *(req, res) {
+  res.json(yield {{camelCasePlural}}.signout(req.body));
+};
+{{/isUser}}
+
+Object.keys(routerTemplate).forEach(method => {
+  if (method === 'socket') return;
+  Object.keys(routerTemplate[method]).forEach(route => {
+    const handler = routerTemplate[method][route];
+    router[method](route, handler);
   });
-  {{/isUser}}
+});
+
+router.socket = routerTemplate.socket;
+
+module.exports = router;
