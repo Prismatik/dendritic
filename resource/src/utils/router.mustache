@@ -1,10 +1,11 @@
 const { nullToUndefined } = require('./helpers');
 const { Router } = require('express');
+const { merge } = require('lodash');
 
 const defaultSerializer = record => Object.assign({}, record);
 
-exports.createRouter = (controller, serialize = defaultSerializer) => {
-  const router = {
+exports.createRouter = (controller, serialize = defaultSerializer, template = {}) => {
+  const router = merge({
     get: {
       '': function *(req, res) {
         const list = yield controller.all(req.query);
@@ -51,18 +52,19 @@ exports.createRouter = (controller, serialize = defaultSerializer) => {
 
       return feed;
     }
-  };
+  }, template);
 
-  return router;
+  return objToRouter(router);
 };
 
-exports.objToRouter = (routerTemplate) => {
+function objToRouter(routerTemplate) {
   const router = new Router();
 
   Object.keys(routerTemplate).forEach(method => {
     if (method === 'socket') return;
     Object.keys(routerTemplate[method]).forEach(route => {
       const handler = routerTemplate[method][route];
+      if (!handler) return;
       router[method](route, handler);
     });
   });
@@ -70,4 +72,4 @@ exports.objToRouter = (routerTemplate) => {
   router.socket = routerTemplate.socket;
 
   return router;
-};
+}

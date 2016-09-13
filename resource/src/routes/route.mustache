@@ -1,4 +1,4 @@
-const { createRouter, objToRouter } = require('../utils/router');
+const { createRouter } = require('../utils/router');
 const {{camelCasePlural}} = require('../controllers/{{snakeCasePlural}}');
 
 const serialize = {{camelCase}} => {
@@ -9,19 +9,18 @@ const serialize = {{camelCase}} => {
   return data;
 };
 
-const routerTemplate = createRouter({{camelCasePlural}}, serialize);
-
 {{#isUser}}
-routerTemplate.post['/signin'] = function *(req, res) {
-  const { user, token } = yield {{camelCasePlural}}.signin(req.body.email, req.body.password);
-  res.json({ token, user: serialize(user) });
-};
-
-routerTemplate.post['/signout'] = function *(req, res) {
-  res.json(yield {{camelCasePlural}}.signout(req.body));
+const template = {
+  post: {
+    '/signin': function *(req, res) {
+      const { user, token } = yield {{camelCasePlural}}.signin(req.body.email, req.body.password);
+      res.json({ token, user: serialize(user) });
+    },
+    '/signout': function *(req, res) {
+      res.json(yield {{camelCasePlural}}.signout(req.body));
+    }
+  }
 };
 {{/isUser}}
 
-const router = objToRouter(routerTemplate);
-
-module.exports = router;
+module.exports = createRouter({{camelCasePlural}}, serialize{{#isUser}}, template{{/isUser}});
