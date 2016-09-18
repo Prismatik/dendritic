@@ -8,7 +8,7 @@ before_install:
 - sudo /etc/init.d/rethinkdb restart
 language: node_js
 node_js:
-- '6'
+- '6.5'
 env:
 - SLOW_TEST=true CXX=g++-4.8
 addons:

@@ -1,10 +1,12 @@
-const { Router } = require('express');
 const { nullToUndefined } = require('./helpers');
+const { Router } = require('express');
 
 const defaultSerializer = record => Object.assign({}, record);
 
 exports.createRouter = (controller, serialize = defaultSerializer) => {
-  const router = new Router()
+  const router = new Router();
+
+  router
     .get('', function *(req, res) {
       const list = yield controller.all(req.query);
       res.json(list.map(serialize));
